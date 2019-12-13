@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="ncc:jar">
+    <output-path>$PROJECT_DIR$/web</output-path>
+    <root id="archive" name="ncc.jar">
+      <element id="module-output" name="ncc" />
+      <element id="module-output" name="jgraphx-4.0.6" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../cheerpj/cheerpj_1.4/cheerpj-dom.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/minimal-json-0.9.5.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

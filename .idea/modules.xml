@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/jgraphx-4.0.6/jgraphx-4.0.6.iml" filepath="$PROJECT_DIR$/jgraphx-4.0.6/jgraphx-4.0.6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jgraphx-examples/jgraphx-examples.iml" filepath="$PROJECT_DIR$/jgraphx-examples/jgraphx-examples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncc/ncc.iml" filepath="$PROJECT_DIR$/ncc/ncc.iml" />
+    </modules>
+  </component>
+</project>
