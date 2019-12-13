@@ -1,0 +1,9 @@
+body {
+    /* background-color: #eae6d1; */
+    font-family: sans-serif;
+}
+
+.nccRed { color: #d66; }
+.nccBlue { color: #66d; }
+.nccDarkViolet { color: #969; }
+.nccLightViolet { color: #f8e8f8; }
