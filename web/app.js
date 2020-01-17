@@ -9,8 +9,8 @@ var theHBPResponse = null;
 function getHBPResponse() { return theHBPResponse; }
 
 function postHBPRequest(targetURL, jsonPayload) {
-   console.log('targetURL', targetURL);
-   console.log('jsonPayload', jsonPayload);
+   // console.log('targetURL', targetURL);
+   // console.log('jsonPayload', jsonPayload);
    var xhr = new XMLHttpRequest();
    xhr.open('POST', targetURL, true);
    xhr.setRequestHeader("Authorization", "Bearer " + getHBPToken());

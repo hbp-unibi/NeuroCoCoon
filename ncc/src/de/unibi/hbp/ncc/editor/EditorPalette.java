@@ -85,33 +85,25 @@ public class EditorPalette extends JPanel
 			 * (non-Javadoc)
 			 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 			 */
-			public void mouseClicked(MouseEvent e)
-			{
-			}
+			public void mouseClicked(MouseEvent e) { }
 
 			/*
 			 * (non-Javadoc)
 			 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
 			 */
-			public void mouseEntered(MouseEvent e)
-			{
-			}
+			public void mouseEntered(MouseEvent e) { }
 
 			/*
 			 * (non-Javadoc)
 			 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
 			 */
-			public void mouseExited(MouseEvent e)
-			{
-			}
+			public void mouseExited(MouseEvent e) { }
 
 			/*
 			 * (non-Javadoc)
 			 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 			 */
-			public void mouseReleased(MouseEvent e)
-			{
-			}
+			public void mouseReleased(MouseEvent e) { }
 
 		});
 
@@ -161,8 +153,7 @@ public class EditorPalette extends JPanel
 
 			Graphics2D g2 = (Graphics2D) g;
 
-			g2.setPaint(new GradientPaint(0, 0, getBackground(), getWidth(), 0,
-					gradientColor));
+			g2.setPaint(new GradientPaint(0, 0, getBackground(), getWidth(), 0, gradientColor));
 			g2.fill(rect);
 		}
 	}

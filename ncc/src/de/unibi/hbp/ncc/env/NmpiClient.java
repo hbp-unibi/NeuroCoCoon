@@ -30,7 +30,7 @@ public class NmpiClient {
    private static final String JOB_SERVICE = JOB_SERVICE_ROOT + "/api/v2/";
 
    public enum Platform {
-      BRAINSCALES("BrainScaleS"), SPINNAKER("SpiNNaker");
+      BRAINSCALES("BrainScaleS"), SPIKEY("Spikey"), SPINNAKER("SpiNNaker");
 
       private String name;
 
@@ -62,12 +62,17 @@ public class NmpiClient {
    public static class Response {
       private JsonValue jsonValue;
       private String errorText;
+      private int statusCode;
       private Throwable errorCause;
       private String locationHeader;
 
-      Response () { }  // ok response without any value
-
       Response (JsonValue jsonValue) { this.jsonValue = jsonValue; }
+
+      Response (int statusCode) {
+         this.statusCode = statusCode;
+         if (statusCode < 200 || statusCode > 299)
+            this.errorText = "Status " + statusCode;
+      }
 
       Response (String errorText) { this.errorText = errorText != null ? errorText : "Error <null>"; }
 
@@ -81,6 +86,8 @@ public class NmpiClient {
       public boolean isSuccess () { return errorText == null && errorCause == null; }
       public boolean isError () { return errorText != null || errorCause != null; }
       public boolean hasLocation () { return locationHeader != null; }
+
+      public int getStatusCode () { return statusCode; }
 
       public String getLocation () { return locationHeader; }
 
@@ -124,8 +131,9 @@ public class NmpiClient {
          conn.setRequestMethod("GET");
          conn.setRequestProperty("Accept", "application/json");
          conn.setRequestProperty("Authorization", "Bearer " + getAuthToken());
-         if (conn.getResponseCode() != 200)
-            return new Response("Failed: HTTP Error code " + conn.getResponseCode());
+         int statusCode = conn.getResponseCode();
+         if (statusCode != 200)
+            return new Response(statusCode);
          try (InputStreamReader in = new InputStreamReader(conn.getInputStream())) {
             Response result = new Response(Json.parse(in));
             if (DO_DISCONNECT) conn.disconnect();
@@ -168,21 +176,20 @@ public class NmpiClient {
             return new Response(locationHeader, true);
             // return new Response(conn.getHeaderField("Location"), true);
          }
-         else if (status <= 299)
-            return new Response("Succeeded: HTTP Status code " + status);
          else {
-            StringBuilder errorText = new StringBuilder("Failed: HTTP Error code ").append(status);
             InputStream errorStream = conn.getErrorStream();
             if (errorStream != null) {
-               errorText.append('\n');
                try (BufferedReader err = new BufferedReader(new InputStreamReader(errorStream))) {
+                  StringBuilder errorText = new StringBuilder();
                   String line;
                   while ((line = err.readLine()) != null)
                      errorText.append(line).append('\n');
                   // if (DO_DISCONNECT) conn.disconnect();  // never in this error case
+                  return new Response(errorText.toString());
                }
             }
-            return new Response(errorText.toString());
+            else
+               return new Response(status);
          }
       }
       catch (Exception excp) {
@@ -328,8 +335,6 @@ public class NmpiClient {
       // String jobURL = postRequest(getResourceEndPoint("queue"), jobData).getLocation();
       // our Java-based postRequest method submits the very same job multiple (4?) times for some reason
       String jobURL = JavaScriptBridge.postRequest(getResourceEndPoint("queue"), jobData);
-      if (jobURL == null)
-         return -1;
       if (jobURL.startsWith("Status 2")) {
          // request succeeded, but CORS prevented us from reading the location response header
          List<Long> jobIds = getJobIds(false);
@@ -337,7 +342,7 @@ public class NmpiClient {
             jobIds = getJobIds(true);
          int count = jobIds.size();
          if (count > 0)
-            return jobIds.get(count - 1);
+            return jobIds.get(count - 1);  // or better get the maximum value?
          else
             return -2;
       }
@@ -354,6 +359,21 @@ public class NmpiClient {
       else
          return -1;
        */
-   // TODO implement waiting
+   }
+
+   public JsonObject getJobInfo (long jobId) {
+      Response result = getRequest(getResourceEndPoint("queue") + "/" + jobId);
+      if (result.isError() && result.getStatusCode() == 404)
+         result = getRequest(getResourceEndPoint("results") + "/" + jobId);
+      if (result.isError())
+         throw new RuntimeException("No such job: " + jobId);
+      JsonObject jobInfo = result.getJsonValue().asObject();
+      if (jobInfo.getLong("id", -1) != jobId)
+         throw new IllegalStateException("unexpected job info for id " + jobInfo.get("id"));
+      return jobInfo;
+   }
+
+   public String getJobStatus (long jobId) {
+      return getJobInfo(jobId).getString("status", "unknown");
    }
 }

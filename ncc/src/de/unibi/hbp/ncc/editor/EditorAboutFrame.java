@@ -2,6 +2,7 @@ package de.unibi.hbp.ncc.editor;
 
 import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
+import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -79,7 +80,7 @@ public class EditorAboutFrame extends JDialog
 
 		// Adds optional subtitle
 		JLabel subtitleLabel = new JLabel(
-				"For more information visit http://www.mxgraph.com/");
+				"For more information visit http://www.humanbrainproject.eu/");
 		subtitleLabel.setBorder(BorderFactory.createEmptyBorder(4, 18, 0, 0));
 		subtitleLabel.setOpaque(false);
 		panel.add(subtitleLabel, BorderLayout.CENTER);
@@ -90,9 +91,13 @@ public class EditorAboutFrame extends JDialog
 		content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 		content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-		content.add(new JLabel("JGraph X - The Swing Portion of mxGraph"));
+		content.add(new JLabel("NeuroCoCoon - Neuromorphic Computing Cocoon"));
 		content.add(new JLabel(" "));
+		content.add(new JLabel("Contributed by Universität Bielefeld, Germany"));
+		content.add(new JLabel("Version " + NeuroCoCoonEditor.VERSION));
 
+		content.add(new JLabel(" "));
+		content.add(new JLabel("Based on:"));
 		content.add(new JLabel("mxGraph Version " + mxGraph.VERSION));
 		content.add(new JLabel("Copyright (C) 2009 by JGraph Ltd."));
 		content.add(new JLabel("All rights reserved."));

@@ -6,6 +6,7 @@
       <element id="module-output" name="jgraphx-4.0.6" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../../cheerpj/cheerpj_1.4/cheerpj-dom.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/minimal-json-0.9.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/StringTemplate4/ST-4.2.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

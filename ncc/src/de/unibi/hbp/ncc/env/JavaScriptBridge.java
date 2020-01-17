@@ -27,6 +27,8 @@ public class JavaScriptBridge {
 
    public static void invalidateCache () { cachedToken = cachedContext = null; }
 
+   // POST requests via standard Java code trigger multiple job submissions per call?!
+   // delegating the actual POST request to a global JavaScript function avoids this
    public static String postRequest (String endPoint, JsonValue payload) {
       Global.jsCall("postHBPRequest", Global.JSString(endPoint), Global.JSString(payload.toString()));
       try {
@@ -34,11 +36,11 @@ public class JavaScriptBridge {
             JSString result = Global.jsCallS("getHBPResponse");
             if (result != null)
                return Global.JavaString(result);
-            Thread.sleep(250);
+            Thread.sleep(500);  // was 250
          }
       }
       catch (InterruptedException ie) {
-         return null;
+         return "Status 999";  // fake a real response similar to a HTTP status code
       }
    }
 }

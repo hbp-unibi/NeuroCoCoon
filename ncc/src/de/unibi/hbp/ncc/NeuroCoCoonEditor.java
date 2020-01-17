@@ -26,6 +26,7 @@ import de.unibi.hbp.ncc.env.JavaScriptBridge;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.Point;
@@ -36,20 +37,15 @@ import java.util.List;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor
 {
+
+	public static final String VERSION = "0.9.0";
+
 	/**
 	 * Holds the shared number formatter.
 	 * 
 	 * @see NumberFormat#getInstance()
 	 */
 	public static final NumberFormat numberFormat = NumberFormat.getInstance();
-
-	/**
-	 * Holds the URL for the icon to be used as a handle for creating new
-	 * connections. This is currently unused.
-	 */
-	public static URL url = null;
-
-	//NeuroCoCoonEditor.class.getResource("images/connector.gif");
 
 	public NeuroCoCoonEditor ()
 	{
@@ -668,6 +664,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		mxConstants.W3C_SHADOWCOLOR = "#D3D3D3";
 
 		NeuroCoCoonEditor editor = new NeuroCoCoonEditor();
-		editor.createFrame(new EditorMenuBar(editor)).setVisible(true);
+		JFrame frame = editor.createFrame(new EditorMenuBar(editor));
+		frame.setSize(1200, 800);
+		frame.setVisible(true);
 	}
 }

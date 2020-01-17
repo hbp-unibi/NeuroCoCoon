@@ -23,6 +23,7 @@ import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 import com.mxgraph.view.mxGraph;
+import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -79,39 +80,13 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
-
-	/**
-	 * 
-	 */
 	protected mxGraphOutline graphOutline;
-
-	/**
-	 * 
-	 */
 	protected JTabbedPane libraryPane;
-
-	/**
-	 * 
-	 */
+	protected EditorToolBar editorToolBar;
 	protected mxUndoManager undoManager;
-
-	/**
-	 * 
-	 */
 	protected String appTitle;
-
-	/**
-	 * 
-	 */
 	protected JLabel statusBar;
-
-	/**
-	 * 
-	 */
 	protected File currentFile;
 
 	/**
@@ -119,25 +94,14 @@ public class BasicGraphEditor extends JPanel
 	 */
 	protected boolean modified = false;
 
-	/**
-	 * 
-	 */
 	protected mxRubberband rubberband;
-
-	/**
-	 * 
-	 */
 	protected mxKeyboardHandler keyboardHandler;
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener undoHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
 		{
-			undoManager.undoableEditHappened((mxUndoableEdit) evt
-					.getProperty("edit"));
+			undoManager.undoableEditHappened((mxUndoableEdit) evt.getProperty("edit"));
 		}
 	};
 
@@ -180,10 +144,8 @@ public class BasicGraphEditor extends JPanel
 		{
 			public void invoke(Object source, mxEventObject evt)
 			{
-				List<mxUndoableChange> changes = ((mxUndoableEdit) evt
-						.getProperty("edit")).getChanges();
-				graph.setSelectionCells(graph
-						.getSelectionCellsForChanges(changes));
+				List<mxUndoableChange> changes = ((mxUndoableEdit) evt.getProperty("edit")).getChanges();
+				graph.setSelectionCells(graph.getSelectionCellsForChanges(changes));
 			}
 		};
 
@@ -198,17 +160,27 @@ public class BasicGraphEditor extends JPanel
 
 		// Creates the inner split pane that contains the library with the
 		// palettes and the graph outline on the left side of the window
-		JSplitPane inner = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-				libraryPane, graphOutline);
+		JSplitPane inner = new JSplitPane(JSplitPane.VERTICAL_SPLIT, libraryPane, graphOutline);
 		inner.setDividerLocation(320);
 		inner.setResizeWeight(1);
 		inner.setDividerSize(6);
 		inner.setBorder(null);
 
+		JTabbedPane inspector = new JTabbedPane();
+		inspector.addTab("Inspector", new DetailsEditor().getComponent());
+		inspector.addTab("Neurons", new JLabel("Not implemented yet"));
+		inspector.addTab("Synapses", new JLabel("Not implemented yet"));
+		inspector.addTab("Plots", new JLabel("Not implemented yet"));
+
+		JSplitPane graphAndInspector = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphComponent, inspector);
+		graphAndInspector.setOneTouchExpandable(true);
+		graphAndInspector.setDividerLocation(600);
+		graphAndInspector.setDividerSize(6);
+		graphAndInspector.setBorder(null);
+
 		// Creates the outer split pane that contains the inner split pane and
 		// the graph component on the right side of the window
-		JSplitPane outer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inner,
-				graphComponent);
+		JSplitPane outer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inner, graphAndInspector);
 		outer.setOneTouchExpandable(true);
 		outer.setDividerLocation(200);
 		outer.setDividerSize(6);
@@ -224,7 +196,7 @@ public class BasicGraphEditor extends JPanel
 		setLayout(new BorderLayout());
 		add(outer, BorderLayout.CENTER);
 		add(statusBar, BorderLayout.SOUTH);
-		installToolBar();
+		editorToolBar = installToolBar();
 
 		// Installs rubberband selection and handling for some special
 		// keystrokes such as F2, Control-C, -V, X, A etc.
@@ -233,29 +205,22 @@ public class BasicGraphEditor extends JPanel
 		updateTitle();
 	}
 
-	/**
-	 * 
-	 */
 	protected mxUndoManager createUndoManager()
 	{
 		return new mxUndoManager();
 	}
 
-	/**
-	 * 
-	 */
 	protected void installHandlers()
 	{
 		rubberband = new mxRubberband(graphComponent);
 		keyboardHandler = new EditorKeyboardHandler(graphComponent);
 	}
 
-	/**
-	 * 
-	 */
-	protected void installToolBar()
+	protected EditorToolBar installToolBar()
 	{
-		add(new EditorToolBar(this, JToolBar.HORIZONTAL), BorderLayout.NORTH);
+		EditorToolBar toolBar = new EditorToolBar(this, JToolBar.HORIZONTAL);
+		add(toolBar, BorderLayout.NORTH);
+		return toolBar;
 	}
 
 	/**
@@ -937,4 +902,5 @@ public class BasicGraphEditor extends JPanel
 		return layout;
 	}
 
+	public EditorToolBar getEditorToolBar () { return editorToolBar; }
 }
