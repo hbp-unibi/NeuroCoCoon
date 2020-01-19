@@ -3,26 +3,25 @@
  */
 package com.mxgraph.layout.hierarchical;
 
+import com.mxgraph.layout.hierarchical.model.mxGraphHierarchyModel;
+import com.mxgraph.layout.hierarchical.stage.mxCoordinateAssignment;
+import com.mxgraph.layout.hierarchical.stage.mxHierarchicalLayoutStage;
+import com.mxgraph.layout.hierarchical.stage.mxMedianHybridCrossingReduction;
+import com.mxgraph.layout.hierarchical.stage.mxMinimumCycleRemover;
+import com.mxgraph.layout.mxGraphLayout;
+import com.mxgraph.model.mxGraphModel;
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphView;
+
+import javax.swing.SwingConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.SwingConstants;
-
-import com.mxgraph.layout.mxGraphLayout;
-import com.mxgraph.layout.hierarchical.model.mxGraphHierarchyModel;
-import com.mxgraph.layout.hierarchical.stage.mxCoordinateAssignment;
-import com.mxgraph.layout.hierarchical.stage.mxHierarchicalLayoutStage;
-import com.mxgraph.layout.hierarchical.stage.mxMedianHybridCrossingReduction;
-import com.mxgraph.layout.hierarchical.stage.mxMinimumCycleRemover;
-import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxGraphView;
 
 /**
  * The top level compound layout of the hierarchical layout. The individual
@@ -681,9 +680,6 @@ JGraphLayout.Stoppable*/
 		this.fineTuning = fineTuning;
 	}
 
-	/**
-	 *
-	 */
 	public boolean isDisableEdgeStyle()
 	{
 		return disableEdgeStyle;

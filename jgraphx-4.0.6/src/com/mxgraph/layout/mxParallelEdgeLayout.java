@@ -1,12 +1,5 @@
 package com.mxgraph.layout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.mxgraph.model.mxCellPath;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
@@ -15,6 +8,13 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class mxParallelEdgeLayout extends mxGraphLayout
 {
@@ -72,9 +72,6 @@ public class mxParallelEdgeLayout extends mxGraphLayout
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected Map<String, List<Object>> findParallels(Object parent)
 	{
 		Map<String, List<Object>> lookup = new Hashtable<String, List<Object>>();
@@ -104,9 +101,6 @@ public class mxParallelEdgeLayout extends mxGraphLayout
 		return lookup;
 	}
 
-	/**
-	 * 
-	 */
 	protected String getEdgeId(Object edge)
 	{
 		mxGraphView view = graph.getView();
@@ -128,9 +122,6 @@ public class mxParallelEdgeLayout extends mxGraphLayout
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	protected void layout(List<Object> parallels)
 	{
 		Object edge = parallels.get(0);
@@ -182,9 +173,6 @@ public class mxParallelEdgeLayout extends mxGraphLayout
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void route(Object edge, double x, double y)
 	{
 		if (graph.isCellMovable(edge))

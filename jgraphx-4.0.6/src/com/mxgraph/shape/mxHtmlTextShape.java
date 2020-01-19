@@ -3,17 +3,16 @@
  */
 package com.mxgraph.shape;
 
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.util.Map;
-
-import javax.swing.CellRendererPane;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxLightweightLabel;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
+
+import javax.swing.CellRendererPane;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.util.Map;
 
 /**
  * To set global CSS for all HTML labels, use the following code:
@@ -57,9 +56,6 @@ public class mxHtmlTextShape implements mxITextShape
 		replaceHtmlLinefeeds = value;
 	}
 
-	/**
-	 * 
-	 */
 	protected String createHtmlDocument(Map<String, Object> style, String text,
 			int w, int h)
 	{
@@ -79,9 +75,6 @@ public class mxHtmlTextShape implements mxITextShape
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, String text,
 			mxCellState state, Map<String, Object> style)
 	{

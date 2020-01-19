@@ -137,9 +137,6 @@ public class mxUndoableEdit
 		changes.add(change);
 	}
 
-	/**
-	 * 
-	 */
 	public void undo()
 	{
 		if (!undone)
@@ -159,9 +156,6 @@ public class mxUndoableEdit
 		dispatch();
 	}
 
-	/**
-	 * 
-	 */
 	public void redo()
 	{
 		if (!redone)

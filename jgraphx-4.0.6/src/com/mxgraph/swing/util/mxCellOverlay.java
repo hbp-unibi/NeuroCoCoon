@@ -1,27 +1,20 @@
 package com.mxgraph.swing.util;
 
-import java.awt.Cursor;
-import java.awt.Graphics;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import java.awt.Cursor;
+import java.awt.Graphics;
+
 public class mxCellOverlay extends JComponent implements mxICellOverlay
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 921991820491141221L;
 
-	/**
-	 * 
-	 */
 	protected ImageIcon imageIcon;
 
 	/**
@@ -45,9 +38,6 @@ public class mxCellOverlay extends JComponent implements mxICellOverlay
 	 */
 	protected double defaultOverlap = 0.5;
 
-	/**
-	 * 
-	 */
 	public mxCellOverlay(ImageIcon icon, String warning)
 	{
 		this.imageIcon = icon;
@@ -87,9 +77,6 @@ public class mxCellOverlay extends JComponent implements mxICellOverlay
 		verticalAlign = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		g.drawImage(imageIcon.getImage(), 0, 0, getWidth(), getHeight(), this);

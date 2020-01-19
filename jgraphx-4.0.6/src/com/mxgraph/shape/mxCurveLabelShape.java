@@ -3,6 +3,15 @@
  */
 package com.mxgraph.shape;
 
+import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxCurve;
+import com.mxgraph.util.mxLine;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -20,15 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import com.mxgraph.canvas.mxGraphics2DCanvas;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxCurve;
-import com.mxgraph.util.mxLine;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
 
 /**
  * Draws the edge label along a curve derived from the curve describing
@@ -120,9 +120,6 @@ public class mxCurveLabelShape implements mxITextShape
 	public static FontRenderContext frc = new FontRenderContext(null, false,
 			false);
 
-	/**
-	 *
-	 */
 	protected boolean rotationEnabled = true;
 
 	public mxCurveLabelShape(mxCellState state, mxCurve value)
@@ -131,25 +128,16 @@ public class mxCurveLabelShape implements mxITextShape
 		this.curve = value;
 	}
 
-	/**
-	 *
-	 */
 	public boolean getRotationEnabled()
 	{
 		return rotationEnabled;
 	}
 
-	/**
-	 *
-	 */
 	public void setRotationEnabled(boolean value)
 	{
 		rotationEnabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, String text,
 			mxCellState state, Map<String, Object> style)
 	{

@@ -3,11 +3,6 @@
  */
 package com.mxgraph.swing.handler;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.util.List;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
@@ -15,6 +10,11 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraphView;
+
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.util.List;
 
 /**
  * @author Administrator
@@ -49,9 +49,6 @@ public class mxElbowEdgeHandler extends mxEdgeHandler
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	protected boolean isFlipEvent(MouseEvent e)
 	{
 		return e.getClickCount() == 2 && index == 1;
@@ -65,9 +62,6 @@ public class mxElbowEdgeHandler extends mxEdgeHandler
 		return index == 3;
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle[] createHandles()
 	{
 		p = createPoints(state);

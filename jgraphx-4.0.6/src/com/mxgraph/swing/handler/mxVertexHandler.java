@@ -3,17 +3,6 @@
  */
 package com.mxgraph.swing.handler;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
@@ -23,15 +12,19 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
-/**
- * 
- */
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.event.MouseEvent;
+
 public class mxVertexHandler extends mxCellHandler
 {
 
-	/**
-	 * 
-	 */
 	public static Cursor[] CURSORS = new Cursor[] {
 			new Cursor(Cursor.NW_RESIZE_CURSOR),
 			new Cursor(Cursor.N_RESIZE_CURSOR),
@@ -62,9 +55,6 @@ public class mxVertexHandler extends mxCellHandler
 		super(graphComponent, state);
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle[] createHandles()
 	{
 		Rectangle[] h = null;
@@ -109,9 +99,6 @@ public class mxVertexHandler extends mxCellHandler
 		return h;
 	}
 
-	/**
-	 * 
-	 */
 	protected JComponent createPreview()
 	{
 		JPanel preview = new JPanel();
@@ -122,9 +109,6 @@ public class mxVertexHandler extends mxCellHandler
 		return preview;
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (!e.isConsumed() && first != null)
@@ -189,9 +173,6 @@ public class mxVertexHandler extends mxCellHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		if (!e.isConsumed() && first != null)
@@ -214,9 +195,6 @@ public class mxVertexHandler extends mxCellHandler
 		super.mouseReleased(e);
 	}
 
-	/**
-	 * 
-	 */
 	protected void moveLabel(MouseEvent e)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -320,9 +298,6 @@ public class mxVertexHandler extends mxCellHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected Cursor getCursor(MouseEvent e, int index)
 	{
 		if (index >= 0 && index <= CURSORS.length)
@@ -386,25 +361,16 @@ public class mxVertexHandler extends mxCellHandler
 		return new mxRectangle(left, top, width, height);
 	}
 
-	/**
-	 * 
-	 */
 	public Color getSelectionColor()
 	{
 		return mxSwingConstants.VERTEX_SELECTION_COLOR;
 	}
 
-	/**
-	 * 
-	 */
 	public Stroke getSelectionStroke()
 	{
 		return mxSwingConstants.VERTEX_SELECTION_STROKE;
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		Rectangle bounds = getState().getRectangle();

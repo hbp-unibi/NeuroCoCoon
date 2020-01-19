@@ -4,16 +4,22 @@
 
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import com.mxgraph.analysis.StructuralException;
+import com.mxgraph.analysis.mxAnalysisGraph;
+import com.mxgraph.analysis.mxGraphGenerator;
+import com.mxgraph.analysis.mxGraphProperties;
+import com.mxgraph.analysis.mxGraphProperties.GraphType;
+import com.mxgraph.analysis.mxGraphStructure;
+import com.mxgraph.analysis.mxTraversal;
+import com.mxgraph.costfunction.mxCostFunction;
+import com.mxgraph.costfunction.mxDoubleValCostFunction;
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.layout.mxOrganicLayout;
+import com.mxgraph.model.mxCell;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraph.mxICellVisitor;
+import com.mxgraph.view.mxGraphView;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,23 +29,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
-import com.mxgraph.analysis.StructuralException;
-import com.mxgraph.analysis.mxAnalysisGraph;
-import com.mxgraph.analysis.mxGraphGenerator;
-import com.mxgraph.analysis.mxTraversal;
-import com.mxgraph.analysis.mxGraphProperties;
-import com.mxgraph.analysis.mxGraphProperties.GraphType;
-import com.mxgraph.analysis.mxGraphStructure;
-import com.mxgraph.layout.mxCircleLayout;
-import com.mxgraph.layout.mxCompactTreeLayout;
-import com.mxgraph.layout.mxOrganicLayout;
-import com.mxgraph.model.mxCell;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxGraph.mxICellVisitor;
-import com.mxgraph.view.mxGraphView;
-import com.mxgraph.costfunction.mxCostFunction;
-import com.mxgraph.costfunction.mxDoubleValCostFunction;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GraphConfigDialog extends JDialog
 {
@@ -1406,9 +1405,6 @@ public class GraphConfigDialog extends JDialog
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void applyValues()
 	{
 		setNumNodes(Integer.parseInt(this.numNodesField.getText()));

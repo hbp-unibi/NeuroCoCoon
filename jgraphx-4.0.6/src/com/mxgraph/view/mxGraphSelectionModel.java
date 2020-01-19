@@ -8,18 +8,18 @@
  */
 package com.mxgraph.view;
 
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
+import com.mxgraph.util.mxUndoableEdit;
+import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource;
-import com.mxgraph.util.mxUndoableEdit;
-import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 
 /**
  * Implements the selection model for a graph.
@@ -228,9 +228,6 @@ public class mxGraphSelectionModel extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void addCells(Object[] cells)
 	{
 		if (cells != null)
@@ -268,9 +265,6 @@ public class mxGraphSelectionModel extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void removeCells(Object[] cells)
 	{
 		if (cells != null)
@@ -289,9 +283,6 @@ public class mxGraphSelectionModel extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void changeSelection(Collection<Object> added,
 			Collection<Object> removed)
 	{
@@ -307,9 +298,6 @@ public class mxGraphSelectionModel extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void cellAdded(Object cell)
 	{
 		if (cell != null)
@@ -318,9 +306,6 @@ public class mxGraphSelectionModel extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void cellRemoved(Object cell)
 	{
 		if (cell != null)
@@ -329,20 +314,11 @@ public class mxGraphSelectionModel extends mxEventSource
 		}
 	}
 
-	/**
-	 *
-	 */
 	public static class mxSelectionChange implements mxUndoableChange
 	{
 
-		/**
-		 * 
-		 */
 		protected mxGraphSelectionModel model;
 
-		/**
-		 * 
-		 */
 		protected Collection<Object> added, removed;
 
 		/**
@@ -360,9 +336,6 @@ public class mxGraphSelectionModel extends mxEventSource
 					: null;
 		}
 
-		/**
-		 * 
-		 */
 		public void execute()
 		{
 			if (removed != null)

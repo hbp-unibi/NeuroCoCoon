@@ -3,6 +3,8 @@
  */
 package com.mxgraph.swing.util;
 
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
@@ -12,9 +14,6 @@ import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 
 public class mxSwingConstants
 {
@@ -170,9 +169,7 @@ public class mxSwingConstants
 	public static Border PREVIEW_BORDER = new LineBorder(
 			mxSwingConstants.HANDLE_BORDERCOLOR)
 	{
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 1348016511717964310L;
 
 		public void paintBorder(Component c, Graphics g, int x, int y,

@@ -1,25 +1,22 @@
 package com.mxgraph.examples.swing;
 
+import com.mxgraph.canvas.mxICanvas;
+import com.mxgraph.canvas.mxImageCanvas;
+import com.mxgraph.swing.handler.mxRubberband;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.view.mxInteractiveCanvas;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+
 import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import com.mxgraph.canvas.mxICanvas;
-import com.mxgraph.canvas.mxImageCanvas;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.handler.mxRubberband;
-import com.mxgraph.swing.view.mxInteractiveCanvas;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
-
 public class CustomCanvas extends JFrame
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -844106998814982739L;
 
 	public CustomCanvas()
@@ -79,9 +76,7 @@ public class CustomCanvas extends JFrame
 
 		mxGraphComponent graphComponent = new mxGraphComponent(graph)
 		{
-			/**
-			 * 
-			 */
+
 			private static final long serialVersionUID = 4683716829748931448L;
 
 			public mxInteractiveCanvas createCanvas()

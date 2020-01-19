@@ -1405,9 +1405,6 @@ public class GraphConfigDialog extends JDialog
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void applyValues()
 	{
 		setNumNodes(Integer.parseInt(this.numNodesField.getText()));

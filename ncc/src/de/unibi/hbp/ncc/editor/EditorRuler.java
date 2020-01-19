@@ -44,9 +44,6 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 		DropTargetListener
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6310912355878668096L;
 
 	/**
@@ -116,9 +113,6 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 	 */
 	protected boolean metric = DEFAULT_ISMETRIC;
 
-	/**
-	 * 
-	 */
 	protected Font labelFont = new Font("Tahoma", Font.PLAIN, 9);
 
 	/**
@@ -146,9 +140,6 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 	 */
 	protected double increment, units;
 
-	/**
-	 * 
-	 */
 	protected transient mxIEventListener repaintHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -263,17 +254,11 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 		this.rulerSize = rulerSize;
 	}
 
-	/**
-	 * 
-	 */
 	public void setTickDistance(int tickDistance)
 	{
 		this.tickDistance = tickDistance;
 	}
 
-	/**
-	 * 
-	 */
 	public int getTickDistance()
 	{
 		return tickDistance;

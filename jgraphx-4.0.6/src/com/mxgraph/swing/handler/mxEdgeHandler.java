@@ -3,6 +3,20 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxSwingConstants;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxConnectionConstraint;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphView;
+
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -16,39 +30,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxSwingConstants;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxConnectionConstraint;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxGraphView;
-
-/**
- *
- */
 public class mxEdgeHandler extends mxCellHandler
 {
-	/**
-	 * 
-	 */
+
 	protected boolean cloneEnabled = true;
 
-	/**
-	 * 
-	 */
 	protected Point[] p;
 
-	/**
-	 * 
-	 */
 	protected transient String error;
 
 	/**
@@ -61,15 +49,9 @@ public class mxEdgeHandler extends mxCellHandler
 	 */
 	protected transient boolean constrainedEvent = false;
 
-	/**
-	 * 
-	 */
 	protected mxCellMarker marker = new mxCellMarker(graphComponent)
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 8826073441093831764L;
 
 		// Only returns edges if they are connectable and never returns
@@ -122,17 +104,11 @@ public class mxEdgeHandler extends mxCellHandler
 		super(graphComponent, state);
 	}
 
-	/**
-	 * 
-	 */
 	public void setCloneEnabled(boolean cloneEnabled)
 	{
 		this.cloneEnabled = cloneEnabled;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isCloneEnabled()
 	{
 		return cloneEnabled;
@@ -146,9 +122,6 @@ public class mxEdgeHandler extends mxCellHandler
 		return !isFlipEvent(e) && super.isIgnoredEvent(e);
 	}
 
-	/**
-	 * 
-	 */
 	protected boolean isFlipEvent(MouseEvent e)
 	{
 		return false;
@@ -189,17 +162,11 @@ public class mxEdgeHandler extends mxCellHandler
 				&& (isSource(index) || isTarget(index) || isCellBendable());
 	}
 
-	/**
-	 * 
-	 */
 	protected boolean isCellBendable()
 	{
 		return graphComponent.getGraph().isCellBendable(state.getCell());
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle[] createHandles()
 	{
 		p = createPoints(state);
@@ -216,9 +183,6 @@ public class mxEdgeHandler extends mxCellHandler
 		return h;
 	}
 
-	/**
-	 * 
-	 */
 	protected Color getHandleFillColor(int index)
 	{
 		boolean source = isSource(index);
@@ -266,26 +230,17 @@ public class mxEdgeHandler extends mxCellHandler
 		return index;
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle createHandle(Point center)
 	{
 		return createHandle(center, mxConstants.HANDLE_SIZE);
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle createHandle(Point center, int size)
 	{
 		return new Rectangle(center.x - size / 2, center.y - size / 2, size,
 				size);
 	}
 
-	/**
-	 * 
-	 */
 	protected Point[] createPoints(mxCellState s)
 	{
 		Point[] pts = new Point[s.getAbsolutePointCount()];
@@ -298,16 +253,11 @@ public class mxEdgeHandler extends mxCellHandler
 		return pts;
 	}
 
-	/**
-	 * 
-	 */
 	protected JComponent createPreview()
 	{
 		JPanel preview = new JPanel()
 		{
-			/**
-			 * 
-			 */
+
 			private static final long serialVersionUID = -894546588972313020L;
 
 			public void paint(Graphics g)
@@ -414,9 +364,6 @@ public class mxEdgeHandler extends mxCellHandler
 		return bounds;
 	}
 
-	/**
-	 * 
-	 */
 	public void mousePressed(MouseEvent e)
 	{
 		super.mousePressed(e);
@@ -439,9 +386,6 @@ public class mxEdgeHandler extends mxCellHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (!e.isConsumed() && first != null)
@@ -610,9 +554,6 @@ public class mxEdgeHandler extends mxCellHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -822,9 +763,6 @@ public class mxEdgeHandler extends mxCellHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected Cursor getCursor(MouseEvent e, int index)
 	{
 		Cursor cursor = null;
@@ -841,25 +779,16 @@ public class mxEdgeHandler extends mxCellHandler
 		return cursor;
 	}
 
-	/**
-	 * 
-	 */
 	public Color getSelectionColor()
 	{
 		return mxSwingConstants.EDGE_SELECTION_COLOR;
 	}
 
-	/**
-	 * 
-	 */
 	public Stroke getSelectionStroke()
 	{
 		return mxSwingConstants.EDGE_SELECTION_STROKE;
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;

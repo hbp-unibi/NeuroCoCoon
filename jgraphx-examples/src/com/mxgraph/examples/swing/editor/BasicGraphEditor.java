@@ -1,18 +1,28 @@
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.io.File;
-import java.util.List;
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.layout.mxEdgeLabelLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.layout.mxOrganicLayout;
+import com.mxgraph.layout.mxParallelEdgeLayout;
+import com.mxgraph.layout.mxPartitionLayout;
+import com.mxgraph.layout.mxStackLayout;
+import com.mxgraph.swing.handler.mxKeyboardHandler;
+import com.mxgraph.swing.handler.mxRubberband;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.mxGraphOutline;
+import com.mxgraph.swing.util.mxMorphing;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxResources;
+import com.mxgraph.util.mxUndoManager;
+import com.mxgraph.util.mxUndoableEdit;
+import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
+import com.mxgraph.view.mxGraph;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -31,37 +41,23 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-
-import com.mxgraph.layout.mxCircleLayout;
-import com.mxgraph.layout.mxCompactTreeLayout;
-import com.mxgraph.layout.mxEdgeLabelLayout;
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.mxOrganicLayout;
-import com.mxgraph.layout.mxParallelEdgeLayout;
-import com.mxgraph.layout.mxPartitionLayout;
-import com.mxgraph.layout.mxStackLayout;
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.mxGraphOutline;
-import com.mxgraph.swing.handler.mxKeyboardHandler;
-import com.mxgraph.swing.handler.mxRubberband;
-import com.mxgraph.swing.util.mxMorphing;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxResources;
-import com.mxgraph.util.mxUndoManager;
-import com.mxgraph.util.mxUndoableEdit;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
-import com.mxgraph.view.mxGraph;
+import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.util.List;
 
 public class BasicGraphEditor extends JPanel
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6561623072112577140L;
 
 	/**
@@ -79,39 +75,18 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
 
-	/**
-	 * 
-	 */
 	protected mxGraphOutline graphOutline;
 
-	/**
-	 * 
-	 */
 	protected JTabbedPane libraryPane;
 
-	/**
-	 * 
-	 */
 	protected mxUndoManager undoManager;
 
-	/**
-	 * 
-	 */
 	protected String appTitle;
 
-	/**
-	 * 
-	 */
 	protected JLabel statusBar;
 
-	/**
-	 * 
-	 */
 	protected File currentFile;
 
 	/**
@@ -119,19 +94,10 @@ public class BasicGraphEditor extends JPanel
 	 */
 	protected boolean modified = false;
 
-	/**
-	 * 
-	 */
 	protected mxRubberband rubberband;
 
-	/**
-	 * 
-	 */
 	protected mxKeyboardHandler keyboardHandler;
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener undoHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -141,9 +107,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener changeTracker = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -152,9 +115,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	};
 
-	/**
-	 * 
-	 */
 	public BasicGraphEditor(String appTitle, mxGraphComponent component)
 	{
 		// Stores and updates the frame title
@@ -233,34 +193,22 @@ public class BasicGraphEditor extends JPanel
 		updateTitle();
 	}
 
-	/**
-	 * 
-	 */
 	protected mxUndoManager createUndoManager()
 	{
 		return new mxUndoManager();
 	}
 
-	/**
-	 * 
-	 */
 	protected void installHandlers()
 	{
 		rubberband = new mxRubberband(graphComponent);
 		keyboardHandler = new EditorKeyboardHandler(graphComponent);
 	}
 
-	/**
-	 * 
-	 */
 	protected void installToolBar()
 	{
 		add(new EditorToolBar(this, JToolBar.HORIZONTAL), BorderLayout.NORTH);
 	}
 
-	/**
-	 * 
-	 */
 	protected JLabel createStatusBar()
 	{
 		JLabel statusBar = new JLabel(mxResources.get("ready"));
@@ -269,9 +217,6 @@ public class BasicGraphEditor extends JPanel
 		return statusBar;
 	}
 
-	/**
-	 * 
-	 */
 	protected void installRepaintListener()
 	{
 		graphComponent.getGraph().addListener(mxEvent.REPAINT,
@@ -299,9 +244,6 @@ public class BasicGraphEditor extends JPanel
 				});
 	}
 
-	/**
-	 * 
-	 */
 	public EditorPalette insertPalette(String title)
 	{
 		final EditorPalette palette = new EditorPalette();
@@ -315,9 +257,7 @@ public class BasicGraphEditor extends JPanel
 		// Updates the widths of the palettes if the container size changes
 		libraryPane.addComponentListener(new ComponentAdapter()
 		{
-			/**
-			 * 
-			 */
+
 			public void componentResized(ComponentEvent e)
 			{
 				int w = scrollPane.getWidth()
@@ -330,9 +270,6 @@ public class BasicGraphEditor extends JPanel
 		return palette;
 	}
 
-	/**
-	 * 
-	 */
 	protected void mouseWheelMoved(MouseWheelEvent e)
 	{
 		if (e.getWheelRotation() < 0)
@@ -349,9 +286,6 @@ public class BasicGraphEditor extends JPanel
 				+ "%");
 	}
 
-	/**
-	 * 
-	 */
 	protected void showOutlinePopupMenu(MouseEvent e)
 	{
 		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(),
@@ -362,9 +296,7 @@ public class BasicGraphEditor extends JPanel
 
 		item.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				graphOutline.setFitPage(!graphOutline.isFitPage());
@@ -378,9 +310,7 @@ public class BasicGraphEditor extends JPanel
 
 		item2.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				graphOutline.setDrawLabels(!graphOutline.isDrawLabels());
@@ -394,9 +324,7 @@ public class BasicGraphEditor extends JPanel
 
 		item3.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				graphOutline.setTripleBuffered(!graphOutline.isTripleBuffered());
@@ -413,9 +341,6 @@ public class BasicGraphEditor extends JPanel
 		e.consume();
 	}
 
-	/**
-	 * 
-	 */
 	protected void showGraphPopupMenu(MouseEvent e)
 	{
 		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(),
@@ -426,25 +351,17 @@ public class BasicGraphEditor extends JPanel
 		e.consume();
 	}
 
-	/**
-	 * 
-	 */
 	protected void mouseLocationChanged(MouseEvent e)
 	{
 		status(e.getX() + ", " + e.getY());
 	}
 
-	/**
-	 * 
-	 */
 	protected void installListeners()
 	{
 		// Installs mouse wheel listener for zooming
 		MouseWheelListener wheelTracker = new MouseWheelListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
 				if (e.getSource() instanceof mxGraphOutline
@@ -464,18 +381,12 @@ public class BasicGraphEditor extends JPanel
 		graphOutline.addMouseListener(new MouseAdapter()
 		{
 
-			/**
-			 * 
-			 */
 			public void mousePressed(MouseEvent e)
 			{
 				// Handles context menu on the Mac where the trigger is on mousepressed
 				mouseReleased(e);
 			}
 
-			/**
-			 * 
-			 */
 			public void mouseReleased(MouseEvent e)
 			{
 				if (e.isPopupTrigger())
@@ -490,18 +401,12 @@ public class BasicGraphEditor extends JPanel
 		graphComponent.getGraphControl().addMouseListener(new MouseAdapter()
 		{
 
-			/**
-			 * 
-			 */
 			public void mousePressed(MouseEvent e)
 			{
 				// Handles context menu on the Mac where the trigger is on mousepressed
 				mouseReleased(e);
 			}
 
-			/**
-			 * 
-			 */
 			public void mouseReleased(MouseEvent e)
 			{
 				if (e.isPopupTrigger())
@@ -538,9 +443,6 @@ public class BasicGraphEditor extends JPanel
 				});
 	}
 
-	/**
-	 * 
-	 */
 	public void setCurrentFile(File file)
 	{
 		File oldValue = currentFile;
@@ -554,9 +456,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public File getCurrentFile()
 	{
 		return currentFile;
@@ -588,33 +487,21 @@ public class BasicGraphEditor extends JPanel
 		return modified;
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphComponent getGraphComponent()
 	{
 		return graphComponent;
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphOutline getGraphOutline()
 	{
 		return graphOutline;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public JTabbedPane getLibraryPane()
 	{
 		return libraryPane;
 	}
 
-	/**
-	 * 
-	 */
 	public mxUndoManager getUndoManager()
 	{
 		return undoManager;
@@ -664,9 +551,6 @@ public class BasicGraphEditor extends JPanel
 		statusBar.setText(msg);
 	}
 
-	/**
-	 * 
-	 */
 	public void updateTitle()
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
@@ -685,9 +569,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void about()
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
@@ -707,9 +588,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void exit()
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
@@ -720,9 +598,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setLookAndFeel(String clazz)
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
@@ -744,9 +619,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public JFrame createFrame(JMenuBar menuBar)
 	{
 		JFrame frame = new JFrame();

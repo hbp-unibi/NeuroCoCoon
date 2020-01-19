@@ -1,14 +1,13 @@
 package com.mxgraph.view;
 
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.util.mxUtils;
+import org.w3c.dom.Element;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.w3c.dom.Element;
-
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.util.mxUtils;
 
 public class mxMultiplicity
 {
@@ -78,9 +77,6 @@ public class mxMultiplicity
 	 */
 	protected String typeError;
 
-	/**
-	 * 
-	 */
 	public mxMultiplicity(boolean source, String type, String attr,
 			String value, int min, String max,
 			Collection<String> validNeighbors, String countError,

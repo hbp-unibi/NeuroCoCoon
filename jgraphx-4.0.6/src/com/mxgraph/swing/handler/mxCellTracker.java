@@ -3,12 +3,12 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
-import com.mxgraph.swing.mxGraphComponent;
 
 /**
  * Event handler that highlights cells. Inherits from mxCellMarker.
@@ -17,9 +17,6 @@ public class mxCellTracker extends mxCellMarker implements MouseListener,
 		MouseMotionListener
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7372144804885125688L;
 
 	/**
@@ -33,9 +30,6 @@ public class mxCellTracker extends mxCellMarker implements MouseListener,
 		graphComponent.getGraphControl().addMouseMotionListener(this);
 	}
 
-	/**
-	 * 
-	 */
 	public void destroy()
 	{
 		graphComponent.getGraphControl().removeMouseListener(this);

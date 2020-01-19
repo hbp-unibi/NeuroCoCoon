@@ -1,11 +1,5 @@
 package com.mxgraph.layout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
@@ -14,6 +8,12 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class mxCompactTreeLayout extends mxGraphLayout
 {
@@ -596,9 +596,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected mxRectangle horizontalLayout(TreeNode node, double x0, double y0,
 			mxRectangle bounds)
 	{
@@ -625,9 +622,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return bounds;
 	}
 
-	/**
-	 * 
-	 */
 	protected mxRectangle verticalLayout(TreeNode node, Object parent,
 			double x0, double y0, mxRectangle bounds)
 	{
@@ -654,9 +648,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return bounds;
 	}
 
-	/**
-	 * 
-	 */
 	protected void attachParent(TreeNode node, double height)
 	{
 		double x = nodeDistance + levelDistance;
@@ -672,9 +663,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 				createLine(x, y2, node.contour.lowerHead));
 	}
 
-	/**
-	 * 
-	 */
 	protected void layoutLeaf(TreeNode node)
 	{
 		double dist = 2 * nodeDistance;
@@ -686,9 +674,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 				node.contour.lowerTail);
 	}
 
-	/**
-	 * 
-	 */
 	protected double join(TreeNode node)
 	{
 		double dist = 2 * nodeDistance;
@@ -712,9 +697,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return sum;
 	}
 
-	/**
-	 * 
-	 */
 	protected double merge(Polygon p1, Polygon p2)
 	{
 		double x = 0;
@@ -765,9 +747,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return total;
 	}
 
-	/**
-	 * 
-	 */
 	protected double offset(double p1, double p2, double a1, double a2,
 			double b1, double b2)
 	{
@@ -820,9 +799,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return 0;
 	}
 
-	/**
-	 * 
-	 */
 	protected Polyline bridge(Polyline line1, double x1, double y1,
 			Polyline line2, double x2, double y2)
 	{
@@ -846,9 +822,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return r;
 	}
 
-	/**
-	 * 
-	 */
 	protected TreeNode createNode(Object cell)
 	{
 		TreeNode node = new TreeNode(cell);
@@ -915,9 +888,6 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		return bounds;
 	}
 
-	/**
-	 * 
-	 */
 	protected Polyline createLine(double dx, double dy, Polyline next)
 	{
 		return new Polyline(dx, dy, next);
@@ -1135,34 +1105,17 @@ public class mxCompactTreeLayout extends mxGraphLayout
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected static class TreeNode
 	{
-		/**
-		 * 
-		 */
+
 		protected Object cell;
 
-		/**
-		 * 
-		 */
 		protected double x, y, width, height, offsetX, offsetY;
 
-		/**
-		 * 
-		 */
 		protected TreeNode child, next; // parent, sibling
 
-		/**
-		 * 
-		 */
 		protected Polygon contour = new Polygon();
 
-		/**
-		 * 
-		 */
 		public TreeNode(Object cell)
 		{
 			this.cell = cell;
@@ -1170,38 +1123,20 @@ public class mxCompactTreeLayout extends mxGraphLayout
 
 	}
 
-	/**
-	 * 
-	 */
 	protected static class Polygon
 	{
 
-		/**
-		 * 
-		 */
 		protected Polyline lowerHead, lowerTail, upperHead, upperTail;
 
 	}
 
-	/**
-	 * 
-	 */
 	protected static class Polyline
 	{
 
-		/**
-		 * 
-		 */
 		protected double dx, dy;
 
-		/**
-		 * 
-		 */
 		protected Polyline next;
 
-		/**
-		 * 
-		 */
 		protected Polyline(double dx, double dy, Polyline next)
 		{
 			this.dx = dx;

@@ -28,14 +28,8 @@ import java.awt.event.KeyEvent;
 public class EditorAboutFrame extends JDialog
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3378029138434324390L;
 
-	/**
-	 * 
-	 */
 	public EditorAboutFrame(Frame owner)
 	{
 		super(owner);
@@ -46,14 +40,8 @@ public class EditorAboutFrame extends JDialog
 		JPanel panel = new JPanel(new BorderLayout())
 		{
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -5062895855016210947L;
 
-			/**
-			 * 
-			 */
 			public void paintComponent(Graphics g)
 			{
 				super.paintComponent(g);

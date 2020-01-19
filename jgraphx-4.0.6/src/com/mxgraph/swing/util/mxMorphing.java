@@ -3,10 +3,6 @@
  */
 package com.mxgraph.swing.util;
 
-import java.awt.Graphics;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxCellStatePreview;
@@ -16,6 +12,10 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+
+import java.awt.Graphics;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides animation effects.
@@ -55,14 +55,8 @@ public class mxMorphing extends mxAnimation
 	 */
 	protected Object[] cells;
 
-	/**
-	 * 
-	 */
 	protected transient mxRectangle dirty;
 
-	/**
-	 * 
-	 */
 	protected transient mxCellStatePreview preview;
 
 	/**
@@ -169,9 +163,6 @@ public class mxMorphing extends mxAnimation
 		}
 	};
 
-	/**
-	 * 
-	 */
 	public void stopAnimation()
 	{
 		graphComponent.getGraph().getView().revalidate();
@@ -313,9 +304,6 @@ public class mxMorphing extends mxAnimation
 		return result;
 	}
 
-	/**
-	 *
-	 */
 	public void paint(Graphics g)
 	{
 		if (preview != null)

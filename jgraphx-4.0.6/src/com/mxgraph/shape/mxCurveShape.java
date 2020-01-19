@@ -3,16 +3,16 @@
  */
 package com.mxgraph.shape;
 
-import java.awt.RenderingHints;
-import java.util.List;
-import java.util.Map;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxCurve;
 import com.mxgraph.util.mxLine;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
+
+import java.awt.RenderingHints;
+import java.util.List;
+import java.util.Map;
 
 public class mxCurveShape extends mxConnectorShape
 {
@@ -22,33 +22,21 @@ public class mxCurveShape extends mxConnectorShape
 	 */
 	protected mxCurve curve;
 
-	/**
-	 * 
-	 */
 	public mxCurveShape()
 	{
 		this(new mxCurve());
 	}
-	
-	/**
-	 * 
-	 */
+
 	public mxCurveShape(mxCurve curve)
 	{
 		this.curve = curve;
 	}
 
-	/**
-	 * 
-	 */
 	public mxCurve getCurve()
 	{
 		return curve;
 	}
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		Object keyStrokeHint = canvas.getGraphics().getRenderingHint(
@@ -63,9 +51,6 @@ public class mxCurveShape extends mxConnectorShape
 				RenderingHints.KEY_STROKE_CONTROL, keyStrokeHint);
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintPolyline(mxGraphics2DCanvas canvas,
 			List<mxPoint> points, Map<String, Object> style)
 	{

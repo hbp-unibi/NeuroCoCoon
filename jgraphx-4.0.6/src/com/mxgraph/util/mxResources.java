@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class mxResources
@@ -67,17 +66,11 @@ public class mxResources
 		bundles.addFirst(PropertyResourceBundle.getBundle(basename, locale));
 	}
 
-	/**
-	 * 
-	 */
 	public static String get(String key)
 	{
 		return get(key, null, null);
 	}
 
-	/**
-	 * 
-	 */
 	public static String get(String key, String defaultValue)
 	{
 		return get(key, null, defaultValue);

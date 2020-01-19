@@ -3,13 +3,12 @@
  */
 package com.mxgraph.util;
 
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 /**
  * @author Administrator
@@ -20,14 +19,8 @@ public class mxLightweightLabel extends JLabel
 
 	private static final Logger log = Logger.getLogger(mxLightweightLabel.class.getName());
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6771477489533614010L;
 
-	/**
-	 * 
-	 */
 	protected static mxLightweightLabel sharedInstance;
 
 	/**
@@ -45,9 +38,6 @@ public class mxLightweightLabel extends JLabel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public static mxLightweightLabel getSharedInstance()
 	{
 		return sharedInstance;

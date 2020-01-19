@@ -58,9 +58,6 @@ import java.util.List;
 public class BasicGraphEditor extends JPanel
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6561623072112577140L;
 
 	/**
@@ -104,9 +101,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener changeTracker = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -115,9 +109,6 @@ public class BasicGraphEditor extends JPanel
 		}
 	};
 
-	/**
-	 * 
-	 */
 	public BasicGraphEditor(String appTitle, mxGraphComponent component)
 	{
 		// Stores and updates the frame title
@@ -222,9 +213,6 @@ public class BasicGraphEditor extends JPanel
 		return toolBar;
 	}
 
-	/**
-	 * 
-	 */
 	protected JLabel createStatusBar()
 	{
 		JLabel statusBar = new JLabel(mxResources.get("ready"));
@@ -233,9 +221,6 @@ public class BasicGraphEditor extends JPanel
 		return statusBar;
 	}
 
-	/**
-	 * 
-	 */
 	protected void installRepaintListener()
 	{
 		graphComponent.getGraph().addListener(mxEvent.REPAINT,
@@ -263,9 +248,6 @@ public class BasicGraphEditor extends JPanel
 				});
 	}
 
-	/**
-	 * 
-	 */
 	public EditorPalette insertPalette(String title)
 	{
 		final EditorPalette palette = new EditorPalette();
@@ -287,9 +269,6 @@ public class BasicGraphEditor extends JPanel
 		return palette;
 	}
 
-	/**
-	 * 
-	 */
 	protected void mouseWheelMoved(MouseWheelEvent e)
 	{
 		if (e.getWheelRotation() < 0)
@@ -300,9 +279,6 @@ public class BasicGraphEditor extends JPanel
 		status(mxResources.get("scale") + ": " + (int) (100 * graphComponent.getGraph().getView().getScale()) + "%");
 	}
 
-	/**
-	 * 
-	 */
 	protected void showOutlinePopupMenu(MouseEvent e)
 	{
 		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
@@ -337,9 +313,6 @@ public class BasicGraphEditor extends JPanel
 		e.consume();
 	}
 
-	/**
-	 * 
-	 */
 	protected void showGraphPopupMenu(MouseEvent e)
 	{
 		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
@@ -349,9 +322,6 @@ public class BasicGraphEditor extends JPanel
 		e.consume();
 	}
 
-	/**
-	 * 
-	 */
 	protected void mouseLocationChanged(MouseEvent e)
 	{
 		status(e.getX() + ", " + e.getY());

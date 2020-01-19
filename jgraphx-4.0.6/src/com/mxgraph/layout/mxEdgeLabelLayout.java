@@ -1,15 +1,15 @@
 package com.mxgraph.layout;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 public class mxEdgeLabelLayout extends mxGraphLayout
 {
@@ -58,9 +58,6 @@ public class mxEdgeLabelLayout extends mxGraphLayout
 		placeLabels(vertices.toArray(), edges.toArray());
 	}
 
-	/**
-	 * 
-	 */
 	protected void placeLabels(Object[] v, Object[] e)
 	{
 		mxIGraphModel model = graph.getModel();
@@ -95,9 +92,6 @@ public class mxEdgeLabelLayout extends mxGraphLayout
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void avoid(mxCellState edge, mxCellState vertex)
 	{
 		mxIGraphModel model = graph.getModel();

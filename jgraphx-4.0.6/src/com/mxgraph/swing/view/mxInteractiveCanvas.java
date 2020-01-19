@@ -3,12 +3,6 @@
  */
 package com.mxgraph.swing.view;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.image.ImageObserver;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.shape.mxBasicShape;
 import com.mxgraph.shape.mxIShape;
@@ -18,40 +12,32 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.image.ImageObserver;
+
 public class mxInteractiveCanvas extends mxGraphics2DCanvas
 {
-	/**
-	 * 
-	 */
+
 	protected ImageObserver imageObserver = null;
 
-	/**
-	 * 
-	 */
 	public mxInteractiveCanvas()
 	{
 		this(null);
 	}
 
-	/**
-	 * 
-	 */
 	public mxInteractiveCanvas(ImageObserver imageObserver)
 	{
 		setImageObserver(imageObserver);
 	}
 
-	/**
-	 * 
-	 */
 	public void setImageObserver(ImageObserver value)
 	{
 		imageObserver = value;
 	}
 
-	/**
-	 * 
-	 */
 	public ImageObserver getImageObserver()
 	{
 		return imageObserver;
@@ -74,9 +60,6 @@ public class mxInteractiveCanvas extends mxGraphics2DCanvas
 				image.getHeight(imageObserver));
 	}
 
-	/**
-	 * 
-	 */
 	public boolean contains(mxGraphComponent graphComponent, Rectangle rect,
 			mxCellState state)
 	{
@@ -86,9 +69,6 @@ public class mxInteractiveCanvas extends mxGraphics2DCanvas
 				&& state.getY() + state.getHeight() <= rect.y + rect.height;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean intersects(mxGraphComponent graphComponent, Rectangle rect,
 			mxCellState state)
 	{

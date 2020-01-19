@@ -10,16 +10,16 @@
  */
 package com.mxgraph.analysis;
 
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphView;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
-
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxGraphView;
 
 /**
  * A singleton class that provides algorithms for graphs. Assume these
@@ -62,9 +62,6 @@ public class mxGraphAnalysis
 	 */
 	protected static mxGraphAnalysis instance = new mxGraphAnalysis();
 
-	/**
-	 *
-	 */
 	protected mxGraphAnalysis()
 	{
 		// empty
@@ -400,9 +397,6 @@ public class mxGraphAnalysis
 		Collections.sort(result, new Comparator<mxCellState>()
 		{
 
-			/**
-			 * 
-			 */
 			public int compare(mxCellState o1, mxCellState o2)
 			{
 				Double d1 = new Double(cf.getCost(o1));

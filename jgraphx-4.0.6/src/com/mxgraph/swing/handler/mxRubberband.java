@@ -3,6 +3,14 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.mxGraphComponent.mxGraphControl;
+import com.mxgraph.swing.util.mxSwingConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxUtils;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -12,14 +20,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.mxGraphComponent.mxGraphControl;
-import com.mxgraph.swing.util.mxSwingConstants;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 /**
  * Implements a rubberband selection.
@@ -192,9 +192,6 @@ public class mxRubberband implements MouseListener, MouseMotionListener
 		return graphComponent.selectRegion(rect, e);
 	}
 
-	/**
-	 * 
-	 */
 	public void paintRubberband(Graphics g)
 	{
 		if (first != null && bounds != null
@@ -210,9 +207,6 @@ public class mxRubberband implements MouseListener, MouseMotionListener
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mousePressed(MouseEvent e)
 	{
 		if (!e.isConsumed() && isEnabled() && isRubberbandTrigger(e)
@@ -223,9 +217,6 @@ public class mxRubberband implements MouseListener, MouseMotionListener
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (!e.isConsumed() && first != null)
@@ -287,9 +278,6 @@ public class mxRubberband implements MouseListener, MouseMotionListener
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		Rectangle rect = bounds;

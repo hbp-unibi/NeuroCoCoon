@@ -1,12 +1,12 @@
 package com.mxgraph.canvas;
 
-import java.awt.image.BufferedImage;
-import java.util.Hashtable;
-import java.util.Map;
-
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
+
+import java.awt.image.BufferedImage;
+import java.util.Hashtable;
+import java.util.Map;
 
 public abstract class mxBasicCanvas implements mxICanvas
 {
@@ -64,49 +64,31 @@ public abstract class mxBasicCanvas implements mxICanvas
 		return translate;
 	}
 
-	/**
-	 * 
-	 */
 	public void setScale(double scale)
 	{
 		this.scale = scale;
 	}
 
-	/**
-	 * 
-	 */
 	public double getScale()
 	{
 		return scale;
 	}
 
-	/**
-	 * 
-	 */
 	public void setDrawLabels(boolean drawLabels)
 	{
 		this.drawLabels = drawLabels;
 	}
 
-	/**
-	 * 
-	 */
 	public String getImageBasePath()
 	{
 		return imageBasePath;
 	}
 
-	/**
-	 * 
-	 */
 	public void setImageBasePath(String imageBasePath)
 	{
 		this.imageBasePath = imageBasePath;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isDrawLabels()
 	{
 		return drawLabels;
@@ -134,9 +116,6 @@ public abstract class mxBasicCanvas implements mxICanvas
 		return img;
 	}
 
-	/**
-	 * 
-	 */
 	public void flushImageCache()
 	{
 		imageCache.clear();

@@ -5,9 +5,6 @@ package com.mxgraph.swing.view;
 
 import java.util.EventObject;
 
-/**
- *
- */
 public interface mxICellEditor
 {
 

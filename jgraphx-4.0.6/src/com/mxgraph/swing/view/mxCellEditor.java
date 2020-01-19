@@ -3,14 +3,12 @@
  */
 package com.mxgraph.swing.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.EventObject;
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -28,13 +26,14 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLWriter;
 import javax.swing.text.html.MinimalHTMLWriter;
-
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.EventObject;
 
 /**
  * To control this editor, use mxGraph.invokesStopCellEditing, mxGraph.
@@ -43,39 +42,18 @@ import com.mxgraph.view.mxCellState;
 public class mxCellEditor implements mxICellEditor
 {
 
-	/**
-	 * 
-	 */
 	private static final String CANCEL_EDITING = "cancel-editing";
 
-	/**
-	 * 
-	 */
 	private static final String INSERT_BREAK = "insert-break";
 
-	/**
-	 * 
-	 */
 	private static final String SUBMIT_TEXT = "submit-text";
 
-	/**
-	 * 
-	 */
 	public static int DEFAULT_MIN_WIDTH = 100;
 
-	/**
-	 * 
-	 */
 	public static int DEFAULT_MIN_HEIGHT = 60;
 
-	/**
-	 * 
-	 */
 	public static double DEFAULT_MINIMUM_EDITOR_SCALE = 1;
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
 
 	/**
@@ -84,29 +62,14 @@ public class mxCellEditor implements mxICellEditor
 	 */
 	protected double minimumEditorScale = DEFAULT_MINIMUM_EDITOR_SCALE;
 
-	/**
-	 * 
-	 */
 	protected int minimumWidth = DEFAULT_MIN_WIDTH;
 
-	/**
-	 * 
-	 */
 	protected int minimumHeight = DEFAULT_MIN_HEIGHT;
 
-	/**
-	 * 
-	 */
 	protected transient Object editingCell;
 
-	/**
-	 * 
-	 */
 	protected transient EventObject trigger;
 
-	/**
-	 * 
-	 */
 	protected transient JScrollPane scrollPane;
 
 	/**
@@ -138,35 +101,17 @@ public class mxCellEditor implements mxICellEditor
 	 */
 	protected boolean shiftEnterSubmitsText = false;
 
-	/**
-	 * 
-	 */
 	transient Object editorEnterActionMapKey;
 
-	/**
-	 * 
-	 */
 	transient Object textEnterActionMapKey;
 
-	/**
-	 * 
-	 */
 	transient KeyStroke escapeKeystroke = KeyStroke.getKeyStroke("ESCAPE");
 
-	/**
-	 * 
-	 */
 	transient KeyStroke enterKeystroke = KeyStroke.getKeyStroke("ENTER");
 
-	/**
-	 * 
-	 */
 	transient KeyStroke shiftEnterKeystroke = KeyStroke
 			.getKeyStroke("shift ENTER");
 
-	/**
-	 * 
-	 */
 	protected AbstractAction cancelEditingAction = new AbstractAction()
 	{
 		public void actionPerformed(ActionEvent e)
@@ -175,9 +120,6 @@ public class mxCellEditor implements mxICellEditor
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected AbstractAction textSubmitAction = new AbstractAction()
 	{
 		public void actionPerformed(ActionEvent e)
@@ -186,9 +128,6 @@ public class mxCellEditor implements mxICellEditor
 		}
 	};
 
-	/**
-	 * 
-	 */
 	public mxCellEditor(mxGraphComponent graphComponent)
 	{
 		this.graphComponent = graphComponent;
@@ -477,9 +416,6 @@ public class mxCellEditor implements mxICellEditor
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected boolean isHideLabel(mxCellState state)
 	{
 		return true;

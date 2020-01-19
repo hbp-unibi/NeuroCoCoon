@@ -8,6 +8,15 @@
  */
 package com.mxgraph.examples.swing.editor;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.view.mxGraph;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -28,16 +37,6 @@ import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 import java.util.TooManyListenersException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.view.mxGraph;
-
 /**
  * Component that displays a ruler for a JGraph component.
  */
@@ -45,9 +44,6 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 		DropTargetListener
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6310912355878668096L;
 
 	/**
@@ -117,9 +113,6 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 	 */
 	protected boolean metric = DEFAULT_ISMETRIC;
 
-	/**
-	 * 
-	 */
 	protected Font labelFont = new Font("Tahoma", Font.PLAIN, 9);
 
 	/**
@@ -147,9 +140,6 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 	 */
 	protected double increment, units;
 
-	/**
-	 * 
-	 */
 	protected transient mxIEventListener repaintHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -264,17 +254,11 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 		this.rulerSize = rulerSize;
 	}
 
-	/**
-	 * 
-	 */
 	public void setTickDistance(int tickDistance)
 	{
 		this.tickDistance = tickDistance;
 	}
 
-	/**
-	 * 
-	 */
 	public int getTickDistance()
 	{
 		return tickDistance;

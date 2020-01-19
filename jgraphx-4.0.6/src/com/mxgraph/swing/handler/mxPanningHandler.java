@@ -3,37 +3,22 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxMouseAdapter;
+
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxMouseAdapter;
-
-/**
- * 
- */
 public class mxPanningHandler extends mxMouseAdapter
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7969814728058376339L;
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
-	
-	/**
-	 * 
-	 */
+
 	protected boolean enabled = true;
 
-	/**
-	 * 
-	 */
 	protected transient Point start;
 
 	/**
@@ -48,25 +33,16 @@ public class mxPanningHandler extends mxMouseAdapter
 		graphComponent.getGraphControl().addMouseMotionListener(this);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setEnabled(boolean value)
 	{
 		enabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void mousePressed(MouseEvent e)
 	{
 		if (isEnabled() && !e.isConsumed() && graphComponent.isPanningEvent(e)
@@ -76,9 +52,6 @@ public class mxPanningHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (!e.isConsumed() && start != null)
@@ -98,9 +71,6 @@ public class mxPanningHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		if (!e.isConsumed() && start != null)

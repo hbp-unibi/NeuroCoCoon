@@ -93,10 +93,7 @@ public class mxStackLayout extends mxGraphLayout
 		this.y0 = y0;
 		this.border = border;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public boolean isHorizontal()
 	{
 		return horizontal;

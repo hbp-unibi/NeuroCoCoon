@@ -1,12 +1,11 @@
 package com.mxgraph.reader;
 
-import java.util.Hashtable;
-import java.util.Map;
-
+import com.mxgraph.canvas.mxICanvas2D;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.mxgraph.canvas.mxICanvas2D;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  *
@@ -52,28 +51,17 @@ import com.mxgraph.canvas.mxICanvas2D;
  */
 public class mxDomOutputParser
 {
-	/**
-	 * 
-	 */
+
 	protected mxICanvas2D canvas;
 
-	/**
-	 * 
-	 */
 	protected transient Map<String, IElementHandler> handlers = new Hashtable<String, IElementHandler>();
 
-	/**
-	 * 
-	 */
 	public mxDomOutputParser(mxICanvas2D canvas)
 	{
 		this.canvas = canvas;
 		initHandlers();
 	}
 
-	/**
-	 * 
-	 */
 	public void read(Node node)
 	{
 		while (node != null)
@@ -93,9 +81,6 @@ public class mxDomOutputParser
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void initHandlers()
 	{
 		handlers.put("save", new IElementHandler()
@@ -500,9 +485,6 @@ public class mxDomOutputParser
 		return value;
 	};
 
-	/**
-	 * 
-	 */
 	protected interface IElementHandler
 	{
 		void parseElement(Element elt);

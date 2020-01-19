@@ -3,6 +3,22 @@
  */
 package com.mxgraph.examples.swing.editor;
 
+import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.swing.util.mxGraphTransferable;
+import com.mxgraph.swing.util.mxSwingConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.TransferHandler;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -20,49 +36,17 @@ import java.awt.dnd.DragSource;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.TransferHandler;
-
-import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.swing.util.mxGraphTransferable;
-import com.mxgraph.swing.util.mxSwingConstants;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-
 public class EditorPalette extends JPanel
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7771113885935187066L;
 
-	/**
-	 * 
-	 */
 	protected JLabel selectedEntry = null;
 
-	/**
-	 * 
-	 */
 	protected mxEventSource eventSource = new mxEventSource(this);
 
-	/**
-	 * 
-	 */
 	protected Color gradientColor = new Color(117, 195, 173);
 
-	/**
-	 * 
-	 */
 	@SuppressWarnings("serial")
 	public EditorPalette()
 	{
@@ -126,25 +110,16 @@ public class EditorPalette extends JPanel
 		});
 	}
 
-	/**
-	 * 
-	 */
 	public void setGradientColor(Color c)
 	{
 		gradientColor = c;
 	}
 
-	/**
-	 * 
-	 */
 	public Color getGradientColor()
 	{
 		return gradientColor;
 	}
 
-	/**
-	 * 
-	 */
 	public void paintComponent(Graphics g)
 	{
 		if (gradientColor == null)
@@ -168,17 +143,11 @@ public class EditorPalette extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void clearSelection()
 	{
 		setSelectionEntry(null, null);
 	}
 
-	/**
-	 * 
-	 */
 	public void setSelectionEntry(JLabel entry, mxGraphTransferable t)
 	{
 		JLabel previous = selectedEntry;
@@ -200,9 +169,6 @@ public class EditorPalette extends JPanel
 				selectedEntry, "transferable", t, "previous", previous));
 	}
 
-	/**
-	 * 
-	 */
 	public void setPreferredWidth(int width)
 	{
 		int cols = Math.max(1, width / 55);
@@ -336,9 +302,7 @@ public class EditorPalette extends JPanel
 		// Install the handler for dragging nodes into a graph
 		DragGestureListener dragGestureListener = new DragGestureListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void dragGestureRecognized(DragGestureEvent e)
 			{
 				e

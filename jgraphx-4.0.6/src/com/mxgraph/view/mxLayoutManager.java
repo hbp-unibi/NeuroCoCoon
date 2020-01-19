@@ -1,5 +1,19 @@
 package com.mxgraph.view;
 
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.model.mxGraphModel;
+import com.mxgraph.model.mxGraphModel.mxChildChange;
+import com.mxgraph.model.mxGraphModel.mxGeometryChange;
+import com.mxgraph.model.mxGraphModel.mxRootChange;
+import com.mxgraph.model.mxGraphModel.mxTerminalChange;
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
+import com.mxgraph.util.mxUndoableEdit;
+import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
+import com.mxgraph.util.mxUtils;
+
 import java.awt.Point;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,20 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.model.mxGraphModel.mxChildChange;
-import com.mxgraph.model.mxGraphModel.mxGeometryChange;
-import com.mxgraph.model.mxGraphModel.mxRootChange;
-import com.mxgraph.model.mxGraphModel.mxTerminalChange;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource;
-import com.mxgraph.util.mxUndoableEdit;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 
 /**
  * Implements a layout manager that updates the layout for a given transaction.
@@ -68,9 +68,6 @@ public class mxLayoutManager extends mxEventSource
 	 */
 	protected boolean bubbling = true;
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener undoHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -82,9 +79,6 @@ public class mxLayoutManager extends mxEventSource
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener moveHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -97,9 +91,6 @@ public class mxLayoutManager extends mxEventSource
 		}
 	};
 
-	/**
-	 * 
-	 */
 	public mxLayoutManager(mxGraph graph)
 	{
 		setGraph(graph);
@@ -167,17 +158,11 @@ public class mxLayoutManager extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected mxIGraphLayout getLayout(Object parent)
 	{
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	protected void cellsMoved(Object[] cells, Point location)
 	{
 		if (cells != null && location != null)
@@ -197,9 +182,6 @@ public class mxLayoutManager extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void beforeUndo(mxUndoableEdit edit)
 	{
 		Collection<Object> cells = getCellsForChanges(edit.getChanges());
@@ -219,9 +201,6 @@ public class mxLayoutManager extends mxEventSource
 		layoutCells(mxUtils.sortCells(cells, false).toArray());
 	}
 
-	/**
-	 * 
-	 */
 	protected Collection<Object> getCellsForChanges(
 			List<mxUndoableChange> changes)
 	{
@@ -245,9 +224,6 @@ public class mxLayoutManager extends mxEventSource
 		return result;
 	}
 
-	/**
-	 * 
-	 */
 	protected Collection<Object> getCellsForChange(mxUndoableChange change)
 	{
 		mxIGraphModel model = getGraph().getModel();
@@ -295,9 +271,6 @@ public class mxLayoutManager extends mxEventSource
 		return result;
 	}
 
-	/**
-	 * 
-	 */
 	protected void layoutCells(Object[] cells)
 	{
 		if (cells.length > 0)
@@ -326,9 +299,6 @@ public class mxLayoutManager extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void executeLayout(mxIGraphLayout layout, Object parent)
 	{
 		if (layout != null && parent != null)
@@ -337,9 +307,6 @@ public class mxLayoutManager extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void destroy()
 	{
 		setGraph(null);

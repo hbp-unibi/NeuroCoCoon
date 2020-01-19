@@ -6,9 +6,6 @@ import com.mxgraph.view.mxCellState;
 public interface mxICellOverlay
 {
 
-	/**
-	 * 
-	 */
 	mxRectangle getBounds(mxCellState state);
 
 }

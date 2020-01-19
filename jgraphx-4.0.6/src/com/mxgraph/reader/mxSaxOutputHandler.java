@@ -1,13 +1,12 @@
 package com.mxgraph.reader;
 
-import java.util.Hashtable;
-import java.util.Map;
-
+import com.mxgraph.canvas.mxICanvas2D;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.mxgraph.canvas.mxICanvas2D;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
 	XMLReader reader = SAXParserFactory.newInstance().newSAXParser()
@@ -18,19 +17,11 @@ import com.mxgraph.canvas.mxICanvas2D;
  */
 public class mxSaxOutputHandler extends DefaultHandler
 {
-	/**
-	 * 
-	 */
+
 	protected mxICanvas2D canvas;
 
-	/**
-	 * 
-	 */
 	protected transient Map<String, IElementHandler> handlers = new Hashtable<String, IElementHandler>();
 
-	/**
-	 * 
-	 */
 	public mxSaxOutputHandler(mxICanvas2D canvas)
 	{
 		setCanvas(canvas);
@@ -53,9 +44,6 @@ public class mxSaxOutputHandler extends DefaultHandler
 		return canvas;
 	}
 
-	/**
-	 * 
-	 */
 	public void startElement(String uri, String localName, String qName,
 			Attributes atts) throws SAXException
 	{
@@ -67,9 +55,6 @@ public class mxSaxOutputHandler extends DefaultHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void initHandlers()
 	{
 		handlers.put("save", new IElementHandler()
@@ -471,9 +456,6 @@ public class mxSaxOutputHandler extends DefaultHandler
 		return value;
 	};
 
-	/**
-	 * 
-	 */
 	protected interface IElementHandler
 	{
 		void parseElement(Attributes atts);

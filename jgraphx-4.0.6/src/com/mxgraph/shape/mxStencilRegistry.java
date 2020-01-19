@@ -5,9 +5,7 @@ import java.util.Map;
 
 public class mxStencilRegistry
 {
-	/**
-	 * 
-	 */
+
 	protected static Map<String, mxStencil> stencils = new HashMap<String, mxStencil>();
 
 	/**

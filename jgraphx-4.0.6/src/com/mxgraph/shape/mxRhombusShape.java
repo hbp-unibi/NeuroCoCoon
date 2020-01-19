@@ -1,18 +1,15 @@
 package com.mxgraph.shape;
 
+import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.view.mxCellState;
+
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import com.mxgraph.canvas.mxGraphics2DCanvas;
-import com.mxgraph.view.mxCellState;
-
 public class mxRhombusShape extends mxBasicShape
 {
 
-	/**
-	 * 
-	 */
 	public Shape createShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		Rectangle temp = state.getRectangle();

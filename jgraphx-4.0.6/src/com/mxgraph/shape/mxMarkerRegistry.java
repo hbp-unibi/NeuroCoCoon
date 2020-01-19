@@ -1,5 +1,11 @@
 package com.mxgraph.shape;
 
+import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
+
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -7,17 +13,9 @@ import java.awt.geom.Line2D;
 import java.util.Hashtable;
 import java.util.Map;
 
-import com.mxgraph.canvas.mxGraphics2DCanvas;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
-
 public class mxMarkerRegistry
 {
-	/**
-	 * 
-	 */
+
 	protected static Map<String, mxIMarker> markers = new Hashtable<String, mxIMarker>();
 
 	static
@@ -130,17 +128,11 @@ public class mxMarkerRegistry
 		});
 	}
 
-	/**
-	 * 
-	 */
 	public static mxIMarker getMarker(String name)
 	{
 		return markers.get(name);
 	}
 
-	/**
-	 * 
-	 */
 	public static void registerMarker(String name, mxIMarker marker)
 	{
 		markers.put(name, marker);

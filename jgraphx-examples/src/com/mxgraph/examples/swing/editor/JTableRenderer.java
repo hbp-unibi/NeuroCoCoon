@@ -8,6 +8,27 @@
  */
 package com.mxgraph.examples.swing.editor;
 
+import com.mxgraph.swing.handler.mxCellHandler;
+import com.mxgraph.swing.handler.mxGraphTransferHandler;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxGraphTransferable;
+import com.mxgraph.view.mxGraph;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.border.BevelBorder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -30,28 +51,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.border.BevelBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.handler.mxCellHandler;
-import com.mxgraph.swing.handler.mxGraphTransferHandler;
-import com.mxgraph.swing.util.mxGraphTransferable;
-import com.mxgraph.view.mxGraph;
-
 /**
  * @author Administrator
  * 
@@ -59,49 +58,22 @@ import com.mxgraph.view.mxGraph;
 public class JTableRenderer extends JComponent
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2106746763664760745L;
 
-	/**
-	 * 
-	 */
 	public static final String IMAGE_PATH = "/com/mxgraph/examples/swing/images/";
 
-	/**
-	 * 
-	 */
 	protected static JTableRenderer dragSource = null;
 
-	/**
-	 * 
-	 */
 	protected static int sourceRow = 0;
 
-	/**
-	 * 
-	 */
 	protected Object cell;
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphContainer;
 
-	/**
-	 * 
-	 */
 	protected mxGraph graph;
 
-	/**
-	 * 
-	 */
 	public JTable table;
 
-	/**
-	 * 
-	 */
 	@SuppressWarnings("serial")
 	public JTableRenderer(final Object cell,
 			final mxGraphComponent graphContainer)
@@ -280,15 +252,9 @@ public class JTableRenderer extends JComponent
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public class MyTable extends JTable implements DropTargetListener
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 5841175227984561071L;
 
 		Object[][] data;
@@ -361,9 +327,6 @@ public class JTableRenderer extends JComponent
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
 
-		/**
-		 * 
-		 */
 		public DropTarget getDropTarget()
 		{
 			if (!((mxGraphTransferHandler) graphContainer.getTransferHandler())
@@ -461,9 +424,6 @@ public class JTableRenderer extends JComponent
 			return new AbstractTableModel()
 			{
 
-				/**
-				 * 
-				 */
 				private static final long serialVersionUID = -3642207266816170738L;
 
 				public int getColumnCount()
@@ -516,9 +476,6 @@ public class JTableRenderer extends JComponent
 
 	}
 
-	/**
-	 * 
-	 */
 	public static JTableRenderer getVertex(Component component)
 	{
 		while (component != null)

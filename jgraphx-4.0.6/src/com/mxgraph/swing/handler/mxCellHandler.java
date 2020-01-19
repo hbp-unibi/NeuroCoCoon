@@ -3,6 +3,13 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxSwingConstants;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+
+import javax.swing.JComponent;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -10,14 +17,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JComponent;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxSwingConstants;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
 
 /**
  * @author Administrator
@@ -77,9 +76,6 @@ public class mxCellHandler
 		refresh(state);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isActive()
 	{
 		return first != null;
@@ -112,9 +108,6 @@ public class mxCellHandler
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphComponent getGraphComponent()
 	{
 		return graphComponent;

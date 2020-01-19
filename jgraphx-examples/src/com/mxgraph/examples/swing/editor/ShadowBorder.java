@@ -10,22 +10,19 @@
  */
 package com.mxgraph.examples.swing.editor;
 
+import javax.swing.border.Border;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.io.Serializable;
 
-import javax.swing.border.Border;
-
 /**
  * Border with a drop shadow.
  */
 public class ShadowBorder implements Border, Serializable
 {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 6854989457150641240L;
 
 	private Insets insets;

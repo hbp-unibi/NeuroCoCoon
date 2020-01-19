@@ -3,17 +3,6 @@
  */
 package com.mxgraph.swing.handler;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JComponent;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
@@ -24,6 +13,16 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraphView;
+
+import javax.swing.JComponent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 
 /**
  * Implements a mouse tracker that marks cells under the mouse.
@@ -118,9 +117,6 @@ import com.mxgraph.view.mxGraphView;
 public class mxCellMarker extends JComponent
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 614473367053597572L;
 
 	/**
@@ -412,18 +408,12 @@ public class mxCellMarker extends JComponent
 
 		return state;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public void highlight(mxCellState state, Color color)
 	{
 		highlight(state, color, true);
 	}
-	
-	/**
-	 * 
-	 */
+
 	public void highlight(mxCellState state, Color color, boolean valid)
 	{
 		if (valid)

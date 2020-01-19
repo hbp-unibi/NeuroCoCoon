@@ -3,29 +3,24 @@
  */
 package com.mxgraph.examples.swing;
 
-import java.util.Arrays;
-
-import javax.swing.JFrame;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxKeyboardHandler;
 import com.mxgraph.swing.handler.mxRubberband;
+import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxDomUtils;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxMultiplicity;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import javax.swing.JFrame;
+import java.util.Arrays;
 
 public class Validation extends JFrame
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8928982366041695471L;
 
 	public Validation()

@@ -1,19 +1,5 @@
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
-import javax.swing.TransferHandler;
-
 import com.mxgraph.examples.swing.editor.EditorActions.ColorAction;
 import com.mxgraph.examples.swing.editor.EditorActions.FontStyleAction;
 import com.mxgraph.examples.swing.editor.EditorActions.HistoryAction;
@@ -27,28 +13,35 @@ import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
+import javax.swing.TransferHandler;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class EditorToolBar extends JToolBar
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8015443128436394471L;
 
-	/**
-	 * 
-	 * @param frame
-	 * @param orientation
-	 */
 	private boolean ignoreZoomChange = false;
 
 	/**
-	 * 
+	 *
+	 * @param editor
+	 * @param orientation
 	 */
 	public EditorToolBar(final BasicGraphEditor editor, int orientation)
 	{
@@ -110,9 +103,7 @@ public class EditorToolBar extends JToolBar
 
 		fontCombo.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				String font = fontCombo.getSelectedItem().toString();
@@ -136,9 +127,7 @@ public class EditorToolBar extends JToolBar
 
 		sizeCombo.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				mxGraph graph = editor.getGraphComponent().getGraph();
@@ -195,9 +184,7 @@ public class EditorToolBar extends JToolBar
 		// Sets the zoom in the zoom combo the current value
 		mxIEventListener scaleTracker = new mxIEventListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void invoke(Object sender, mxEventObject evt)
 			{
 				ignoreZoomChange = true;
@@ -226,9 +213,7 @@ public class EditorToolBar extends JToolBar
 
 		zoomCombo.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				mxGraphComponent graphComponent = editor.getGraphComponent();

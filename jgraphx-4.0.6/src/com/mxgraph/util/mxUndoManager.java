@@ -57,9 +57,6 @@ public class mxUndoManager extends mxEventSource
 		clear();
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEmpty()
 	{
 		return history.isEmpty();

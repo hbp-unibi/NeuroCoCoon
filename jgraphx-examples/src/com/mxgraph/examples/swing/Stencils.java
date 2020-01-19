@@ -1,13 +1,5 @@
 package com.mxgraph.examples.swing;
 
-import java.awt.Image;
-
-import javax.swing.JFrame;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.canvas.mxGraphicsCanvas2D;
 import com.mxgraph.shape.mxStencil;
@@ -17,13 +9,16 @@ import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
 import com.mxgraph.view.mxGraph;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import javax.swing.JFrame;
+import java.awt.Image;
 
 public class Stencils extends JFrame
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2707712944901661771L;
 
 	public Stencils()

@@ -1,9 +1,5 @@
 package com.mxgraph.examples.swing;
 
-import java.util.Map;
-
-import javax.swing.JFrame;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
@@ -13,11 +9,12 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
 
+import javax.swing.JFrame;
+import java.util.Map;
+
 public class Port extends JFrame
 {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -464235672367772404L;
 
 	final int PORT_DIAMETER = 20;

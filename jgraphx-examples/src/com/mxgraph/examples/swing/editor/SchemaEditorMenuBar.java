@@ -1,7 +1,11 @@
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.mxgraph.examples.swing.editor.EditorActions.*;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxGraphActions;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxResources;
+import com.mxgraph.view.mxGraph;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -10,43 +14,12 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
-
-import com.mxgraph.examples.swing.editor.EditorActions.BackgroundAction;
-import com.mxgraph.examples.swing.editor.EditorActions.BackgroundImageAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ExitAction;
-import com.mxgraph.examples.swing.editor.EditorActions.GridColorAction;
-import com.mxgraph.examples.swing.editor.EditorActions.GridStyleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.HistoryAction;
-import com.mxgraph.examples.swing.editor.EditorActions.NewAction;
-import com.mxgraph.examples.swing.editor.EditorActions.OpenAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PageBackgroundAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PageSetupAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PrintAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PromptPropertyAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SaveAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ScaleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SelectShortestPathAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SelectSpanningTreeAction;
-import com.mxgraph.examples.swing.editor.EditorActions.StylesheetAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleDirtyAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleGridItem;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleOutlineItem;
-import com.mxgraph.examples.swing.editor.EditorActions.TogglePropertyItem;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleRulersItem;
-import com.mxgraph.examples.swing.editor.EditorActions.WarningAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ZoomPolicyAction;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxGraphActions;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxResources;
-import com.mxgraph.view.mxGraph;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SchemaEditorMenuBar extends JMenuBar
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6776304509649205465L;
 
 	@SuppressWarnings("serial")
@@ -129,9 +102,7 @@ public class SchemaEditorMenuBar extends JMenuBar
 				mxResources.get("pageLayout"), "PageVisible", true,
 				new ActionListener()
 				{
-					/**
-					 * 
-					 */
+
 					public void actionPerformed(ActionEvent e)
 					{
 						if (graphComponent.isPageVisible()
@@ -343,9 +314,7 @@ public class SchemaEditorMenuBar extends JMenuBar
 		item = submenu.add(new TogglePropertyItem(graphComponent, mxResources
 				.get("centerPage"), "CenterPage", true, new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				if (graphComponent.isPageVisible()

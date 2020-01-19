@@ -1,5 +1,11 @@
 package com.mxgraph.canvas;
 
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxLightweightLabel;
+import com.mxgraph.util.mxUtils;
+
+import javax.swing.CellRendererPane;
+import javax.swing.JLabel;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -25,13 +31,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.CellRendererPane;
-import javax.swing.JLabel;
-
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxLightweightLabel;
-import com.mxgraph.util.mxUtils;
 
 /**
  * Used for exporting images. To render to an image from a given XML string,
@@ -272,18 +271,12 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public void scale(double value)
 	{
 		// This implementation uses custom scale/translate and built-in rotation
 		state.scale = state.scale * value;
 	}
 
-	/**
-	 * 
-	 */
 	public void translate(double dx, double dy)
 	{
 		// This implementation uses custom scale/translate and built-in rotation
@@ -291,9 +284,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		state.dy += dy;
 	}
 
-	/**
-	 * 
-	 */
 	public void rotate(double theta, boolean flipH, boolean flipV, double cx,
 			double cy)
 	{
@@ -329,9 +319,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		state.flipV = flipV;
 	}
 
-	/**
-	 * 
-	 */
 	public void setStrokeWidth(double value)
 	{
 		// Lazy and cached instantiation strategy for all stroke properties
@@ -355,17 +342,11 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setDashed(boolean value)
 	{
 		this.setDashed(value, state.fixDash);
 	}
 
-	/**
-	 * 
-	 */
 	public void setDashed(boolean value, boolean fixDash)
 	{
 		// Lazy and cached instantiation strategy for all stroke properties
@@ -373,9 +354,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		state.fixDash = fixDash;
 	}
 
-	/**
-	 * 
-	 */
 	public void setDashPattern(String value)
 	{
 		if (value != null && value.length() > 0)
@@ -384,9 +362,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setLineCap(String value)
 	{
 		if (!state.lineCap.equals(value))
@@ -395,9 +370,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setLineJoin(String value)
 	{
 		if (!state.lineJoin.equals(value))
@@ -406,9 +378,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setMiterLimit(double value)
 	{
 		if (value != state.miterLimit)
@@ -417,9 +386,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFontSize(double value)
 	{
 		if (value != state.fontSize)
@@ -428,9 +394,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFontColor(String value)
 	{
 		if (state.fontColorValue == null || !state.fontColorValue.equals(value))
@@ -440,9 +403,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFontBackgroundColor(String value)
 	{
 		if (state.fontBackgroundColorValue == null
@@ -453,9 +413,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFontBorderColor(String value)
 	{
 		if (state.fontBorderColorValue == null
@@ -466,9 +423,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFontFamily(String value)
 	{
 		if (!state.fontFamily.equals(value))
@@ -477,9 +431,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFontStyle(int value)
 	{
 		if (value != state.fontStyle)
@@ -488,9 +439,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setAlpha(double value)
 	{
 		if (state.alpha != value)
@@ -501,9 +449,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFillAlpha(double value)
 	{
 		if (state.fillAlpha != value)
@@ -513,9 +458,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setStrokeAlpha(double value)
 	{
 		if (state.strokeAlpha != value)
@@ -525,9 +467,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFillColor(String value)
 	{
 		if (state.fillColorValue == null || !state.fillColorValue.equals(value))
@@ -540,9 +479,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setGradient(String color1, String color2, double x, double y,
 			double w, double h, String direction, double alpha1, double alpha2)
 	{
@@ -618,9 +554,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		return result;
 	};
 
-	/**
-	 *
-	 */
 	public void rect(double x, double y, double w, double h)
 	{
 		currentPath = new GeneralPath();
@@ -648,9 +581,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		quadTo(x, y, x + dx, y);
 	}
 
-	/**
-	 * 
-	 */
 	public void ellipse(double x, double y, double w, double h)
 	{
 		currentPath = new GeneralPath();
@@ -659,9 +589,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 				false);
 	}
 
-	/**
-	 * 
-	 */
 	public void image(double x, double y, double w, double h, String src,
 			boolean aspect, boolean flipH, boolean flipV)
 	{
@@ -685,9 +612,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void drawImage(Graphics2D graphics, Image image, int x, int y)
 	{
 		graphics.drawImage(image, x, y, null);
@@ -701,9 +625,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		return mxUtils.loadImage(src);
 	}
 
-	/**
-	 * 
-	 */
 	protected final Rectangle getImageBounds(Image img, double x, double y,
 			double w, double h, boolean aspect)
 	{
@@ -929,9 +850,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		return mxLightweightLabel.getSharedInstance();
 	}
 
-	/**
-	 * 
-	 */
 	protected Point2D getMargin(String align, String valign)
 	{
 		double dx = 0;
@@ -1255,17 +1173,11 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		return g2;
 	}
 
-	/**
-	 * 
-	 */
 	public void begin()
 	{
 		currentPath = new GeneralPath();
 	}
 
-	/**
-	 * 
-	 */
 	public void moveTo(double x, double y)
 	{
 		if (currentPath != null)
@@ -1275,9 +1187,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void lineTo(double x, double y)
 	{
 		if (currentPath != null)
@@ -1287,9 +1196,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void quadTo(double x1, double y1, double x2, double y2)
 	{
 		if (currentPath != null)
@@ -1301,9 +1207,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void curveTo(double x1, double y1, double x2, double y2, double x3,
 			double y3)
 	{
@@ -1329,33 +1232,21 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void stroke()
 	{
 		paintCurrentPath(false, true);
 	}
 
-	/**
-	 * 
-	 */
 	public void fill()
 	{
 		paintCurrentPath(true, false);
 	}
 
-	/**
-	 * 
-	 */
 	public void fillAndStroke()
 	{
 		paintCurrentPath(true, true);
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintCurrentPath(boolean filled, boolean stroked)
 	{
 		if (currentPath != null)
@@ -1414,9 +1305,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintShadow(boolean filled, boolean stroked)
 	{
 		if (state.shadowColor == null)
@@ -1472,42 +1360,27 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setShadow(boolean value)
 	{
 		state.shadow = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setShadowColor(String value)
 	{
 		state.shadowColorValue = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setShadowAlpha(double value)
 	{
 		state.shadowAlpha = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setShadowOffset(double dx, double dy)
 	{
 		state.shadowOffsetX = dx;
 		state.shadowOffsetY = dy;
 	}
 
-	/**
-	 * 
-	 */
 	protected void updateFont()
 	{
 		int size = (int) Math.round(state.fontSize * state.scale);
@@ -1558,9 +1431,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		return family;
 	}
 
-	/**
-	 * 
-	 */
 	protected void updateStroke()
 	{
 		float sw = (float) Math.max(1, state.strokeWidth * state.scale);
@@ -1617,199 +1487,83 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		state.g.setStroke(lastStroke);
 	}
 
-	/**
-	 * 
-	 */
 	protected class CanvasState implements Cloneable
 	{
-		/**
-		 * 
-		 */
+
 		protected double alpha = 1;
 
-		/**
-		 * 
-		 */
 		protected double fillAlpha = 1;
 
-		/**
-		 * 
-		 */
 		protected double strokeAlpha = 1;
 
-		/**
-		 * 
-		 */
 		protected double scale = 1;
 
-		/**
-		 * 
-		 */
 		protected double dx = 0;
 
-		/**
-		 * 
-		 */
 		protected double dy = 0;
 
-		/**
-		 * 
-		 */
 		protected double theta = 0;
 
-		/**
-		 * 
-		 */
 		protected double rotationCx = 0;
 
-		/**
-		 * 
-		 */
 		protected double rotationCy = 0;
 
-		/**
-		 * 
-		 */
 		protected boolean flipV = false;
 
-		/**
-		 * 
-		 */
 		protected boolean flipH = false;
 
-		/**
-		 * 
-		 */
 		protected double miterLimit = 10;
 
-		/**
-		 * 
-		 */
 		protected int fontStyle = 0;
 
-		/**
-		 * 
-		 */
 		protected double fontSize = mxConstants.DEFAULT_FONTSIZE;
 
-		/**
-		 * 
-		 */
 		protected String fontFamily = mxConstants.DEFAULT_FONTFAMILIES;
 
-		/**
-		 * 
-		 */
 		protected String fontColorValue = "#000000";
 
-		/**
-		 * 
-		 */
 		protected Color fontColor;
 
-		/**
-		 * 
-		 */
 		protected String fontBackgroundColorValue;
 
-		/**
-		 * 
-		 */
 		protected Color fontBackgroundColor;
 
-		/**
-		 * 
-		 */
 		protected String fontBorderColorValue;
 
-		/**
-		 * 
-		 */
 		protected Color fontBorderColor;
 
-		/**
-		 * 
-		 */
 		protected String lineCap = "flat";
 
-		/**
-		 * 
-		 */
 		protected String lineJoin = "miter";
 
-		/**
-		 * 
-		 */
 		protected double strokeWidth = 1;
 
-		/**
-		 * 
-		 */
 		protected String strokeColorValue;
 
-		/**
-		 * 
-		 */
 		protected Color strokeColor;
 
-		/**
-		 * 
-		 */
 		protected String fillColorValue;
 
-		/**
-		 * 
-		 */
 		protected Color fillColor;
 
-		/**
-		 * 
-		 */
 		protected Paint gradientPaint;
 
-		/**
-		 * 
-		 */
 		protected boolean dashed = false;
 
-		/**
-		 * 
-		 */
 		protected boolean fixDash = false;
 
-		/**
-		 * 
-		 */
 		protected float[] dashPattern = { 3, 3 };
 
-		/**
-		 * 
-		 */
 		protected boolean shadow = false;
 
-		/**
-		 * 
-		 */
 		protected String shadowColorValue = mxConstants.W3C_SHADOWCOLOR;
 
-		/**
-		 * 
-		 */
 		protected Color shadowColor;
 
-		/**
-		 * 
-		 */
 		protected double shadowAlpha = 1;
 
-		/**
-		 * 
-		 */
 		protected double shadowOffsetX = mxConstants.SHADOW_OFFSETX;
 
-		/**
-		 * 
-		 */
 		protected double shadowOffsetY = mxConstants.SHADOW_OFFSETY;
 
 		/**
@@ -1817,9 +1571,6 @@ public class mxGraphicsCanvas2D implements mxICanvas2D
 		 */
 		protected transient Graphics2D g;
 
-		/**
-		 * 
-		 */
 		public Object clone() throws CloneNotSupportedException
 		{
 			return super.clone();

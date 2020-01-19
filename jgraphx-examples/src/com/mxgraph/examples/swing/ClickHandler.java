@@ -1,19 +1,15 @@
 package com.mxgraph.examples.swing;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JFrame;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 
+import javax.swing.JFrame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 public class ClickHandler extends JFrame
 {
-	
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -2764911804288120883L;
 
 	public ClickHandler()

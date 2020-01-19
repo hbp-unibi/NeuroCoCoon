@@ -3,8 +3,6 @@
  */
 package com.mxgraph.shape;
 
-import org.w3c.dom.Node;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
@@ -14,6 +12,11 @@ import com.mxgraph.util.svg.AWTPolylineProducer;
 import com.mxgraph.util.svg.CSSConstants;
 import com.mxgraph.util.svg.ExtendedGeneralPath;
 import com.mxgraph.view.mxCellState;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -28,10 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Stencil shape drawing that takes an XML definition of the shape and renders
@@ -121,9 +120,6 @@ public class mxStencilShape extends mxBasicShape
 		}
 	}
 
-	/**
-	 * 
-	 */
 	@Override
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
@@ -147,9 +143,6 @@ public class mxStencilShape extends mxBasicShape
 		canvas.getGraphics().translate(-x, -y);
 	}
 
-	/**
-	 * 
-	 */
 	public void paintNode(mxGraphics2DCanvas canvas, mxCellState state,
 			svgShape shape, double widthRatio, double heightRatio)
 	{
@@ -333,9 +326,6 @@ public class mxStencilShape extends mxBasicShape
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void createShape(Node root, svgShape shape)
 	{
 		Node child = root.getFirstChild();

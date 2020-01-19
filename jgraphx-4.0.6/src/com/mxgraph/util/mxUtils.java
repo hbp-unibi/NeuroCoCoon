@@ -3,6 +3,18 @@
  */
 package com.mxgraph.util;
 
+import com.mxgraph.io.mxCodecRegistry;
+import com.mxgraph.model.mxCellPath;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.view.mxCellState;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+import javax.imageio.ImageIO;
+import javax.swing.text.html.HTMLDocument;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -42,20 +54,6 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-import javax.swing.text.html.HTMLDocument;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import com.mxgraph.io.mxCodecRegistry;
-import com.mxgraph.model.mxCellPath;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.view.mxCellState;
 
 /**
  * Contains various helper methods for use with mxGraph.
@@ -990,9 +988,6 @@ public class mxUtils
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public static void fillClippedRect(Graphics g, int x, int y, int width,
 			int height)
 	{
@@ -1650,17 +1645,11 @@ public class mxUtils
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public static Font getFont(Map<String, Object> style)
 	{
 		return getFont(style, 1);
 	}
 
-	/**
-	 * 
-	 */
 	public static Font getFont(Map<String, Object> style, double scale)
 	{
 		String fontFamily = getString(style, mxConstants.STYLE_FONTFAMILY,
@@ -1680,9 +1669,6 @@ public class mxUtils
 		return new Font(fontFamily, swingFontStyle, (int) (fontSize * scale)).deriveFont(fontAttributes);
 	}
 
-	/**
-	 * 
-	 */
 	public static String hexString(Color color)
 	{
 		return mxHtmlColor.hexString(color);

@@ -64,18 +64,12 @@ public class mxEventObject
 	{
 		return name;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public Map<String, Object> getProperties()
 	{
 		return properties;
 	}
 
-	/**
-	 * 
-	 */
 	public Object getProperty(String key)
 	{
 		return properties.get(key);

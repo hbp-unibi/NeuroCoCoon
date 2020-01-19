@@ -3,18 +3,6 @@
  */
 package com.mxgraph.swing.handler;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
@@ -31,6 +19,17 @@ import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
  * Connection handler creates new connections between cells. This control is used to display the connector
  * icon, while the preview is used to draw the line.
@@ -42,19 +41,10 @@ import com.mxgraph.view.mxGraphView;
 public class mxConnectionHandler extends mxMouseAdapter
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2543899557644889853L;
 
-	/**
-	 * 
-	 */
 	public static Cursor CONNECT_CURSOR = new Cursor(Cursor.HAND_CURSOR);
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
 
 	/**
@@ -62,9 +52,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 	 */
 	protected mxEventSource eventSource = new mxEventSource(this);
 
-	/**
-	 * 
-	 */
 	protected mxConnectPreview connectPreview;
 
 	/**
@@ -87,9 +74,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 	 */
 	protected boolean handleEnabled = mxConstants.CONNECT_HANDLE_ENABLED;
 
-	/**
-	 * 
-	 */
 	protected boolean select = true;
 
 	/**
@@ -103,44 +87,20 @@ public class mxConnectionHandler extends mxMouseAdapter
 	 */
 	protected boolean keepOnTop = true;
 
-	/**
-	 * 
-	 */
 	protected boolean enabled = true;
 
-	/**
-	 * 
-	 */
 	protected transient Point first;
 
-	/**
-	 * 
-	 */
 	protected transient boolean active = false;
 
-	/**
-	 * 
-	 */
 	protected transient Rectangle bounds;
 
-	/**
-	 * 
-	 */
 	protected transient mxCellState source;
 
-	/**
-	 * 
-	 */
 	protected transient mxCellMarker marker;
 
-	/**
-	 * 
-	 */
 	protected transient String error;
 
-	/**
-	 * 
-	 */
 	protected transient mxIEventListener resetHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -190,9 +150,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 		marker = new mxCellMarker(graphComponent)
 		{
-			/**
-			 * 
-			 */
+
 			private static final long serialVersionUID = 103433247310526381L;
 
 			// Overrides to return cell at location only if valid (so that
@@ -299,25 +257,16 @@ public class mxConnectionHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected mxConnectPreview createConnectPreview()
 	{
 		return new mxConnectPreview(graphComponent);
 	}
 
-	/**
-	 * 
-	 */
 	public mxConnectPreview getConnectPreview()
 	{
 		return connectPreview;
 	}
 
-	/**
-	 * 
-	 */
 	public void setConnectPreview(mxConnectPreview value)
 	{
 		connectPreview = value;
@@ -332,9 +281,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		return connectPreview.isActive();
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isActive()
 	{
 		return active;
@@ -348,137 +294,86 @@ public class mxConnectionHandler extends mxMouseAdapter
 		return connectIcon == null && !handleEnabled;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setEnabled(boolean value)
 	{
 		enabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isKeepOnTop()
 	{
 		return keepOnTop;
 	}
 
-	/**
-	 * 
-	 */
 	public void setKeepOnTop(boolean value)
 	{
 		keepOnTop = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setConnectIcon(ImageIcon value)
 	{
 		connectIcon = value;
 	}
 
-	/**
-	 * 
-	 */
 	public ImageIcon getConnecIcon()
 	{
 		return connectIcon;
 	}
 
-	/**
-	 * 
-	 */
 	public void setHandleEnabled(boolean value)
 	{
 		handleEnabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isHandleEnabled()
 	{
 		return handleEnabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setHandleSize(int value)
 	{
 		handleSize = value;
 	}
 
-	/**
-	 * 
-	 */
 	public int getHandleSize()
 	{
 		return handleSize;
 	}
 
-	/**
-	 * 
-	 */
 	public mxCellMarker getMarker()
 	{
 		return marker;
 	}
 
-	/**
-	 * 
-	 */
 	public void setMarker(mxCellMarker value)
 	{
 		marker = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setCreateTarget(boolean value)
 	{
 		createTarget = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isCreateTarget()
 	{
 		return createTarget;
 	}
 
-	/**
-	 * 
-	 */
 	public void setSelect(boolean value)
 	{
 		select = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isSelect()
 	{
 		return select;
 	}
 
-	/**
-	 * 
-	 */
 	public void reset()
 	{
 		connectPreview.stop(false);
@@ -490,9 +385,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		error = null;
 	}
 
-	/**
-	 * 
-	 */
 	public Object createTargetVertex(MouseEvent e, Object source)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -510,9 +402,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		return clone;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isValidSource(Object cell)
 	{
 		return graphComponent.getGraph().isValidSource(cell);
@@ -548,9 +437,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 				connectPreview.getPreviewState().getCell(), source, target);
 	}
 
-	/**
-	 * 
-	 */
 	public void mousePressed(MouseEvent e)
 	{
 		if (!graphComponent.isForceMarqueeEvent(e)
@@ -567,18 +453,12 @@ public class mxConnectionHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void start(MouseEvent e, mxCellState state)
 	{
 		first = e.getPoint();
 		connectPreview.start(e, state, "");
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseMoved(MouseEvent e)
 	{
 		mouseDragged(e);
@@ -631,9 +511,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (!e.isConsumed() && graphComponent.isEnabled() && isEnabled())
@@ -670,9 +547,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		if (isActive())
@@ -768,9 +642,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		reset();
 	}
 
-	/**
-	 * 
-	 */
 	public void setBounds(Rectangle value)
 	{
 		if ((bounds == null && value != null)
@@ -824,9 +695,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 		eventSource.removeListener(listener, eventName);
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		if (bounds != null)

@@ -3,28 +3,6 @@
  */
 package com.mxgraph.view;
 
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.w3c.dom.Element;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxImageCanvas;
@@ -54,6 +32,27 @@ import com.mxgraph.util.mxStyleUtils;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 import com.mxgraph.util.mxUtils;
+import org.w3c.dom.Element;
+
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implements a graph object that allows to create diagrams from a graph model
@@ -202,9 +201,6 @@ public class mxGraph extends mxEventSource
 	 */
 	public static final String VERSION = "4.0.6";
 
-	/**
-	 * 
-	 */
 	public interface mxICellVisitor
 	{
 
@@ -2941,17 +2937,11 @@ public class mxGraph extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public Object splitEdge(Object edge, Object[] cells)
 	{
 		return splitEdge(edge, cells, null, 0, 0);
 	}
 
-	/**
-	 * 
-	 */
 	public Object splitEdge(Object edge, Object[] cells, double dx, double dy)
 	{
 		return splitEdge(edge, cells, null, dx, dy);
@@ -4629,9 +4619,6 @@ public class mxGraph extends mxEventSource
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public void enterGroup()
 	{
 		enterGroup(null);
@@ -5084,9 +5071,6 @@ public class mxGraph extends mxEventSource
 	// Cell validation
 	//
 
-	/**
-	 * 
-	 */
 	public void setMultiplicities(mxMultiplicity[] value)
 	{
 		mxMultiplicity[] oldValue = multiplicities;
@@ -5096,9 +5080,6 @@ public class mxGraph extends mxEventSource
 				multiplicities);
 	}
 
-	/**
-	 * 
-	 */
 	public mxMultiplicity[] getMultiplicities()
 	{
 		return multiplicities;
@@ -5319,9 +5300,6 @@ public class mxGraph extends mxEventSource
 		changeSupport.firePropertyChange("htmlLabels", oldValue, htmlLabels);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isHtmlLabels()
 	{
 		return htmlLabels;
@@ -7604,17 +7582,11 @@ public class mxGraph extends mxEventSource
 	// Selection
 	//
 
-	/**
-	 * 
-	 */
 	public mxGraphSelectionModel getSelectionModel()
 	{
 		return selectionModel;
 	}
 
-	/**
-	 * 
-	 */
 	public int getSelectionCount()
 	{
 		return selectionModel.size();
@@ -7639,9 +7611,6 @@ public class mxGraph extends mxEventSource
 		return selectionModel.isEmpty();
 	}
 
-	/**
-	 * 
-	 */
 	public void clearSelection()
 	{
 		selectionModel.clear();
@@ -7674,9 +7643,6 @@ public class mxGraph extends mxEventSource
 		return selectionModel.getCells();
 	}
 
-	/**
-	 * 
-	 */
 	public void setSelectionCells(Object[] cells)
 	{
 		selectionModel.setCells(cells);
@@ -7694,33 +7660,21 @@ public class mxGraph extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void addSelectionCell(Object cell)
 	{
 		selectionModel.addCell(cell);
 	}
 
-	/**
-	 * 
-	 */
 	public void addSelectionCells(Object[] cells)
 	{
 		selectionModel.addCells(cells);
 	}
 
-	/**
-	 * 
-	 */
 	public void removeSelectionCell(Object cell)
 	{
 		selectionModel.removeCell(cell);
 	}
 
-	/**
-	 * 
-	 */
 	public void removeSelectionCells(Object[] cells)
 	{
 		selectionModel.removeCells(cells);
@@ -7890,9 +7844,6 @@ public class mxGraph extends mxEventSource
 				new mxGraphModel.Filter()
 				{
 
-					/**
-					 * 
-					 */
 					public boolean filter(Object cell)
 					{
 						return view.getState(cell) != null
@@ -7905,9 +7856,6 @@ public class mxGraph extends mxEventSource
 		setSelectionCells(cells);
 	}
 
-	/**
-	 * 
-	 */
 	public void selectAll()
 	{
 		selectAll(null);

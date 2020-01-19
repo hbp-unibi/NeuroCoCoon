@@ -1,62 +1,13 @@
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.UIManager;
-
 import com.mxgraph.analysis.StructuralException;
-import com.mxgraph.analysis.mxGraphProperties.GraphType;
 import com.mxgraph.analysis.mxAnalysisGraph;
 import com.mxgraph.analysis.mxGraphProperties;
+import com.mxgraph.analysis.mxGraphProperties.GraphType;
 import com.mxgraph.analysis.mxGraphStructure;
 import com.mxgraph.analysis.mxTraversal;
 import com.mxgraph.costfunction.mxCostFunction;
-import com.mxgraph.examples.swing.editor.EditorActions.AlignCellsAction;
-import com.mxgraph.examples.swing.editor.EditorActions.AutosizeAction;
-import com.mxgraph.examples.swing.editor.EditorActions.BackgroundAction;
-import com.mxgraph.examples.swing.editor.EditorActions.BackgroundImageAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ColorAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ExitAction;
-import com.mxgraph.examples.swing.editor.EditorActions.GridColorAction;
-import com.mxgraph.examples.swing.editor.EditorActions.GridStyleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.HistoryAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ImportAction;
-import com.mxgraph.examples.swing.editor.EditorActions.KeyValueAction;
-import com.mxgraph.examples.swing.editor.EditorActions.NewAction;
-import com.mxgraph.examples.swing.editor.EditorActions.OpenAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PageBackgroundAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PageSetupAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PrintAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PromptPropertyAction;
-import com.mxgraph.examples.swing.editor.EditorActions.PromptValueAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SaveAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ScaleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SelectShortestPathAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SelectSpanningTreeAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SetLabelPositionAction;
-import com.mxgraph.examples.swing.editor.EditorActions.SetStyleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.StyleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.StylesheetAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleConnectModeAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleCreateTargetItem;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleDirtyAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleGridItem;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleOutlineItem;
-import com.mxgraph.examples.swing.editor.EditorActions.TogglePropertyItem;
-import com.mxgraph.examples.swing.editor.EditorActions.ToggleRulersItem;
-import com.mxgraph.examples.swing.editor.EditorActions.WarningAction;
-import com.mxgraph.examples.swing.editor.EditorActions.ZoomPolicyAction;
+import com.mxgraph.examples.swing.editor.EditorActions.*;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
@@ -66,12 +17,22 @@ import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 
+import javax.swing.AbstractAction;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.UIManager;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 public class EditorMenuBar extends JMenuBar
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4060203894740766714L;
 
 	public enum AnalyzeType
@@ -141,9 +102,7 @@ public class EditorMenuBar extends JMenuBar
 		JMenuItem item = menu.add(new TogglePropertyItem(graphComponent, mxResources.get("pageLayout"), "PageVisible", true,
 				new ActionListener()
 				{
-					/**
-					 * 
-					 */
+
 					public void actionPerformed(ActionEvent e)
 					{
 						if (graphComponent.isPageVisible() && graphComponent.isCenterPage())
@@ -333,9 +292,7 @@ public class EditorMenuBar extends JMenuBar
 
 		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("preferPageSize"), "PreferPageSize", true, new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				graphComponent.zoomAndCenter();
@@ -361,9 +318,7 @@ public class EditorMenuBar extends JMenuBar
 
 		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("centerPage"), "CenterPage", true, new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				if (graphComponent.isPageVisible() && graphComponent.isCenterPage())
@@ -435,9 +390,7 @@ public class EditorMenuBar extends JMenuBar
 			
 			menu.add(new AbstractAction(lafs[i].getName())
 			{
-				/**
-				 * 
-				 */
+
 				private static final long serialVersionUID = 7588919504149148501L;
 
 				public void actionPerformed(ActionEvent e)
@@ -782,20 +735,11 @@ public class EditorMenuBar extends JMenuBar
 		menu.add(editor.bind(mxResources.get("style"), new StyleAction()));
 	}
 
-	/**
-	 *
-	 */
 	public static class InsertGraph extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 4010463992665008365L;
 
-		/**
-		 * 
-		 */
 		protected GraphType graphType;
 
 		protected mxAnalysisGraph aGraph;
@@ -810,9 +754,6 @@ public class EditorMenuBar extends JMenuBar
 			this.aGraph = aGraph;
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			if (e.getSource() instanceof mxGraphComponent)
@@ -879,21 +820,13 @@ public class EditorMenuBar extends JMenuBar
 		}
 	}
 
-	/**
-	 *
-	 */
 	public static class AnalyzeGraph extends AbstractAction
 	{
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 6926170745240507985L;
 
 		mxAnalysisGraph aGraph;
 
-		/**
-		 * 
-		 */
 		protected AnalyzeType analyzeType;
 
 		/**

@@ -11,9 +11,7 @@ import java.awt.geom.Line2D;
 
 public class mxLine extends mxPoint
 {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -4730972599169158546L;
 	/**
 	 * The end point of the line

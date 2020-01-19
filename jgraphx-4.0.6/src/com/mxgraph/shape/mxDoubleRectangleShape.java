@@ -1,18 +1,15 @@
 package com.mxgraph.shape;
 
-import java.awt.Rectangle;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 
+import java.awt.Rectangle;
+
 public class mxDoubleRectangleShape extends mxRectangleShape
 {
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		super.paintShape(canvas, state);

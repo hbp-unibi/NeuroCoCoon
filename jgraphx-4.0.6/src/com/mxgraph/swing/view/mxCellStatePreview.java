@@ -3,16 +3,6 @@
  */
 package com.mxgraph.swing.view;
 
-import java.awt.AlphaComposite;
-import java.awt.Composite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
@@ -23,24 +13,26 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Represents the current state of a cell in a given graph view.
  */
 public class mxCellStatePreview
 {
-	/**
-	 * 
-	 */
+
 	protected Map<mxCellState, mxPoint> deltas = new LinkedHashMap<mxCellState, mxPoint>();
 
-	/**
-	 * 
-	 */
 	protected int count = 0;
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
 
 	/**
@@ -48,14 +40,8 @@ public class mxCellStatePreview
 	 */
 	protected boolean cloned;
 
-	/**
-	 * 
-	 */
 	protected float opacity = 1;
 
-	/**
-	 * 
-	 */
 	protected List<mxCellState> cellStates;
 
 	/**
@@ -68,73 +54,46 @@ public class mxCellStatePreview
 		this.cloned = cloned;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isCloned()
 	{
 		return cloned;
 	}
 
-	/**
-	 * 
-	 */
 	public void setCloned(boolean value)
 	{
 		cloned = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEmpty()
 	{
 		return count == 0;
 	}
 
-	/**
-	 * 
-	 */
 	public int getCount()
 	{
 		return count;
 	}
 
-	/**
-	 * 
-	 */
 	public Map<mxCellState, mxPoint> getDeltas()
 	{
 		return deltas;
 	}
 
-	/**
-	 * 
-	 */
 	public void setOpacity(float value)
 	{
 		opacity = value;
 	}
 
-	/**
-	 * 
-	 */
 	public float getOpacity()
 	{
 		return opacity;
 	}
 
-	/**
-	 * 
-	 */
 	public mxPoint moveState(mxCellState state, double dx, double dy)
 	{
 		return moveState(state, dx, dy, true, true);
 	}
 
-	/**
-	 * 
-	 */
 	public mxPoint moveState(mxCellState state, double dx, double dy,
 			boolean add, boolean includeEdges)
 	{
@@ -252,9 +211,6 @@ public class mxCellStatePreview
 		return dirty;
 	}
 
-	/**
-	 * 
-	 */
 	public void restore(List<mxCellState> snapshot)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -272,9 +228,6 @@ public class mxCellStatePreview
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void restoreState(mxCellState state, mxCellState from)
 	{
 		state.setLabelBounds(from.getLabelBounds());
@@ -291,9 +244,6 @@ public class mxCellStatePreview
 		state.setHeight(from.getHeight());
 	}
 
-	/**
-	 * 
-	 */
 	public List<mxCellState> snapshot(mxCellState state)
 	{
 		List<mxCellState> result = new LinkedList<mxCellState>();
@@ -317,9 +267,6 @@ public class mxCellStatePreview
 		return result;
 	}
 
-	/**
-	 *
-	 */
 	protected void translateState(mxCellState parentState, mxCellState state,
 			double dx, double dy)
 	{
@@ -356,9 +303,6 @@ public class mxCellStatePreview
 		}
 	}
 
-	/**
-	 *
-	 */
 	protected mxRectangle revalidateState(mxCellState parentState,
 			mxCellState state, double dx, double dy)
 	{
@@ -421,9 +365,6 @@ public class mxCellStatePreview
 		return dirty;
 	}
 
-	/**
-	 * 
-	 */
 	public void addEdges(mxCellState state)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -443,9 +384,6 @@ public class mxCellStatePreview
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		if (cellStates != null && cellStates.size() > 0)
@@ -479,9 +417,6 @@ public class mxCellStatePreview
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected float getOpacityForCell(Object cell)
 	{
 		return opacity;

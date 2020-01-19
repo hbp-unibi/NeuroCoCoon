@@ -76,17 +76,11 @@ public class mxCurve
 	 */
 	protected boolean valid = false;
 
-	/**
-	 * 
-	 */
 	public void setLabelBuffer(double buffer)
 	{
 		labelBuffer = buffer;
 	}
 
-	/**
-	 * 
-	 */
 	public mxRectangle getBounds()
 	{
 		if (!valid)
@@ -97,16 +91,10 @@ public class mxCurve
 				maxYBounds - minYBounds);
 	}
 
-	/**
-	 * 
-	 */
 	public mxCurve()
 	{
 	}
 
-	/**
-	 * 
-	 */
 	public mxCurve(List<mxPoint> points)
 	{
 		boolean nullPoints = false;

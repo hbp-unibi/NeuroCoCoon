@@ -3,12 +3,6 @@
  */
 package com.mxgraph.swing.handler;
 
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.util.Collection;
-import java.util.LinkedList;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.swing.view.mxCellStatePreview;
@@ -19,15 +13,19 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.util.Collection;
+import java.util.LinkedList;
+
 /**
  * Connection handler creates new connections between cells. This control is used to display the connector
  * icon, while the preview is used to draw the line.
  */
 public class mxMovePreview extends mxEventSource
 {
-	/**
-	 * 
-	 */
+
 	protected mxGraphComponent graphComponent;
 
 	/**
@@ -61,39 +59,18 @@ public class mxMovePreview extends mxEventSource
 	 */
 	protected boolean hideSelectionHandler = false;
 
-	/**
-	 * 
-	 */
 	protected transient mxCellState startState;
 
-	/**
-	 * 
-	 */
 	protected transient mxCellState[] previewStates;
 
-	/**
-	 * 
-	 */
 	protected transient Object[] movingCells;
 
-	/**
-	 * 
-	 */
 	protected transient Rectangle initialPlaceholder;
 
-	/**
-	 * 
-	 */
 	protected transient Rectangle placeholder;
 
-	/**
-	 * 
-	 */
 	protected transient mxRectangle lastDirty;
 
-	/**
-	 * 
-	 */
 	protected transient mxCellStatePreview preview;
 
 	/**
@@ -116,89 +93,56 @@ public class mxMovePreview extends mxEventSource
 		});
 	}
 
-	/**
-	 * 
-	 */
 	public int getThreshold()
 	{
 		return threshold;
 	}
 
-	/**
-	 * 
-	 */
 	public void setThreshold(int value)
 	{
 		threshold = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isPlaceholderPreview()
 	{
 		return placeholderPreview;
 	}
 
-	/**
-	 * 
-	 */
 	public void setPlaceholderPreview(boolean value)
 	{
 		placeholderPreview = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isClonePreview()
 	{
 		return clonePreview;
 	}
 
-	/**
-	 * 
-	 */
 	public void setClonePreview(boolean value)
 	{
 		clonePreview = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isContextPreview()
 	{
 		return contextPreview;
 	}
 
-	/**
-	 * 
-	 */
 	public void setContextPreview(boolean value)
 	{
 		contextPreview = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isHideSelectionHandler()
 	{
 		return hideSelectionHandler;
 	}
 
-	/**
-	 * 
-	 */
 	public void setHideSelectionHandler(boolean value)
 	{
 		hideSelectionHandler = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isActive()
 	{
 		return startState != null;
@@ -212,9 +156,6 @@ public class mxMovePreview extends mxEventSource
 		return movingCells;
 	}
 
-	/**
-	 * 
-	 */
 	public Object[] getCells(mxCellState initialState)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -274,9 +215,6 @@ public class mxMovePreview extends mxEventSource
 		return result.toArray(new mxCellState[result.size()]);
 	}
 
-	/**
-	 * 
-	 */
 	protected boolean isCellOpaque(Object cell)
 	{
 		return startState != null && startState.getCell() == cell;
@@ -302,9 +240,6 @@ public class mxMovePreview extends mxEventSource
 				startState));
 	}
 
-	/**
-	 * 
-	 */
 	protected mxRectangle getPlaceholderBounds(mxCellState startState)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -312,9 +247,6 @@ public class mxMovePreview extends mxEventSource
 		return graph.getView().getBounds(graph.getSelectionCells());
 	}
 
-	/**
-	 * 
-	 */
 	public mxCellStatePreview createCellStatePreview()
 	{
 		return new mxCellStatePreview(graphComponent, isClonePreview())
@@ -400,9 +332,6 @@ public class mxMovePreview extends mxEventSource
 				"dy", dy));
 	}
 
-	/**
-	 * 
-	 */
 	protected void repaint(mxRectangle dirty)
 	{
 		if (dirty != null)
@@ -415,9 +344,6 @@ public class mxMovePreview extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void reset()
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -453,9 +379,6 @@ public class mxMovePreview extends mxEventSource
 		}
 	}
 
-	/**
-	 *
-	 */
 	public Object[] stop(boolean commit, MouseEvent e, double dx, double dy,
 			boolean clone, Object target)
 	{
@@ -484,9 +407,6 @@ public class mxMovePreview extends mxEventSource
 		return cells;
 	}
 
-	/**
-	 *
-	 */
 	public void paint(Graphics g)
 	{
 		if (placeholder != null)

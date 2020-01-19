@@ -11,9 +11,6 @@ import java.io.Serializable;
 public class mxImage implements Serializable, Cloneable
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8541229679513497585L;
 
 	/**

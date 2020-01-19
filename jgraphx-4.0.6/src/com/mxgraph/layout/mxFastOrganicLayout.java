@@ -3,14 +3,14 @@
  */
 package com.mxgraph.layout;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Fast organic layout algorithm.
@@ -156,9 +156,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 				|| graph.getConnections(vertex).length == 0;
 	}
 
-	/**
-	 *
-	 */
 	public boolean isUseInputOrigin()
 	{
 		return useInputOrigin;
@@ -173,9 +170,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 		useInputOrigin = value;
 	}
 
-	/**
-	 *
-	 */
 	public boolean isResetEdges()
 	{
 		return resetEdges;
@@ -190,9 +184,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 		resetEdges = value;
 	}
 
-	/**
-	 *
-	 */
 	public boolean isDisableEdgeStyle()
 	{
 		return disableEdgeStyle;
@@ -207,9 +198,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 		disableEdgeStyle = value;
 	}
 
-	/**
-	 * 
-	 */
 	public double getMaxIterations()
 	{
 		return maxIterations;
@@ -224,9 +212,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 		maxIterations = value;
 	}
 
-	/**
-	 * 
-	 */
 	public double getForceConstant()
 	{
 		return forceConstant;
@@ -241,9 +226,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 		forceConstant = value;
 	}
 
-	/**
-	 * 
-	 */
 	public double getMinDistanceLimit()
 	{
 		return minDistanceLimit;
@@ -274,9 +256,6 @@ public class mxFastOrganicLayout extends mxGraphLayout
 		this.maxDistanceLimit = maxDistanceLimit;
 	}
 
-	/**
-	 * 
-	 */
 	public double getInitialTemp()
 	{
 		return initialTemp;

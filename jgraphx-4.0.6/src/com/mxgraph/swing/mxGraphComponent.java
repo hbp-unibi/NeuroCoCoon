@@ -3,53 +3,6 @@
  */
 package com.mxgraph.swing;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.TransferHandler;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.model.mxGraphModel;
@@ -84,6 +37,52 @@ import com.mxgraph.view.mxEdgeStyle.mxEdgeStyleFunction;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 import com.mxgraph.view.mxTemporaryCellStates;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.TransferHandler;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * For setting the preferred size of the viewport for scrolling, use
@@ -124,59 +123,26 @@ public class mxGraphComponent extends JScrollPane implements Printable
 
 	private static final Logger log = Logger.getLogger(mxGraphComponent.class.getName());
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -30203858391633447L;
 
-	/**
-	 * 
-	 */
 	public static final int GRID_STYLE_DOT = 0;
 
-	/**
-	 * 
-	 */
 	public static final int GRID_STYLE_CROSS = 1;
 
-	/**
-	 * 
-	 */
 	public static final int GRID_STYLE_LINE = 2;
 
-	/**
-	 * 
-	 */
 	public static final int GRID_STYLE_DASHED = 3;
 
-	/**
-	 * 
-	 */
 	public static final int ZOOM_POLICY_NONE = 0;
 
-	/**
-	 * 
-	 */
 	public static final int ZOOM_POLICY_PAGE = 1;
 
-	/**
-	 * 
-	 */
 	public static final int ZOOM_POLICY_WIDTH = 2;
 
-	/**
-	 * 
-	 */
 	public static ImageIcon DEFAULT_EXPANDED_ICON = null;
 
-	/**
-	 * 
-	 */
 	public static ImageIcon DEFAULT_COLLAPSED_ICON = null;
 
-	/**
-	 * 
-	 */
 	public static ImageIcon DEFAULT_WARNING_ICON = null;
 
 	/**
@@ -200,44 +166,20 @@ public class mxGraphComponent extends JScrollPane implements Printable
 						.getResource("/com/mxgraph/swing/images/warning.gif"));
 	}
 
-	/**
-	 * 
-	 */
 	protected mxGraph graph;
 
-	/**
-	 * 
-	 */
 	protected mxGraphControl graphControl;
 
-	/**
-	 * 
-	 */
 	protected mxEventSource eventSource = new mxEventSource(this);
 
-	/**
-	 * 
-	 */
 	protected mxICellEditor cellEditor;
 
-	/**
-	 * 
-	 */
 	protected mxConnectionHandler connectionHandler;
 
-	/**
-	 * 
-	 */
 	protected mxPanningHandler panningHandler;
 
-	/**
-	 * 
-	 */
 	protected mxSelectionCellsHandler selectionCellsHandler;
 
-	/**
-	 * 
-	 */
 	protected mxGraphHandler graphHandler;
 
 	/**
@@ -257,19 +199,10 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	protected PageFormat pageFormat = new PageFormat();
 
-	/**
-	 * 
-	 */
 	protected mxInteractiveCanvas canvas;
 
-	/**
-	 * 
-	 */
 	protected BufferedImage tripleBuffer;
 
-	/**
-	 * 
-	 */
 	protected Graphics2D tripleBufferGraphics;
 
 	/**
@@ -321,14 +254,8 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	protected Color pageBackgroundColor = new Color(144, 153, 174);
 
-	/**
-	 * 
-	 */
 	protected Color pageShadowColor = new Color(110, 120, 140);
 
-	/**
-	 * 
-	 */
 	protected Color pageBorderColor = Color.black;
 
 	/**
@@ -336,9 +263,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	protected boolean gridVisible = false;
 
-	/**
-	 * 
-	 */
 	protected Color gridColor = new Color(192, 192, 192);
 
 	/**
@@ -355,19 +279,10 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	protected boolean autoExtend = true;
 
-	/**
-	 * 
-	 */
 	protected boolean dragEnabled = true;
 
-	/**
-	 * 
-	 */
 	protected boolean importEnabled = true;
 
-	/**
-	 * 
-	 */
 	protected boolean exportEnabled = true;
 
 	/**
@@ -393,34 +308,16 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	protected boolean transparentSwimlaneContent = true;
 
-	/**
-	 * 
-	 */
 	protected int gridStyle = GRID_STYLE_DOT;
 
-	/**
-	 * 
-	 */
 	protected ImageIcon expandedIcon = DEFAULT_EXPANDED_ICON;
 
-	/**
-	 * 
-	 */
 	protected ImageIcon collapsedIcon = DEFAULT_COLLAPSED_ICON;
 
-	/**
-	 * 
-	 */
 	protected ImageIcon warningIcon = DEFAULT_WARNING_ICON;
 
-	/**
-	 * 
-	 */
 	protected boolean antiAlias = true;
 
-	/**
-	 * 
-	 */
 	protected boolean textAntiAlias = true;
 
 	/**
@@ -510,9 +407,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener repaintHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -565,14 +459,9 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected PropertyChangeListener viewChangeHandler = new PropertyChangeListener()
 	{
-		/**
-		 * 
-		 */
+
 		public void propertyChange(PropertyChangeEvent evt)
 		{
 			if (evt.getPropertyName().equals("view"))
@@ -619,9 +508,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	protected mxIEventListener scaleHandler = new mxIEventListener()
 	{
-		/**
-		 * 
-		 */
+
 		public void invoke(Object sender, mxEventObject evt)
 		{
 			if (!zooming)
@@ -734,17 +621,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		});
 	}
 
-	/**
-	 * 
-	 */
 	protected mxICellEditor createCellEditor()
 	{
 		return new mxCellEditor(this);
 	}
 
-	/**
-	 * 
-	 */
 	public void setGraph(mxGraph value)
 	{
 		mxGraph oldValue = graph;
@@ -829,97 +710,61 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		graphHandler = createGraphHandler();
 	}
 
-	/**
-	 * 
-	 */
 	protected TransferHandler createTransferHandler()
 	{
 		return new mxGraphTransferHandler();
 	}
 
-	/**
-	 *
-	 */
 	protected mxSelectionCellsHandler createSelectionCellsHandler()
 	{
 		return new mxSelectionCellsHandler(this);
 	}
 
-	/**
-	 *
-	 */
 	protected mxGraphHandler createGraphHandler()
 	{
 		return new mxGraphHandler(this);
 	}
 
-	/**
-	 * 
-	 */
 	public mxSelectionCellsHandler getSelectionCellsHandler()
 	{
 		return selectionCellsHandler;
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphHandler getGraphHandler()
 	{
 		return graphHandler;
 	}
 
-	/**
-	 *
-	 */
 	protected mxConnectionHandler createConnectionHandler()
 	{
 		return new mxConnectionHandler(this);
 	}
 
-	/**
-	 * 
-	 */
 	public mxConnectionHandler getConnectionHandler()
 	{
 		return connectionHandler;
 	}
 
-	/**
-	 *
-	 */
 	protected mxPanningHandler createPanningHandler()
 	{
 		return new mxPanningHandler(this);
 	}
 
-	/**
-	 * 
-	 */
 	public mxPanningHandler getPanningHandler()
 	{
 		return panningHandler;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEditing()
 	{
 		return getCellEditor().getEditingCell() != null;
 	}
 
-	/**
-	 * 
-	 */
 	public mxICellEditor getCellEditor()
 	{
 		return cellEditor;
 	}
 
-	/**
-	 * 
-	 */
 	public void setCellEditor(mxICellEditor value)
 	{
 		mxICellEditor oldValue = cellEditor;
@@ -948,17 +793,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("tolerance", oldValue, tolerance);
 	}
 
-	/**
-	 * 
-	 */
 	public PageFormat getPageFormat()
 	{
 		return pageFormat;
 	}
 
-	/**
-	 * 
-	 */
 	public void setPageFormat(PageFormat value)
 	{
 		PageFormat oldValue = pageFormat;
@@ -967,17 +806,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("pageFormat", oldValue, pageFormat);
 	}
 
-	/**
-	 * 
-	 */
 	public double getPageScale()
 	{
 		return pageScale;
 	}
 
-	/**
-	 * 
-	 */
 	public void setPageScale(double value)
 	{
 		double oldValue = pageScale;
@@ -1003,17 +836,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public ImageIcon getBackgroundImage()
 	{
 		return backgroundImage;
 	}
 
-	/**
-	 * 
-	 */
 	public void setBackgroundImage(ImageIcon value)
 	{
 		ImageIcon oldValue = backgroundImage;
@@ -1115,9 +942,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("horizontalPageCount", oldValue, horizontalPageCount);
 	}
 
-	/**
-	 * 
-	 */
 	public int getHorizontalPageCount()
 	{
 		return horizontalPageCount;
@@ -1135,9 +959,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("verticalPageCount", oldValue, verticalPageCount);
 	}
 
-	/**
-	 * 
-	 */
 	public int getVerticalPageCount()
 	{
 		return verticalPageCount;
@@ -1288,9 +1109,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("centerZoom", oldValue, centerZoom);
 	}
 
-	/**
-	 * 
-	 */
 	public void setZoomPolicy(int value)
 	{
 		int oldValue = zoomPolicy;
@@ -1304,9 +1122,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("zoomPolicy", oldValue, zoomPolicy);
 	}
 
-	/**
-	 * 
-	 */
 	public int getZoomPolicy()
 	{
 		return zoomPolicy;
@@ -1385,25 +1200,16 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return new mxPoint(x, y);
 	}
 
-	/**
-	 * 
-	 */
 	public void startEditing()
 	{
 		startEditingAtCell(null);
 	}
 
-	/**
-	 * 
-	 */
 	public void startEditingAtCell(Object cell)
 	{
 		startEditingAtCell(cell, null);
 	}
 
-	/**
-	 * 
-	 */
 	public void startEditingAtCell(Object cell, EventObject evt)
 	{
 		if (cell == null)
@@ -1424,17 +1230,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public String getEditingValue(Object cell, EventObject trigger)
 	{
 		return graph.convertValueToString(cell);
 	}
 
-	/**
-	 * 
-	 */
 	public void stopEditing(boolean cancel)
 	{
 		cellEditor.stopEditing(cancel);
@@ -1581,9 +1381,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		zoom(1 / zoomFactor);
 	}
 
-	/**
-	 * 
-	 */
 	public void zoom(double factor)
 	{
 		mxGraphView view = graph.getView();
@@ -1610,9 +1407,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void zoomTo(final double newScale, final boolean center)
 	{
 		mxGraphView view = graph.getView();
@@ -1693,9 +1487,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void zoom(final boolean page, final boolean center)
 	{
 		if (pageVisible && !zooming)
@@ -1766,9 +1557,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 *
-	 */
 	protected void maintainScrollBar(boolean horizontal, double factor,
 			boolean center)
 	{
@@ -1785,9 +1573,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void scrollToCenter(boolean horizontal)
 	{
 		JScrollBar scrollBar = (horizontal) ? getHorizontalScrollBar()
@@ -1933,9 +1718,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public void setSwimlaneSelectionEnabled(boolean value)
 	{
 		boolean oldValue = swimlaneSelectionEnabled;
@@ -1945,17 +1727,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 				swimlaneSelectionEnabled);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isSwimlaneSelectionEnabled()
 	{
 		return swimlaneSelectionEnabled;
 	}
 
-	/**
-	 * 
-	 */
 	public Object[] selectRegion(Rectangle rect, MouseEvent e)
 	{
 		Object[] cells = getCells(rect);
@@ -2116,9 +1892,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public Rectangle getFoldingIconBounds(mxCellState state, ImageIcon icon)
 	{
 		mxIGraphModel model = graph.getModel();
@@ -2141,9 +1914,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return new Rectangle(x, y, w, h);
 	}
 
-	/**
-	 *
-	 */
 	public boolean hitFoldingIcon(Object cell, int x, int y)
 	{
 		if (cell != null)
@@ -2188,9 +1958,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isConnectable()
 	{
 		return connectionHandler.isEnabled();
@@ -2204,9 +1971,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		connectionHandler.setEnabled(connectable);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isPanning()
 	{
 		return panningHandler.isEnabled();
@@ -2402,17 +2166,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("textAntiAlias", oldValue, textAntiAlias);
 	}
 
-	/**
-	 * 
-	 */
 	public float getPreviewAlpha()
 	{
 		return previewAlpha;
 	}
 
-	/**
-	 * 
-	 */
 	public void setPreviewAlpha(float value)
 	{
 		float oldValue = previewAlpha;
@@ -2599,9 +2357,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		firePropertyChange("foldingEnabled", oldValue, foldingEnabled);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEditEvent(MouseEvent e)
 	{
 		return (e != null) ? e.getClickCount() == 2 : false;
@@ -2684,17 +2439,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return (event != null) ? event.isAltDown() : false;
 	}
 
-	/**
-	 * 
-	 */
 	public mxPoint snapScaledPoint(mxPoint pt)
 	{
 		return snapScaledPoint(pt, 0, 0);
 	}
 
-	/**
-	 * 
-	 */
 	public mxPoint snapScaledPoint(mxPoint pt, double dx, double dy)
 	{
 		if (pt != null)
@@ -2801,17 +2550,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return result;
 	}
 
-	/**
-	 * 
-	 */
 	public mxInteractiveCanvas getCanvas()
 	{
 		return canvas;
 	}
 
-	/**
-	 * 
-	 */
 	public BufferedImage getTripleBuffer()
 	{
 		return tripleBuffer;
@@ -2872,17 +2615,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public void insertComponent(mxCellState state, Component c)
 	{
 		getGraphControl().add(c, 0);
 	}
 
-	/**
-	 * 
-	 */
 	public void removeComponent(Component c, Object cell)
 	{
 		if (c.getParent() != null)
@@ -2891,9 +2628,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void updateComponent(mxCellState state, Component c)
 	{
 		int x = (int) state.getX();
@@ -2918,9 +2652,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		c.setBounds(x, y, width, height);
 	}
 
-	/**
-	 * 
-	 */
 	public void updateComponents()
 	{
 		Object root = graph.getModel().getRoot();
@@ -2944,9 +2675,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void removeAllComponents(Hashtable<Object, Component[]> map)
 	{
 		Iterator<Map.Entry<Object, Component[]>> it = map.entrySet().iterator();
@@ -2963,9 +2691,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void removeAllOverlays(Hashtable<Object, mxICellOverlay[]> map)
 	{
 		Iterator<Map.Entry<Object, mxICellOverlay[]>> it = map.entrySet()
@@ -2983,9 +2708,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public Hashtable<Object, Component[]> updateComponents(Object cell)
 	{
 		Hashtable<Object, Component[]> result = new Hashtable<Object, Component[]>();
@@ -3487,9 +3209,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return result;
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintBackground(Graphics g)
 	{
 		Rectangle clip = g.getClipBounds();
@@ -3508,9 +3227,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		g.setClip(clip);
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle paintBackgroundPage(Graphics g)
 	{
 		mxPoint translate = graph.getView().getTranslate();
@@ -3597,9 +3313,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return new Rectangle(x0, y0, w, h);
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintBackgroundImage(Graphics g)
 	{
 		if (backgroundImage != null)
@@ -4008,9 +3721,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	public class mxGraphControl extends JComponent
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -8916603170766739124L;
 
 		/**
@@ -4020,9 +3730,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		 */
 		protected Point translate = new Point(0, 0);
 
-		/**
-		 * 
-		 */
 		public mxGraphControl()
 		{
 			addMouseListener(new MouseAdapter()
@@ -4054,9 +3761,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			translate = value;
 		}
 
-		/**
-		 * 
-		 */
 		public mxGraphComponent getGraphContainer()
 		{
 			return mxGraphComponent.this;
@@ -4140,9 +3844,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			}
 		}
 
-		/**
-		 * 
-		 */
 		public String getToolTipText(MouseEvent e)
 		{
 			String tip = getSelectionCellsHandler().getToolTipText(e);
@@ -4217,9 +3918,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			}
 		}
 
-		/**
-		 * 
-		 */
 		public void paint(Graphics g)
 		{
 			g.translate(translate.x, translate.y);
@@ -4231,9 +3929,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			g.translate(-translate.x, -translate.y);
 		}
 
-		/**
-		 * 
-		 */
 		public void paintComponent(Graphics g)
 		{
 			super.paintComponent(g);
@@ -4279,9 +3974,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			eventSource.fireEvent(new mxEventObject(mxEvent.PAINT, "g", g));
 		}
 
-		/**
-		 * 
-		 */
 		public void drawGraph(Graphics2D g, boolean drawLabels)
 		{
 			Graphics2D previousGraphics = canvas.getGraphics();
@@ -4316,9 +4008,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			drawCell(canvas, graph.getModel().getRoot());
 		}
 
-		/**
-		 * 
-		 */
 		protected boolean hitClip(mxGraphics2DCanvas canvas, mxCellState state)
 		{
 			Rectangle rect = getExtendedCellBounds(state);
@@ -4432,9 +4121,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			}
 		}
 
-		/**
-		 * 
-		 */
 		protected void cellDrawn(mxICanvas canvas, mxCellState state)
 		{
 			if (isFoldingEnabled() && canvas instanceof mxGraphics2DCanvas)
@@ -4474,21 +4160,12 @@ public class mxGraphComponent extends JScrollPane implements Printable
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class mxMouseRedirector implements MouseListener,
 			MouseMotionListener
 	{
 
-		/**
-		 * 
-		 */
 		protected mxGraphComponent graphComponent;
 
-		/**
-		 * 
-		 */
 		public mxMouseRedirector(mxGraphComponent graphComponent)
 		{
 			this.graphComponent = graphComponent;

@@ -3,21 +3,19 @@
  */
 package com.mxgraph.view;
 
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
 
 /**
  * Represents the current state of a cell in a given graph view.
  */
 public class mxCellState extends mxRectangle
 {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 7588335615324083354L;
 
 	/**

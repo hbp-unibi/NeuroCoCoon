@@ -3,141 +3,65 @@
  */
 package com.mxgraph.swing.util;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 
-/**
- *
- */
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
+
 public class mxGraphActions
 {
 
-	/**
-	 * 
-	 */
 	static final Action deleteAction = new DeleteAction("delete");
 
-	/**
-	 * 
-	 */
 	static final Action editAction = new EditAction("edit");
 
-	/**
-	 * 
-	 */
 	static final Action groupAction = new GroupAction("group");
 
-	/**
-	 * 
-	 */
 	static final Action ungroupAction = new UngroupAction("ungroup");
 
-	/**
-	 * 
-	 */
 	static final Action removeFromParentAction = new RemoveFromParentAction(
 			"removeFromParent");
 
-	/**
-	 * 
-	 */
 	static final Action updateGroupBoundsAction = new UpdateGroupBoundsAction(
 			"updateGroupBounds");
 
-	/**
-	 * 
-	 */
 	static final Action selectAllAction = new SelectAction("selectAll");
 
-	/**
-	 * 
-	 */
 	static final Action selectVerticesAction = new SelectAction("vertices");
 
-	/**
-	 * 
-	 */
 	static final Action selectEdgesAction = new SelectAction("edges");
 
-	/**
-	 * 
-	 */
 	static final Action selectNoneAction = new SelectAction("selectNone");
 
-	/**
-	 *
-	 */
 	static final Action selectNextAction = new SelectAction("selectNext");
 
-	/**
-	 * 
-	 */
 	static final Action selectPreviousAction = new SelectAction(
 			"selectPrevious");
 
-	/**
-	 * 
-	 */
 	static final Action selectParentAction = new SelectAction("selectParent");
 
-	/**
-	 * 
-	 */
 	static final Action selectChildAction = new SelectAction("selectChild");
 
-	/**
-	 * 
-	 */
 	static final Action collapseAction = new FoldAction("collapse");
 
-	/**
-	 * 
-	 */
 	static final Action expandAction = new FoldAction("expand");
 
-	/**
-	 * 
-	 */
 	static final Action enterGroupAction = new DrillAction("enterGroup");
 
-	/**
-	 * 
-	 */
 	static final Action exitGroupAction = new DrillAction("exitGroup");
 
-	/**
-	 * 
-	 */
 	static final Action homeAction = new DrillAction("home");
 
-	/**
-	 * 
-	 */
 	static final Action zoomActualAction = new ZoomAction("actual");
 
-	/**
-	 * 
-	 */
 	static final Action zoomInAction = new ZoomAction("zoomIn");
 
-	/**
-	 * 
-	 */
 	static final Action zoomOutAction = new ZoomAction("zoomOut");
 
-	/**
-	 * 
-	 */
 	static final Action toBackAction = new LayerAction("toBack");
 
-	/**
-	 * 
-	 */
 	static final Action toFrontAction = new LayerAction("toFront");
 
 	/**
@@ -373,15 +297,9 @@ public class mxGraphActions
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public static class EditAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 4610112721356742702L;
 
 		/**
@@ -393,9 +311,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			if (e.getSource() instanceof mxGraphComponent)
@@ -406,15 +321,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class DeleteAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -8212339796803275529L;
 
 		/**
@@ -426,9 +335,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -441,15 +347,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class GroupAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -4718086600089409092L;
 
 		/**
@@ -461,18 +361,12 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		protected int getGroupBorder(mxGraph graph)
 		{
 			return 2 * graph.getGridSize();
 
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -486,15 +380,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class UngroupAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 2247770767961318251L;
 
 		/**
@@ -506,9 +394,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -521,15 +406,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class RemoveFromParentAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 7169443038859140811L;
 
 		/**
@@ -541,9 +420,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -556,15 +432,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class UpdateGroupBoundsAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -4718086600089409092L;
 
 		/**
@@ -576,17 +446,11 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		protected int getGroupBorder(mxGraph graph)
 		{
 			return 2 * graph.getGridSize();
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -599,15 +463,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class LayerAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 562519299806253741L;
 
 		/**
@@ -619,9 +477,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -636,15 +491,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class FoldAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 4078517503905239901L;
 
 		/**
@@ -656,9 +505,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -673,15 +519,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class DrillAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 5464382323663870291L;
 
 		/**
@@ -693,9 +533,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);
@@ -721,15 +558,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class ZoomAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -7500195051313272384L;
 
 		/**
@@ -741,9 +572,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			Object source = e.getSource();
@@ -770,15 +598,9 @@ public class mxGraphActions
 
 	}
 
-	/**
-	 * 
-	 */
 	public static class SelectAction extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 6501585024845668187L;
 
 		/**
@@ -790,9 +612,6 @@ public class mxGraphActions
 			super(name);
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = getGraph(e);

@@ -12,9 +12,6 @@ import java.awt.geom.Rectangle2D;
 public class mxRectangle extends mxPoint
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3793966043543578946L;
 
 	/**

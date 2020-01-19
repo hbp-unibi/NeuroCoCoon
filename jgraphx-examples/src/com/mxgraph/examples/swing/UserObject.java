@@ -3,25 +3,20 @@
  */
 package com.mxgraph.examples.swing;
 
-import java.util.EventObject;
-
-import javax.swing.JFrame;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxDomUtils;
 import com.mxgraph.view.mxGraph;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import javax.swing.JFrame;
+import java.util.EventObject;
 
 public class UserObject extends JFrame
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -708317745824467773L;
 
 	public UserObject()
@@ -156,9 +151,7 @@ public class UserObject extends JFrame
 		// Overrides method to create the editing value
 		mxGraphComponent graphComponent = new mxGraphComponent(graph)
 		{
-			/**
-			 * 
-			 */
+
 			private static final long serialVersionUID = 6824440535661529806L;
 
 			public String getEditingValue(Object cell, EventObject trigger)

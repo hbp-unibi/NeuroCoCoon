@@ -37,9 +37,6 @@ import java.util.List;
 public class mxCell implements mxICell, Cloneable, Serializable
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 910211337632342672L;
 
 	/**

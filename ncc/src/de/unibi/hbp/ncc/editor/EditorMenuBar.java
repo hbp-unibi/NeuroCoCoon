@@ -7,7 +7,6 @@ import com.mxgraph.analysis.mxGraphProperties.GraphType;
 import com.mxgraph.analysis.mxGraphStructure;
 import com.mxgraph.analysis.mxTraversal;
 import com.mxgraph.costfunction.mxCostFunction;
-import de.unibi.hbp.ncc.editor.EditorActions.*;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
@@ -16,6 +15,7 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+import de.unibi.hbp.ncc.editor.EditorActions.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -33,9 +33,6 @@ import java.util.ArrayList;
 public class EditorMenuBar extends JMenuBar
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4060203894740766714L;
 
 	public enum AnalyzeType
@@ -105,9 +102,7 @@ public class EditorMenuBar extends JMenuBar
 		JMenuItem item = menu.add(new TogglePropertyItem(graphComponent, mxResources.get("pageLayout"), "PageVisible", true,
 				new ActionListener()
 				{
-					/**
-					 * 
-					 */
+
 					public void actionPerformed(ActionEvent e)
 					{
 						if (graphComponent.isPageVisible() && graphComponent.isCenterPage())
@@ -297,9 +292,7 @@ public class EditorMenuBar extends JMenuBar
 
 		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("preferPageSize"), "PreferPageSize", true, new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				graphComponent.zoomAndCenter();
@@ -325,9 +318,7 @@ public class EditorMenuBar extends JMenuBar
 
 		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("centerPage"), "CenterPage", true, new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				if (graphComponent.isPageVisible() && graphComponent.isCenterPage())
@@ -399,9 +390,7 @@ public class EditorMenuBar extends JMenuBar
 			
 			menu.add(new AbstractAction(lafs[i].getName())
 			{
-				/**
-				 * 
-				 */
+
 				private static final long serialVersionUID = 7588919504149148501L;
 
 				public void actionPerformed(ActionEvent e)
@@ -746,20 +735,11 @@ public class EditorMenuBar extends JMenuBar
 		menu.add(editor.bind(mxResources.get("style"), new StyleAction()));
 	}
 
-	/**
-	 *
-	 */
 	public static class InsertGraph extends AbstractAction
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 4010463992665008365L;
 
-		/**
-		 * 
-		 */
 		protected GraphType graphType;
 
 		protected mxAnalysisGraph aGraph;
@@ -774,9 +754,6 @@ public class EditorMenuBar extends JMenuBar
 			this.aGraph = aGraph;
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			if (e.getSource() instanceof mxGraphComponent)
@@ -843,21 +820,13 @@ public class EditorMenuBar extends JMenuBar
 		}
 	}
 
-	/**
-	 *
-	 */
 	public static class AnalyzeGraph extends AbstractAction
 	{
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 6926170745240507985L;
 
 		mxAnalysisGraph aGraph;
 
-		/**
-		 * 
-		 */
 		protected AnalyzeType analyzeType;
 
 		/**

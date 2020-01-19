@@ -13,9 +13,6 @@ import java.io.Serializable;
 public class mxPoint implements Serializable, Cloneable
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6554231393215892186L;
 
 	/**

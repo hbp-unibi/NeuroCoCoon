@@ -9,9 +9,6 @@ import com.mxgraph.view.mxCellState;
 public class mxLineShape extends mxBasicShape
 {
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		if (configureGraphics(canvas, state, false))
@@ -24,9 +21,6 @@ public class mxLineShape extends mxBasicShape
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public mxPoint[] createPoints(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		String direction = mxUtils.getString(state.getStyle(),

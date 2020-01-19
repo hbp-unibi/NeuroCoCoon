@@ -396,17 +396,11 @@ public class mxPngImageEncoder
 		this.dataOutput = new DataOutputStream(output);
 	}
 
-	/**
-	 *
-	 */
 	public mxPngEncodeParam getParam()
 	{
 		return param;
 	}
 
-	/**
-	 *
-	 */
 	public void setParam(mxPngEncodeParam param)
 	{
 		this.param = param;

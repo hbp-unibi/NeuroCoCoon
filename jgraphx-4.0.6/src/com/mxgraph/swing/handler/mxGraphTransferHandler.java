@@ -3,6 +3,16 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxGraphTransferable;
+import com.mxgraph.util.mxCellRenderer;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.view.mxGraph;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.TransferHandler;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Point;
@@ -11,26 +21,9 @@ import java.awt.datatransfer.Transferable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxGraphTransferable;
-import com.mxgraph.util.mxCellRenderer;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.view.mxGraph;
-
-/**
- * 
- */
 public class mxGraphTransferHandler extends TransferHandler
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6443287704811197675L;
 	private static final Logger log = Logger.getLogger(mxGraphTransferHandler.class.getName());
 
@@ -80,59 +73,35 @@ public class mxGraphTransferHandler extends TransferHandler
 	 */
 	protected Color transferImageBackground = DEFAULT_BACKGROUNDCOLOR;
 
-	/**
-	 * 
-	 */
 	protected Point location;
 
-	/**
-	 * 
-	 */
 	protected Point offset;
 
-	/**
-	 * 
-	 */
 	public int getImportCount()
 	{
 		return importCount;
 	}
 
-	/**
-	 * 
-	 */
 	public void setImportCount(int value)
 	{
 		importCount = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setTransferImageEnabled(boolean transferImageEnabled)
 	{
 		this.transferImageEnabled = transferImageEnabled;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isTransferImageEnabled()
 	{
 		return this.transferImageEnabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setTransferImageBackground(Color transferImageBackground)
 	{
 		this.transferImageBackground = transferImageBackground;
 	}
 
-	/**
-	 * 
-	 */
 	public Color getTransferImageBackground()
 	{
 		return this.transferImageBackground;
@@ -146,25 +115,16 @@ public class mxGraphTransferHandler extends TransferHandler
 		return originalCells != null;
 	}
 
-	/**
-	 * 
-	 */
 	public void setLocation(Point value)
 	{
 		location = value;
 	}
 
-	/**
-	 * 
-	 */
 	public void setOffset(Point value)
 	{
 		offset = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean canImport(JComponent comp, DataFlavor[] flavors)
 	{
 		for (int i = 0; i < flavors.length; i++)
@@ -210,9 +170,6 @@ public class mxGraphTransferHandler extends TransferHandler
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphTransferable createGraphTransferable(
 			mxGraphComponent graphComponent, Object[] cells, ImageIcon icon)
 	{
@@ -231,9 +188,6 @@ public class mxGraphTransferHandler extends TransferHandler
 		return createGraphTransferable(graphComponent, cells, bounds, icon);
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphTransferable createGraphTransferable(
 			mxGraphComponent graphComponent, Object[] cells,
 			mxRectangle bounds, ImageIcon icon)
@@ -242,9 +196,6 @@ public class mxGraphTransferHandler extends TransferHandler
 				cells), bounds, icon);
 	}
 
-	/**
-	 * 
-	 */
 	public ImageIcon createTransferableImage(mxGraphComponent graphComponent,
 			Object[] cells)
 	{
@@ -263,9 +214,6 @@ public class mxGraphTransferHandler extends TransferHandler
 		return icon;
 	}
 
-	/**
-	 * 
-	 */
 	public void exportDone(JComponent c, Transferable data, int action)
 	{
 		initialImportCount = 1;
@@ -289,17 +237,11 @@ public class mxGraphTransferHandler extends TransferHandler
 		offset = null;
 	}
 
-	/**
-	 * 
-	 */
 	protected void removeCells(mxGraphComponent graphComponent, Object[] cells)
 	{
 		graphComponent.getGraph().removeCells(cells);
 	}
 
-	/**
-	 * 
-	 */
 	public int getSourceActions(JComponent c)
 	{
 		return COPY_OR_MOVE;

@@ -12,9 +12,6 @@ import com.mxgraph.view.mxCellState;
 public class mxConstantCostFunction implements mxICostFunction
 {
 
-	/**
-	 * 
-	 */
 	protected double cost = 0;
 
 	/**
@@ -26,9 +23,6 @@ public class mxConstantCostFunction implements mxICostFunction
 		this.cost = cost;
 	}
 
-	/**
-	 *
-	 */
 	public double getCost(mxCellState state)
 	{
 		return cost;

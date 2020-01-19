@@ -5,9 +5,7 @@ import com.mxgraph.view.mxCellState;
 
 public interface mxIShape
 {
-	/**
-	 * 
-	 */
+
 	void paintShape(mxGraphics2DCanvas canvas, mxCellState state);
 
 }

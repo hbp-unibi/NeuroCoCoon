@@ -3,6 +3,12 @@
  */
 package com.mxgraph.model;
 
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxUndoableEdit;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -17,12 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxUndoableEdit;
 
 /**
  * Extends mxEventSource to implement a graph model. The graph model acts as
@@ -119,9 +119,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	 */
 	protected transient int updateLevel = 0;
 
-	/**
-	 * 
-	 */
 	protected transient boolean endingUpdate = false;
 
 	/**
@@ -160,9 +157,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 		setRoot(createRoot());
 	}
 
-	/**
-	 * 
-	 */
 	public int getUpdateLevel()
 	{
 		return updateLevel;
@@ -1584,9 +1578,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 		return result.toArray();
 	}
 
-	/**
-	 * 
-	 */
 	public static Object[] getParents(mxIGraphModel model, Object[] cells)
 	{
 		HashSet<Object> parents = new HashSet<Object>();
@@ -1607,9 +1598,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 		return parents.toArray();
 	}
 
-	/**
-	 * 
-	 */
 	public static Object[] filterCells(Object[] cells, Filter filter)
 	{
 		ArrayList<Object> result = null;
@@ -1758,15 +1746,9 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	// Visitor patterns
 	//
 
-	/**
-	 * 
-	 */
 	public static interface Filter
 	{
 
-		/**
-		 * 
-		 */
 		boolean filter(Object cell);
 	}
 
@@ -1782,17 +1764,11 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 		 */
 		protected Object root, previous;
 
-		/**
-		 * 
-		 */
 		public mxRootChange()
 		{
 			this(null, null);
 		}
 
-		/**
-		 * 
-		 */
 		public mxRootChange(mxGraphModel model, Object root)
 		{
 			super(model);
@@ -1800,9 +1776,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			previous = root;
 		}
 
-		/**
-		 * 
-		 */
 		public void setRoot(Object value)
 		{
 			root = value;
@@ -1816,9 +1789,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return root;
 		}
 
-		/**
-		 * 
-		 */
 		public void setPrevious(Object value)
 		{
 			previous = value;
@@ -1846,35 +1816,20 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxChildChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object parent, previous, child;
 
-		/**
-		 * 
-		 */
 		protected int index, previousIndex;
 
-		/**
-		 * 
-		 */
 		public mxChildChange()
 		{
 			this(null, null, null, 0);
 		}
 
-		/**
-		 * 
-		 */
 		public mxChildChange(mxGraphModel model, Object parent, Object child)
 		{
 			this(model, parent, child, 0);
 		}
 
-		/**
-		 * 
-		 */
 		public mxChildChange(mxGraphModel model, Object parent, Object child,
 				int index)
 		{
@@ -1886,9 +1841,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			previousIndex = index;
 		}
 
-		/**
-		 *
-		 */
 		public void setParent(Object value)
 		{
 			parent = value;
@@ -1902,9 +1854,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return parent;
 		}
 
-		/**
-		 *
-		 */
 		public void setPrevious(Object value)
 		{
 			previous = value;
@@ -1918,9 +1867,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return previous;
 		}
 
-		/**
-		 *
-		 */
 		public void setChild(Object value)
 		{
 			child = value;
@@ -1934,9 +1880,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return child;
 		}
 
-		/**
-		 *
-		 */
 		public void setIndex(int value)
 		{
 			index = value;
@@ -1950,9 +1893,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return index;
 		}
 
-		/**
-		 *
-		 */
 		public void setPreviousIndex(int value)
 		{
 			previousIndex = value;
@@ -1986,9 +1926,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			((mxICell) edge).setTerminal((mxICell) terminal, source);
 		}
 
-		/**
-		 * 
-		 */
 		protected void connect(Object cell, boolean isConnect)
 		{
 			Object source = getTerminal(cell, true);
@@ -2075,27 +2012,15 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxTerminalChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object cell, terminal, previous;
 
-		/**
-		 * 
-		 */
 		protected boolean source;
 
-		/**
-		 * 
-		 */
 		public mxTerminalChange()
 		{
 			this(null, null, null, false);
 		}
 
-		/**
-		 * 
-		 */
 		public mxTerminalChange(mxGraphModel model, Object cell,
 				Object terminal, boolean source)
 		{
@@ -2106,9 +2031,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			this.source = source;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCell(Object value)
 		{
 			cell = value;
@@ -2122,9 +2044,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return cell;
 		}
 
-		/**
-		 * 
-		 */
 		public void setTerminal(Object value)
 		{
 			terminal = value;
@@ -2138,9 +2057,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return terminal;
 		}
 
-		/**
-		 * 
-		 */
 		public void setPrevious(Object value)
 		{
 			previous = value;
@@ -2154,9 +2070,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return previous;
 		}
 
-		/**
-		 * 
-		 */
 		public void setSource(boolean value)
 		{
 			source = value;
@@ -2185,22 +2098,13 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxValueChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object cell, value, previous;
 
-		/**
-		 * 
-		 */
 		public mxValueChange()
 		{
 			this(null, null, null);
 		}
 
-		/**
-		 * 
-		 */
 		public mxValueChange(mxGraphModel model, Object cell, Object value)
 		{
 			super(model);
@@ -2209,9 +2113,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			this.previous = this.value;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCell(Object value)
 		{
 			cell = value;
@@ -2225,9 +2126,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return cell;
 		}
 
-		/**
-		 * 
-		 */
 		public void setValue(Object value)
 		{
 			this.value = value;
@@ -2241,9 +2139,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return value;
 		}
 
-		/**
-		 * 
-		 */
 		public void setPrevious(Object value)
 		{
 			previous = value;
@@ -2272,27 +2167,15 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxStyleChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object cell;
 
-		/**
-		 * 
-		 */
 		protected String style, previous;
 
-		/**
-		 * 
-		 */
 		public mxStyleChange()
 		{
 			this(null, null, null);
 		}
 
-		/**
-		 * 
-		 */
 		public mxStyleChange(mxGraphModel model, Object cell, String style)
 		{
 			super(model);
@@ -2301,9 +2184,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			this.previous = this.style;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCell(Object value)
 		{
 			cell = value;
@@ -2317,9 +2197,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return cell;
 		}
 
-		/**
-		 * 
-		 */
 		public void setStyle(String value)
 		{
 			style = value;
@@ -2333,9 +2210,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return style;
 		}
 
-		/**
-		 * 
-		 */
 		public void setPrevious(String value)
 		{
 			previous = value;
@@ -2364,27 +2238,15 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxGeometryChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object cell;
 
-		/**
-		 * 
-		 */
 		protected mxGeometry geometry, previous;
 
-		/**
-		 * 
-		 */
 		public mxGeometryChange()
 		{
 			this(null, null, null);
 		}
 
-		/**
-		 * 
-		 */
 		public mxGeometryChange(mxGraphModel model, Object cell,
 				mxGeometry geometry)
 		{
@@ -2394,9 +2256,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			this.previous = this.geometry;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCell(Object value)
 		{
 			cell = value;
@@ -2410,9 +2269,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return cell;
 		}
 
-		/**
-		 *
-		 */
 		public void setGeometry(mxGeometry value)
 		{
 			geometry = value;
@@ -2426,9 +2282,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return geometry;
 		}
 
-		/**
-		 *
-		 */
 		public void setPrevious(mxGeometry value)
 		{
 			previous = value;
@@ -2457,27 +2310,15 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxCollapseChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object cell;
 
-		/**
-		 * 
-		 */
 		protected boolean collapsed, previous;
 
-		/**
-		 * 
-		 */
 		public mxCollapseChange()
 		{
 			this(null, null, false);
 		}
 
-		/**
-		 * 
-		 */
 		public mxCollapseChange(mxGraphModel model, Object cell,
 				boolean collapsed)
 		{
@@ -2487,9 +2328,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			this.previous = this.collapsed;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCell(Object value)
 		{
 			cell = value;
@@ -2503,9 +2341,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return cell;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCollapsed(boolean value)
 		{
 			collapsed = value;
@@ -2519,9 +2354,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return collapsed;
 		}
 
-		/**
-		 * 
-		 */
 		public void setPrevious(boolean value)
 		{
 			previous = value;
@@ -2550,27 +2382,15 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 	public static class mxVisibleChange extends mxAtomicGraphModelChange
 	{
 
-		/**
-		 *
-		 */
 		protected Object cell;
 
-		/**
-		 * 
-		 */
 		protected boolean visible, previous;
 
-		/**
-		 * 
-		 */
 		public mxVisibleChange()
 		{
 			this(null, null, false);
 		}
 
-		/**
-		 * 
-		 */
 		public mxVisibleChange(mxGraphModel model, Object cell, boolean visible)
 		{
 			super(model);
@@ -2579,9 +2399,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			this.previous = this.visible;
 		}
 
-		/**
-		 * 
-		 */
 		public void setCell(Object value)
 		{
 			cell = value;
@@ -2595,9 +2412,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return cell;
 		}
 
-		/**
-		 * 
-		 */
 		public void setVisible(boolean value)
 		{
 			visible = value;
@@ -2611,9 +2425,6 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 			return visible;
 		}
 
-		/**
-		 * 
-		 */
 		public void setPrevious(boolean value)
 		{
 			previous = value;

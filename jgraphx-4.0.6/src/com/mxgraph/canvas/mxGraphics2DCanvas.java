@@ -3,6 +3,15 @@
  */
 package com.mxgraph.canvas;
 
+import com.mxgraph.shape.*;
+import com.mxgraph.swing.util.mxSwingConstants;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
+
+import javax.swing.CellRendererPane;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -21,37 +30,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.CellRendererPane;
-
-import com.mxgraph.shape.mxActorShape;
-import com.mxgraph.shape.mxArrowShape;
-import com.mxgraph.shape.mxCloudShape;
-import com.mxgraph.shape.mxConnectorShape;
-import com.mxgraph.shape.mxCurveShape;
-import com.mxgraph.shape.mxCylinderShape;
-import com.mxgraph.shape.mxDefaultTextShape;
-import com.mxgraph.shape.mxDoubleEllipseShape;
-import com.mxgraph.shape.mxDoubleRectangleShape;
-import com.mxgraph.shape.mxEllipseShape;
-import com.mxgraph.shape.mxHexagonShape;
-import com.mxgraph.shape.mxHtmlTextShape;
-import com.mxgraph.shape.mxIShape;
-import com.mxgraph.shape.mxITextShape;
-import com.mxgraph.shape.mxImageShape;
-import com.mxgraph.shape.mxLabelShape;
-import com.mxgraph.shape.mxLineShape;
-import com.mxgraph.shape.mxRectangleShape;
-import com.mxgraph.shape.mxRhombusShape;
-import com.mxgraph.shape.mxStencilRegistry;
-import com.mxgraph.shape.mxSwimlaneShape;
-import com.mxgraph.shape.mxTriangleShape;
-import com.mxgraph.swing.util.mxSwingConstants;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
-
 /**
  * An implementation of a canvas that uses Graphics2D for painting.
  */
@@ -60,14 +38,8 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 
 	private static final Logger log = Logger.getLogger(mxGraphics2DCanvas.class.getName());
 
-	/**
-	 * 
-	 */
 	public static final String TEXT_SHAPE_DEFAULT = "default";
 
-	/**
-	 * 
-	 */
 	public static final String TEXT_SHAPE_HTML = "html";
 
 	/**
@@ -148,17 +120,11 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public static void putShape(String name, mxIShape shape)
 	{
 		shapes.put(name, shape);
 	}
 
-	/**
-	 * 
-	 */
 	public mxIShape getShape(Map<String, Object> style)
 	{
 		String name = mxUtils.getString(style, mxConstants.STYLE_SHAPE, null);
@@ -172,17 +138,11 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		return shape;
 	}
 
-	/**
-	 * 
-	 */
 	public static void putTextShape(String name, mxITextShape shape)
 	{
 		textShapes.put(name, shape);
 	}
 
-	/**
-	 * 
-	 */
 	public mxITextShape getTextShape(Map<String, Object> style, boolean html)
 	{
 		String name;
@@ -199,9 +159,6 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		return textShapes.get(name);
 	}
 
-	/**
-	 * 
-	 */
 	public CellRendererPane getRendererPane()
 	{
 		return rendererPane;
@@ -283,17 +240,11 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		return shape;
 	}
 
-	/**
-	 * 
-	 */
 	public void drawImage(Rectangle bounds, String imageUrl)
 	{
 		drawImage(bounds, imageUrl, PRESERVE_IMAGE_ASPECT, false, false);
 	}
 
-	/**
-	 * 
-	 */
 	public void drawImage(Rectangle bounds, String imageUrl,
 			boolean preserveAspect, boolean flipH, boolean flipV)
 	{
@@ -382,9 +333,6 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		return new Dimension(image.getWidth(null), image.getHeight(null));
 	}
 
-	/**
-	 * 
-	 */
 	public void paintPolyline(mxPoint[] points, boolean rounded)
 	{
 		if (points != null && points.length > 1)
@@ -456,9 +404,6 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		}
 	}
 
-	/**
-	 *
-	 */
 	public void paintRectangle(Rectangle bounds, Color background, Color border)
 	{
 		if (background != null)
@@ -474,17 +419,11 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		}
 	}
 
-	/**
-	 *
-	 */
 	public void fillShape(Shape shape)
 	{
 		fillShape(shape, false);
 	}
 
-	/**
-	 *
-	 */
 	public void fillShape(Shape shape, boolean shadow)
 	{
 		int shadowOffsetX = (shadow) ? mxConstants.SHADOW_OFFSETX : 0;
@@ -510,9 +449,6 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		g.fill(shape);
 	}
 
-	/**
-	 * 
-	 */
 	public Stroke createStroke(Map<String, Object> style)
 	{
 		double width = mxUtils
@@ -539,9 +475,6 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public Paint createFillPaint(mxRectangle bounds, Map<String, Object> style)
 	{
 		Color fillColor = mxUtils.getColor(style, mxConstants.STYLE_FILLCOLOR);
@@ -589,9 +522,6 @@ public class mxGraphics2DCanvas extends mxBasicCanvas
 		return fillPaint;
 	}
 
-	/**
-	 * 
-	 */
 	public Graphics2D createTemporaryGraphics(Map<String, Object> style,
 			float opacity, mxRectangle bounds)
 	{

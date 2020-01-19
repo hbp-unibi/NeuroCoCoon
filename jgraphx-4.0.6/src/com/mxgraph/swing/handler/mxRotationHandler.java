@@ -1,17 +1,5 @@
 package com.mxgraph.swing.handler;
 
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxMouseAdapter;
 import com.mxgraph.util.mxConstants;
@@ -21,6 +9,17 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 
 /**
  * Basic example of implementing a handler for rotation. This can be used as follows:
@@ -32,9 +31,7 @@ import com.mxgraph.view.mxCellState;
  */
 public class mxRotationHandler extends mxMouseAdapter
 {
-	/**
-	 * 
-	 */
+
 	public static ImageIcon ROTATE_ICON = null;
 
 	/**
@@ -47,9 +44,6 @@ public class mxRotationHandler extends mxMouseAdapter
 						.getResource("/com/mxgraph/swing/images/rotate.gif"));
 	}
 
-	/**
-	 * 
-	 */
 	private static double PI4 = Math.PI / 4;
 
 	/**
@@ -62,29 +56,14 @@ public class mxRotationHandler extends mxMouseAdapter
 	 */
 	protected boolean enabled = true;
 
-	/**
-	 * 
-	 */
 	protected JComponent handle;
 
-	/**
-	 * 
-	 */
 	protected mxCellState currentState;
 
-	/**
-	 * 
-	 */
 	protected double initialAngle;
 
-	/**
-	 * 
-	 */
 	protected double currentAngle;
 
-	/**
-	 * 
-	 */
 	protected Point first;
 
 	/**
@@ -115,33 +94,21 @@ public class mxRotationHandler extends mxMouseAdapter
 		handle.addMouseMotionListener(this);
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphComponent getGraphComponent()
 	{
 		return graphComponent;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setEnabled(boolean value)
 	{
 		enabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	protected JComponent createHandle()
 	{
 		JLabel label = new JLabel(ROTATE_ICON);
@@ -151,17 +118,11 @@ public class mxRotationHandler extends mxMouseAdapter
 		return label;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isStateHandled(mxCellState state)
 	{
 		return graphComponent.getGraph().getModel().isVertex(state.getCell());
 	}
 
-	/**
-	 * 
-	 */
 	public void mousePressed(MouseEvent e)
 	{
 		if (currentState != null && handle.getParent() != null
@@ -172,9 +133,6 @@ public class mxRotationHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void start(MouseEvent e)
 	{
 		initialAngle = mxUtils.getDouble(currentState.getStyle(),
@@ -189,9 +147,6 @@ public class mxRotationHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseMoved(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled())
@@ -250,9 +205,6 @@ public class mxRotationHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled() && !e.isConsumed()
@@ -286,9 +238,6 @@ public class mxRotationHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled() && !e.isConsumed()
@@ -327,9 +276,6 @@ public class mxRotationHandler extends mxMouseAdapter
 		currentState = null;
 	}
 
-	/**
-	 * 
-	 */
 	public void reset()
 	{
 		if (handle.getParent() != null)
@@ -356,9 +302,6 @@ public class mxRotationHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 *
-	 */
 	public void paint(Graphics g)
 	{
 		if (currentState != null && first != null)

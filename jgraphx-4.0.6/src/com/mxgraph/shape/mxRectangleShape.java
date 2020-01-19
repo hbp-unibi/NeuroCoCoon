@@ -3,21 +3,18 @@
  */
 package com.mxgraph.shape;
 
-import java.awt.Rectangle;
-import java.util.Map;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 
+import java.awt.Rectangle;
+import java.util.Map;
+
 public class mxRectangleShape extends mxBasicShape
 {
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		Map<String, Object> style = state.getStyle();

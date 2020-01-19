@@ -2,17 +2,6 @@
  * Copyright (c) 2006-2012, JGraph Ltd */
 package com.mxgraph.examples.swing;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
-
-import org.w3c.dom.Document;
-
 import com.mxgraph.examples.swing.editor.BasicGraphEditor;
 import com.mxgraph.examples.swing.editor.EditorMenuBar;
 import com.mxgraph.examples.swing.editor.EditorPalette;
@@ -33,12 +22,20 @@ import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+import org.w3c.dom.Document;
+
+import javax.swing.ImageIcon;
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.Point;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.Iterator;
+import java.util.List;
 
 public class GraphEditor extends BasicGraphEditor
 {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -4601740824088314699L;
 
 	/**
@@ -61,9 +58,6 @@ public class GraphEditor extends BasicGraphEditor
 		this("mxGraph Editor", new CustomGraphComponent(new CustomGraph()));
 	}
 
-	/**
-	 * 
-	 */
 	public GraphEditor(String appTitle, mxGraphComponent component)
 	{
 		super(appTitle, component);
@@ -436,15 +430,9 @@ public class GraphEditor extends BasicGraphEditor
 						80, 80, "Timer");
 	}
 
-	/**
-	 * 
-	 */
 	public static class CustomGraphComponent extends mxGraphComponent
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -6833603133512882012L;
 
 		/**

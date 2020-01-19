@@ -4,24 +4,22 @@
 
 package com.mxgraph.reader;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxImageCanvas;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * A converter that renders display XML data onto a graphics canvas. This
@@ -102,49 +100,31 @@ public class mxGraphViewImageReader extends mxGraphViewReader
 		setCropping(cropping);
 	}
 
-	/**
-	 * 
-	 */
 	public Color getBackground()
 	{
 		return background;
 	}
 
-	/**
-	 * 
-	 */
 	public void setBackground(Color background)
 	{
 		this.background = background;
 	}
 
-	/**
-	 * 
-	 */
 	public int getBorder()
 	{
 		return border;
 	}
 
-	/**
-	 * 
-	 */
 	public void setBorder(int border)
 	{
 		this.border = border;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isAntiAlias()
 	{
 		return antiAlias;
 	}
 
-	/**
-	 * 
-	 */
 	public void setAntiAlias(boolean antiAlias)
 	{
 		this.antiAlias = antiAlias;
@@ -158,25 +138,16 @@ public class mxGraphViewImageReader extends mxGraphViewReader
 		return cropping;
 	}
 
-	/**
-	 * 
-	 */
 	public void setCropping(boolean value)
 	{
 		this.cropping = value;
 	}
 
-	/**
-	 * 
-	 */
 	public mxRectangle getClip()
 	{
 		return clip;
 	}
 
-	/**
-	 * 
-	 */
 	public void setClip(mxRectangle value)
 	{
 		this.clip = value;

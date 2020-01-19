@@ -1,10 +1,5 @@
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.Component;
-
-import javax.swing.JTable;
-import javax.swing.JViewport;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
@@ -12,12 +7,13 @@ import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import java.awt.Component;
+
 public class SchemaGraphComponent extends mxGraphComponent
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -1152655782652932774L;
 
 	/**
@@ -31,9 +27,6 @@ public class SchemaGraphComponent extends mxGraphComponent
 		mxGraphView graphView = new mxGraphView(graph)
 		{
 
-			/**
-			 * 
-			 */
 			public void updateFloatingTerminalPoint(mxCellState edge,
 					mxCellState start, mxCellState end, boolean isSource)
 			{
@@ -82,7 +75,7 @@ public class SchemaGraphComponent extends mxGraphComponent
 
 	/**
 	 * 
-	 * @param edge
+	 * @param state
 	 * @param isSource
 	 * @return the column number the edge is attached to
 	 */
@@ -103,9 +96,6 @@ public class SchemaGraphComponent extends mxGraphComponent
 		return -1;
 	}
 
-	/**
-	 * 
-	 */
 	public int getColumnLocation(mxCellState edge, mxCellState terminal,
 			int column)
 	{
@@ -133,9 +123,6 @@ public class SchemaGraphComponent extends mxGraphComponent
 		return y;
 	}
 
-	/**
-	 * 
-	 */
 	public Component[] createComponents(mxCellState state)
 	{
 		if (getGraph().getModel().isVertex(state.getCell()))

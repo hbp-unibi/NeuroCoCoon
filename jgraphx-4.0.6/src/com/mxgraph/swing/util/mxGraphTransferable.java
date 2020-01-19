@@ -3,6 +3,11 @@
  */
 package com.mxgraph.swing.util;
 
+import com.mxgraph.util.mxRectangle;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.plaf.UIResource;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -17,22 +22,10 @@ import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.plaf.UIResource;
-
-import com.mxgraph.util.mxRectangle;
-
-/**
- *
- */
 public class mxGraphTransferable implements Transferable, UIResource,
 		Serializable
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5123819419918087664L;
 	private static final Logger log = Logger.getLogger(mxGraphTransferable.class.getName());
 
@@ -66,52 +59,25 @@ public class mxGraphTransferable implements Transferable, UIResource,
 	 */
 	public static DataFlavor dataFlavor;
 
-	/**
-	 * 
-	 */
 	private static DataFlavor[] htmlFlavors;
 
-	/**
-	 * 
-	 */
 	private static DataFlavor[] stringFlavors;
 
-	/**
-	 * 
-	 */
 	private static DataFlavor[] plainFlavors;
 
-	/**
-	 * 
-	 */
 	private static DataFlavor[] imageFlavors;
 
-	/**
-	 * 
-	 */
 	protected Object[] cells;
 
-	/**
-	 * 
-	 */
 	protected mxRectangle bounds;
 
-	/**
-	 * 
-	 */
 	protected ImageIcon image;
 
-	/**
-	 * 
-	 */
 	public mxGraphTransferable(Object[] cells, mxRectangle bounds)
 	{
 		this(cells, bounds, null);
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphTransferable(Object[] cells, mxRectangle bounds,
 			ImageIcon image)
 	{
@@ -136,17 +102,11 @@ public class mxGraphTransferable implements Transferable, UIResource,
 		return bounds;
 	}
 
-	/**
-	 * 
-	 */
 	public ImageIcon getImage()
 	{
 		return image;
 	}
 
-	/**
-	 * 
-	 */
 	public DataFlavor[] getTransferDataFlavors()
 	{
 		DataFlavor[] richerFlavors = getRicherFlavors();
@@ -420,9 +380,6 @@ public class mxGraphTransferable implements Transferable, UIResource,
 		return false;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isImageSupported()
 	{
 		return enableImageSupport && image != null;

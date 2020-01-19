@@ -1,8 +1,8 @@
 package de.unibi.hbp.ncc.editor;
 
-import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxResources;
+import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
 
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
@@ -11,9 +11,6 @@ import javax.swing.TransferHandler;
 public class EditorPopupMenu extends JPopupMenu
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3132749140550242191L;
 
 	public EditorPopupMenu(BasicGraphEditor editor)

@@ -21,14 +21,8 @@ public class mxPngTextDecoder
 {
 	private static final Logger log = Logger.getLogger(mxPngTextDecoder.class.getName());
 
-	/**
-	 * 
-	 */
 	public static final int PNG_CHUNK_ZTXT = 2052348020;
 
-	/**
-	 * 
-	 */
 	public static final int PNG_CHUNK_IEND = 1229278788;
 
 	/**

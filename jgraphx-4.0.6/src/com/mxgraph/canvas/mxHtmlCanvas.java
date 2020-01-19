@@ -3,19 +3,18 @@
  */
 package com.mxgraph.canvas;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of a canvas that uses HTML for painting.
@@ -45,9 +44,6 @@ public class mxHtmlCanvas extends mxBasicCanvas
 		setDocument(document);
 	}
 
-	/**
-	 * 
-	 */
 	public void appendHtmlElement(Element node)
 	{
 		if (document != null)
@@ -62,9 +58,6 @@ public class mxHtmlCanvas extends mxBasicCanvas
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setDocument(Document document)
 	{
 		this.document = document;

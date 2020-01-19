@@ -1,15 +1,5 @@
 package com.mxgraph.examples.swing.editor;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
-import javax.swing.TransferHandler;
-
 import com.mxgraph.examples.swing.editor.EditorActions.HistoryAction;
 import com.mxgraph.examples.swing.editor.EditorActions.NewAction;
 import com.mxgraph.examples.swing.editor.EditorActions.OpenAction;
@@ -19,16 +9,22 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraphView;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
+import javax.swing.TransferHandler;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SchemaEditorToolBar extends JToolBar
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3979320704834605323L;
 
 	/**
@@ -38,9 +34,6 @@ public class SchemaEditorToolBar extends JToolBar
 	 */
 	private boolean ignoreZoomChange = false;
 
-	/**
-	 * 
-	 */
 	public SchemaEditorToolBar(final BasicGraphEditor editor, int orientation)
 	{
 		super(orientation);
@@ -98,9 +91,7 @@ public class SchemaEditorToolBar extends JToolBar
 		// Sets the zoom in the zoom combo the current value
 		mxIEventListener scaleTracker = new mxIEventListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void invoke(Object sender, mxEventObject evt)
 			{
 				ignoreZoomChange = true;
@@ -129,9 +120,7 @@ public class SchemaEditorToolBar extends JToolBar
 
 		zoomCombo.addActionListener(new ActionListener()
 		{
-			/**
-			 * 
-			 */
+
 			public void actionPerformed(ActionEvent e)
 			{
 				mxGraphComponent graphComponent = editor.getGraphComponent();

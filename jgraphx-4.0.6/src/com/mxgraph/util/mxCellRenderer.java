@@ -3,12 +3,6 @@
  */
 package com.mxgraph.util;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-
-import org.w3c.dom.Document;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.canvas.mxHtmlCanvas;
 import com.mxgraph.canvas.mxICanvas;
@@ -18,12 +12,15 @@ import com.mxgraph.canvas.mxVmlCanvas;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 import com.mxgraph.view.mxTemporaryCellStates;
+import org.w3c.dom.Document;
+
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 public class mxCellRenderer
 {
-	/**
-	 * 
-	 */
+
 	private mxCellRenderer()
 	{
 		// static class
@@ -107,9 +104,6 @@ public class mxCellRenderer
 		return canvas;
 	}
 
-	/**
-	 * 
-	 */
 	public static BufferedImage createBufferedImage(mxGraph graph,
 			Object[] cells, double scale, Color background, boolean antiAlias,
 			mxRectangle clip)
@@ -118,9 +112,6 @@ public class mxCellRenderer
 				clip, new mxGraphics2DCanvas());
 	}
 
-	/**
-	 * 
-	 */
 	public static BufferedImage createBufferedImage(mxGraph graph,
 			Object[] cells, double scale, final Color background,
 			final boolean antiAlias, mxRectangle clip,
@@ -140,9 +131,6 @@ public class mxCellRenderer
 		return (canvas != null) ? canvas.destroy() : null;
 	}
 
-	/**
-	 * 
-	 */
 	public static Document createHtmlDocument(mxGraph graph, Object[] cells,
 			double scale, Color background, mxRectangle clip)
 	{
@@ -159,9 +147,6 @@ public class mxCellRenderer
 		return (canvas != null) ? canvas.getDocument() : null;
 	}
 
-	/**
-	 * 
-	 */
 	public static Document createSvgDocument(mxGraph graph, Object[] cells,
 			double scale, Color background, mxRectangle clip)
 	{
@@ -179,9 +164,6 @@ public class mxCellRenderer
 		return (canvas != null) ? canvas.getDocument() : null;
 	}
 
-	/**
-	 * 
-	 */
 	public static Document createVmlDocument(mxGraph graph, Object[] cells,
 			double scale, Color background, mxRectangle clip)
 	{
@@ -198,9 +180,6 @@ public class mxCellRenderer
 		return (canvas != null) ? canvas.getDocument() : null;
 	}
 
-	/**
-	 * 
-	 */
 	public static abstract class CanvasFactory
 	{
 

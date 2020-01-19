@@ -8,6 +8,14 @@
  */
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+
+import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Stroke;
@@ -19,22 +27,10 @@ import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import javax.swing.SwingUtilities;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
-
 public class mxSelectionCellsHandler implements MouseListener,
 		MouseMotionListener
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -882368002120921842L;
 
 	/**
@@ -73,9 +69,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 	 */
 	protected transient LinkedHashMap<Object, mxCellHandler> handlers = new LinkedHashMap<Object, mxCellHandler>();
 
-	/**
-	 * 
-	 */
 	protected transient mxIEventListener refreshHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -87,9 +80,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected transient PropertyChangeListener labelMoveHandler = new PropertyChangeListener()
 	{
 
@@ -191,65 +181,41 @@ public class mxSelectionCellsHandler implements MouseListener,
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphComponent getGraphComponent()
 	{
 		return graphComponent;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setEnabled(boolean value)
 	{
 		enabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isVisible()
 	{
 		return visible;
 	}
 
-	/**
-	 * 
-	 */
 	public void setVisible(boolean value)
 	{
 		visible = value;
 	}
 
-	/**
-	 * 
-	 */
 	public int getMaxHandlers()
 	{
 		return maxHandlers;
 	}
 
-	/**
-	 * 
-	 */
 	public void setMaxHandlers(int value)
 	{
 		maxHandlers = value;
 	}
 
-	/**
-	 * 
-	 */
 	public mxCellHandler getHandler(Object cell)
 	{
 		return handlers.get(cell);
@@ -274,9 +240,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseMoved(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled())
@@ -290,9 +253,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled())
@@ -306,9 +266,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled())
@@ -344,9 +301,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		return tip;
 	}
 
-	/**
-	 * 
-	 */
 	public void reset()
 	{
 		Iterator<mxCellHandler> it = handlers.values().iterator();
@@ -357,9 +311,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void refresh()
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -443,9 +394,6 @@ public class mxSelectionCellsHandler implements MouseListener,
 		bounds = handleBounds;
 	}
 
-	/**
-	 * 
-	 */
 	public void paintHandles(Graphics g)
 	{
 		Iterator<mxCellHandler> it = handlers.values().iterator();

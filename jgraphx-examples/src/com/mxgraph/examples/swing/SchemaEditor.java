@@ -1,11 +1,5 @@
 package com.mxgraph.examples.swing;
 
-import java.awt.BorderLayout;
-
-import javax.swing.ImageIcon;
-import javax.swing.JToolBar;
-import javax.swing.UIManager;
-
 import com.mxgraph.examples.swing.editor.BasicGraphEditor;
 import com.mxgraph.examples.swing.editor.EditorPalette;
 import com.mxgraph.examples.swing.editor.SchemaEditorMenuBar;
@@ -17,17 +11,16 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+import javax.swing.ImageIcon;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import java.awt.BorderLayout;
+
 public class SchemaEditor extends BasicGraphEditor
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7007225006753337933L;
 
-	/**
-	 * 
-	 */
 	public SchemaEditor()
 	{
 		super("mxGraph for JFC/Swing", new SchemaGraphComponent(new mxGraph()
@@ -42,9 +35,7 @@ public class SchemaEditor extends BasicGraphEditor
 		})
 
 		{
-			/**
-			 * 
-			 */
+
 			private static final long serialVersionUID = -1194463455177427496L;
 
 			/**
@@ -101,9 +92,6 @@ public class SchemaEditor extends BasicGraphEditor
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void installToolBar()
 	{
 		add(new SchemaEditorToolBar(this, JToolBar.HORIZONTAL),

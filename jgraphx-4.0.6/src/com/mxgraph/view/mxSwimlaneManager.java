@@ -3,8 +3,6 @@
  */
 package com.mxgraph.view;
 
-import java.util.Map;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxConstants;
@@ -13,6 +11,8 @@ import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
+
+import java.util.Map;
 
 /**
  * Manager for swimlanes and nested swimlanes that sets the size of newly added
@@ -52,9 +52,6 @@ public class mxSwimlaneManager extends mxEventSource
 	 */
 	protected boolean resizeEnabled;
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener addHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -66,9 +63,6 @@ public class mxSwimlaneManager extends mxEventSource
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener resizeHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -80,9 +74,6 @@ public class mxSwimlaneManager extends mxEventSource
 		}
 	};
 
-	/**
-	 * 
-	 */
 	public mxSwimlaneManager(mxGraph graph)
 	{
 		setGraph(graph);
@@ -380,9 +371,6 @@ public class mxSwimlaneManager extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void destroy()
 	{
 		setGraph(null);

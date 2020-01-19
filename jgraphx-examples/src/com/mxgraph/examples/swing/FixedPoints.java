@@ -1,16 +1,13 @@
 package com.mxgraph.examples.swing;
 
-import javax.swing.JFrame;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+
+import javax.swing.JFrame;
 
 public class FixedPoints extends JFrame
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2707712944901661771L;
 
 	@SuppressWarnings("unused")

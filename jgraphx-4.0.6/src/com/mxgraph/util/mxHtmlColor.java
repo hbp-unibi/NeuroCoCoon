@@ -25,9 +25,6 @@ public class mxHtmlColor
 	protected static final Pattern rgbRegex = Pattern.compile(
 			"rgba?\\([^)]*\\)", Pattern.CASE_INSENSITIVE);
 
-	/**
-	 * 
-	 */
 	public static String hexString(Color color)
 	{
 		int r = color.getRed();

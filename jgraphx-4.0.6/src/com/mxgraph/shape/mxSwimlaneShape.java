@@ -21,9 +21,6 @@ public class mxSwimlaneShape extends mxBasicShape
 						mxConstants.DEFAULT_STARTSIZE) * canvas.getScale());
 	};
 
-	/**
-	 * 
-	 */
 	protected mxRectangle getGradientBounds(mxGraphics2DCanvas canvas,
 			mxCellState state)
 	{
@@ -46,9 +43,6 @@ public class mxSwimlaneShape extends mxBasicShape
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		double start = getTitleSize(canvas, state);
@@ -132,9 +126,6 @@ public class mxSwimlaneShape extends mxBasicShape
 		return c;
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintSwimlane(mxGraphics2DCanvas canvas, mxCellState state,
 			double start, String fill, boolean swimlaneLine)
 	{

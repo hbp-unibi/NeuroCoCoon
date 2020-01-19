@@ -18,14 +18,8 @@ public class mxFibonacciHeap
 	 */
 	protected Map<Object, Node> nodes = new Hashtable<Object, Node>();
 
-	/**
-	 * 
-	 */
 	protected Node min;
 
-	/**
-	 * 
-	 */
 	protected int size;
 
 	/**

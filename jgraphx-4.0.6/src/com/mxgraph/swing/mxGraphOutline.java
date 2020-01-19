@@ -3,6 +3,16 @@
  */
 package com.mxgraph.swing;
 
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxGraphView;
+
+import javax.swing.JComponent;
+import javax.swing.JScrollBar;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -25,17 +35,6 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxGraphView;
-
 /**
  * An outline view for a specific graph component.
  */
@@ -44,19 +43,10 @@ public class mxGraphOutline extends JComponent
 
 	private static final Logger log = Logger.getLogger(mxGraphOutline.class.getName());
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2521103946905154267L;
 
-	/**
-	 * 
-	 */
 	public static Color DEFAULT_ZOOMHANDLE_FILL = new Color(0, 255, 255);
 
-	/**
-	 * 
-	 */
 	protected mxGraphComponent graphComponent;
 
 	/**
@@ -79,44 +69,20 @@ public class mxGraphOutline extends JComponent
 	 */
 	protected mxRectangle repaintClip = null;
 
-	/**
-	 * 
-	 */
 	protected boolean tripleBuffered = true;
 
-	/**
-	 * 
-	 */
 	protected Rectangle finderBounds = new Rectangle();
 
-	/**
-	 * 
-	 */
 	protected Point zoomHandleLocation = null;
 
-	/**
-	 * 
-	 */
 	protected boolean finderVisible = true;
 
-	/**
-	 * 
-	 */
 	protected boolean zoomHandleVisible = true;
 
-	/**
-	 * 
-	 */
 	protected boolean useScaledInstance = false;
 
-	/**
-	 * 
-	 */
 	protected boolean antiAlias = false;
 
-	/**
-	 * 
-	 */
 	protected boolean drawLabels = false;
 
 	/**
@@ -133,29 +99,14 @@ public class mxGraphOutline extends JComponent
 	 */
 	protected int outlineBorder = 10;
 
-	/**
-	 * 
-	 */
 	protected MouseTracker tracker = new MouseTracker();
 
-	/**
-	 * 
-	 */
 	protected double scale = 1;
 
-	/**
-	 * 
-	 */
 	protected Point translate = new Point();
 
-	/**
-	 * 
-	 */
 	protected transient boolean zoomGesture = false;
 
-	/**
-	 * 
-	 */
 	protected mxIEventListener repaintHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
@@ -193,9 +144,6 @@ public class mxGraphOutline extends JComponent
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected ComponentListener componentHandler = new ComponentAdapter()
 	{
 		public void componentResized(ComponentEvent e)
@@ -213,15 +161,9 @@ public class mxGraphOutline extends JComponent
 		}
 	};
 
-	/**
-	 * 
-	 */
 	protected AdjustmentListener adjustmentHandler = new AdjustmentListener()
 	{
 
-		/**
-		 * 
-		 */
 		public void adjustmentValueChanged(AdjustmentEvent e)
 		{
 			if (updateScaleAndTranslate())
@@ -238,9 +180,6 @@ public class mxGraphOutline extends JComponent
 
 	};
 
-	/**
-	 * 
-	 */
 	public mxGraphOutline(mxGraphComponent graphComponent)
 	{
 		addComponentListener(componentHandler);
@@ -269,9 +208,6 @@ public class mxGraphOutline extends JComponent
 		firePropertyChange("tripleBuffered", oldValue, tripleBuffered);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isTripleBuffered()
 	{
 		return tripleBuffered;
@@ -291,9 +227,6 @@ public class mxGraphOutline extends JComponent
 		firePropertyChange("drawLabels", oldValue, drawLabels);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isDrawLabels()
 	{
 		return drawLabels;
@@ -321,9 +254,6 @@ public class mxGraphOutline extends JComponent
 		return antiAlias;
 	}
 
-	/**
-	 * 
-	 */
 	public void setVisible(boolean visible)
 	{
 		super.setVisible(visible);
@@ -335,17 +265,11 @@ public class mxGraphOutline extends JComponent
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setFinderVisible(boolean visible)
 	{
 		finderVisible = visible;
 	}
 
-	/**
-	 * 
-	 */
 	public void setZoomHandleVisible(boolean visible)
 	{
 		zoomHandleVisible = visible;
@@ -370,17 +294,11 @@ public class mxGraphOutline extends JComponent
 		firePropertyChange("fitPage", oldValue, fitPage);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isFitPage()
 	{
 		return fitPage;
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphComponent getGraphComponent()
 	{
 		return graphComponent;
@@ -517,9 +435,6 @@ public class mxGraphOutline extends JComponent
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void updateFinder(boolean repaint)
 	{
 		Rectangle rect = graphComponent.getViewport().getViewRect();
@@ -533,9 +448,6 @@ public class mxGraphOutline extends JComponent
 				w + 1, h + 1), repaint);
 	}
 
-	/**
-	 * 
-	 */
 	public void updateFinderBounds(Rectangle bounds, boolean repaint)
 	{
 		if (bounds != null && !bounds.equals(finderBounds))
@@ -553,9 +465,6 @@ public class mxGraphOutline extends JComponent
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
@@ -782,14 +691,9 @@ public class mxGraphOutline extends JComponent
 		}
 	}
 
-	/**
-	 *
-	 */
 	public class MouseTracker implements MouseListener, MouseMotionListener
 	{
-		/**
-		 * 
-		 */
+
 		protected Point start = null;
 
 		/*
@@ -914,9 +818,6 @@ public class mxGraphOutline extends JComponent
 			}
 		}
 
-		/**
-		 * 
-		 */
 		public boolean hitZoomHandle(int x, int y)
 		{
 			return new Rectangle(finderBounds.x + finderBounds.width - 6,

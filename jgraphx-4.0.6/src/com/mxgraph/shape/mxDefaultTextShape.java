@@ -3,6 +3,11 @@
  */
 package com.mxgraph.shape;
 
+import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -10,17 +15,9 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.Map;
 
-import com.mxgraph.canvas.mxGraphics2DCanvas;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
-
 public class mxDefaultTextShape implements mxITextShape
 {
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, String text,
 			mxCellState state, Map<String, Object> style)
 	{

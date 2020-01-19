@@ -1,29 +1,18 @@
 package com.mxgraph.view;
 
-import java.util.Hashtable;
-
 import com.mxgraph.util.mxRectangle;
+
+import java.util.Hashtable;
 
 public class mxTemporaryCellStates
 {
-	/**
-	 * 
-	 */
+
 	protected mxGraphView view;
 
-	/**
-	 * 
-	 */
 	protected Hashtable<Object, mxCellState> oldStates;
 
-	/**
-	 * 
-	 */
 	protected mxRectangle oldBounds;
 
-	/**
-	 * 
-	 */
 	protected double oldScale;
 
 	/**

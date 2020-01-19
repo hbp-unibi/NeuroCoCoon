@@ -1,5 +1,15 @@
 package com.mxgraph.swing.handler;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxMouseAdapter;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.view.mxGraph;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,16 +17,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxMouseAdapter;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.view.mxGraph;
 
 public class mxInsertHandler extends mxMouseAdapter
 {
@@ -31,44 +31,20 @@ public class mxInsertHandler extends mxMouseAdapter
 	 */
 	protected boolean enabled = true;
 
-	/**
-	 * 
-	 */
 	protected String style;
 
-	/**
-	 * 
-	 */
 	protected Point first;
 
-	/**
-	 * 
-	 */
 	protected float lineWidth = 1;
 
-	/**
-	 * 
-	 */
 	protected Color lineColor = Color.black;
 
-	/**
-	 * 
-	 */
 	protected boolean rounded = false;
 
-	/**
-	 * 
-	 */
 	protected mxRectangle current;
 
-	/**
-	 * 
-	 */
 	protected mxEventSource eventSource = new mxEventSource(this);
 
-	/**
-	 * 
-	 */
 	public mxInsertHandler(mxGraphComponent graphComponent, String style)
 	{
 		this.graphComponent = graphComponent;
@@ -89,49 +65,31 @@ public class mxInsertHandler extends mxMouseAdapter
 		graphComponent.getGraphControl().addMouseMotionListener(this);
 	}
 
-	/**
-	 * 
-	 */
 	public mxGraphComponent getGraphComponent()
 	{
 		return graphComponent;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
 
-	/**
-	 * 
-	 */
 	public void setEnabled(boolean value)
 	{
 		enabled = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isStartEvent(MouseEvent e)
 	{
 		return true;
 	}
 
-	/**
-	 * 
-	 */
 	public void start(MouseEvent e)
 	{
 		first = e.getPoint();
 	}
 
-	/**
-	 * 
-	 */
 	public void mousePressed(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled() && !e.isConsumed()
@@ -142,9 +100,6 @@ public class mxInsertHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseDragged(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled() && !e.isConsumed()
@@ -173,9 +128,6 @@ public class mxInsertHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void mouseReleased(MouseEvent e)
 	{
 		if (graphComponent.isEnabled() && isEnabled() && !e.isConsumed()
@@ -198,9 +150,6 @@ public class mxInsertHandler extends mxMouseAdapter
 		reset();
 	}
 
-	/**
-	 * 
-	 */
 	public Object insertCell(mxRectangle bounds)
 	{
 		// FIXME: Clone prototype cell for insert
@@ -209,9 +158,6 @@ public class mxInsertHandler extends mxMouseAdapter
 				bounds.getHeight(), style);
 	}
 
-	/**
-	 * 
-	 */
 	public void reset()
 	{
 		Rectangle dirty = null;
@@ -232,9 +178,6 @@ public class mxInsertHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		if (first != null && current != null)
@@ -254,25 +197,16 @@ public class mxInsertHandler extends mxMouseAdapter
 		}
 	}
 
-	/**
-	 *
-	 */
 	public void addListener(String eventName, mxIEventListener listener)
 	{
 		eventSource.addListener(eventName, listener);
 	}
 
-	/**
-	 *
-	 */
 	public void removeListener(mxIEventListener listener)
 	{
 		removeListener(listener, null);
 	}
 
-	/**
-	 *
-	 */
 	public void removeListener(mxIEventListener listener, String eventName)
 	{
 		eventSource.removeListener(listener, eventName);

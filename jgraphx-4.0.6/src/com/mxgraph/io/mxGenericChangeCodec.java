@@ -3,9 +3,9 @@
  */
 package com.mxgraph.io;
 
-import java.util.Map;
-
 import org.w3c.dom.Node;
+
+import java.util.Map;
 
 /**
  * Codec for mxChildChanges. This class is created and registered
@@ -14,9 +14,7 @@ import org.w3c.dom.Node;
  */
 public class mxGenericChangeCodec extends mxObjectCodec
 {
-	/**
-	 * 
-	 */
+
 	protected String fieldname;
 
 	/**

@@ -3,11 +3,6 @@
  */
 package com.mxgraph.shape;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxLine;
@@ -15,12 +10,14 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class mxConnectorShape extends mxBasicShape
 {
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		if (state.getAbsolutePointCount() > 1
@@ -59,9 +56,6 @@ public class mxConnectorShape extends mxBasicShape
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected void paintPolyline(mxGraphics2DCanvas canvas,
 			List<mxPoint> points, Map<String, Object> style)
 	{
@@ -72,17 +66,11 @@ public class mxConnectorShape extends mxBasicShape
 				rounded);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isRounded(Map<String, Object> style)
 	{
 		return mxUtils.isTrue(style, mxConstants.STYLE_ROUNDED, false);
 	}
 
-	/**
-	 * 
-	 */
 	private void translatePoint(List<mxPoint> points, int index, mxPoint offset)
 	{
 		if (offset != null)

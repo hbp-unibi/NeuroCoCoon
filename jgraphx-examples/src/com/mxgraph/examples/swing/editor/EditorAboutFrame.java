@@ -1,5 +1,17 @@
 package com.mxgraph.examples.swing.editor;
 
+import com.mxgraph.util.mxResources;
+import com.mxgraph.view.mxGraph;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -12,30 +24,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.KeyStroke;
-
-import com.mxgraph.util.mxResources;
-import com.mxgraph.view.mxGraph;
-
 public class EditorAboutFrame extends JDialog
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3378029138434324390L;
 
-	/**
-	 * 
-	 */
 	public EditorAboutFrame(Frame owner)
 	{
 		super(owner);
@@ -46,14 +39,8 @@ public class EditorAboutFrame extends JDialog
 		JPanel panel = new JPanel(new BorderLayout())
 		{
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -5062895855016210947L;
 
-			/**
-			 * 
-			 */
 			public void paintComponent(Graphics g)
 			{
 				super.paintComponent(g);

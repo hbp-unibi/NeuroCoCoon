@@ -3,6 +3,15 @@
  */
 package com.mxgraph.canvas;
 
+import com.mxgraph.util.mxBase64;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.awt.Font;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,16 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.mxgraph.util.mxBase64;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
 
 /**
  * An implementation of a canvas that uses SVG for painting. This canvas
@@ -51,9 +50,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 	 */
 	private Map<String, Element> images = new Hashtable<String, Element>();
 
-	/**
-	 * 
-	 */
 	protected Element defs = null;
 
 	/**
@@ -79,9 +75,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		setDocument(document);
 	}
 
-	/**
-	 * 
-	 */
 	public void appendSvgElement(Element node)
 	{
 		if (document != null)
@@ -90,9 +83,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected Element getDefsElement()
 	{
 		if (defs == null)
@@ -114,9 +104,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return defs;
 	}
 
-	/**
-	 * 
-	 */
 	public Element getGradientElement(String start, String end, String direction)
 	{
 		String id = getGradientId(start, end, direction);
@@ -133,9 +120,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return gradient;
 	}
 
-	/**
-	 * 
-	 */
 	public Element getGlassGradientElement()
 	{
 		String id = "mx-glass-gradient";
@@ -168,9 +152,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return glassGradient;
 	}
 
-	/**
-	 * 
-	 */
 	protected Element createGradientElement(String start, String end,
 			String direction)
 	{
@@ -210,9 +191,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return gradient;
 	}
 
-	/**
-	 * 
-	 */
 	public String getGradientId(String start, String end, String direction)
 	{
 		// Removes illegal characters from gradient ID
@@ -271,9 +249,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 						.toLowerCase().endsWith(".gif"));
 	}
 
-	/**
-	 * 
-	 */
 	protected InputStream getResource(String src)
 	{
 		InputStream stream = null;
@@ -331,9 +306,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return result;
 	}
 
-	/**
-	 * 
-	 */
 	protected Element getEmbeddedImageElement(String src)
 	{
 		Element img = images.get(src);
@@ -377,9 +349,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return img;
 	}
 
-	/**
-	 * 
-	 */
 	protected Element createImageElement(double x, double y, double w,
 			double h, String src, boolean aspect, boolean flipH, boolean flipV,
 			boolean embedded)
@@ -454,9 +423,6 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return elem;
 	}
 
-	/**
-	 * 
-	 */
 	public void setDocument(Document document)
 	{
 		this.document = document;
@@ -472,17 +438,11 @@ public class mxSvgCanvas extends mxBasicCanvas
 		return document;
 	}
 
-	/**
-	 * 
-	 */
 	public void setEmbedded(boolean value)
 	{
 		embedded = value;
 	}
 
-	/**
-	 * 
-	 */
 	public boolean isEmbedded()
 	{
 		return embedded;

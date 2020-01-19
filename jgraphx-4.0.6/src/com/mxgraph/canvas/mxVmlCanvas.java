@@ -3,20 +3,19 @@
  */
 package com.mxgraph.canvas;
 
-import java.awt.Rectangle;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.awt.Rectangle;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of a canvas that uses VML for painting.
@@ -46,9 +45,6 @@ public class mxVmlCanvas extends mxBasicCanvas
 		setDocument(document);
 	}
 
-	/**
-	 * 
-	 */
 	public void setDocument(Document document)
 	{
 		this.document = document;
@@ -64,9 +60,6 @@ public class mxVmlCanvas extends mxBasicCanvas
 		return document;
 	}
 
-	/**
-	 * 
-	 */
 	public void appendVmlElement(Element node)
 	{
 		if (document != null)

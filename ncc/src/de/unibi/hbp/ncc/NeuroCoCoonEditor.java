@@ -50,9 +50,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		this("NeuroCoCoon Editor", new CustomGraphComponent(new CustomGraph()));
 	}
 
-	/**
-	 * 
-	 */
 	public NeuroCoCoonEditor (String appTitle, mxGraphComponent component)
 	{
 		super(appTitle, component);
@@ -425,15 +422,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 						80, 80, "Timer");
 	}
 
-	/**
-	 * 
-	 */
 	public static class CustomGraphComponent extends mxGraphComponent
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -6833603133512882012L;
 
 		/**

@@ -3,12 +3,6 @@
  */
 package com.mxgraph.swing.handler;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
@@ -22,30 +16,25 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+
 /**
  * Connection handler creates new connections between cells. This control is used to display the connector
  * icon, while the preview is used to draw the line.
  */
 public class mxConnectPreview extends mxEventSource
 {
-	/**
-	 * 
-	 */
+
 	protected mxGraphComponent graphComponent;
 
-	/**
-	 * 
-	 */
 	protected mxCellState previewState;
 
-	/**
-	 * 
-	 */
 	protected mxCellState sourceState;
 
-	/**
-	 * 
-	 */
 	protected mxPoint startPoint;
 
 	/**
@@ -81,34 +70,22 @@ public class mxConnectPreview extends mxEventSource
 
 		return cell;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public boolean isActive()
 	{
 		return sourceState != null;
 	}
 
-	/**
-	 * 
-	 */
 	public mxCellState getSourceState()
 	{
 		return sourceState;
 	}
 
-	/**
-	 * 
-	 */
 	public mxCellState getPreviewState()
 	{
 		return previewState;
 	}
 
-	/**
-	 * 
-	 */
 	public mxPoint getStartPoint()
 	{
 		return startPoint;
@@ -131,9 +108,6 @@ public class mxConnectPreview extends mxEventSource
 				previewState));
 	}
 
-	/**
-	 * 
-	 */
 	public void update(MouseEvent e, mxCellState targetState, double x, double y)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -175,17 +149,11 @@ public class mxConnectPreview extends mxEventSource
 		}
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle getDirtyRect()
 	{
 		return getDirtyRect(null);
 	}
 
-	/**
-	 * 
-	 */
 	protected Rectangle getDirtyRect(mxRectangle dirty)
 	{
 		if (previewState != null)
@@ -214,9 +182,6 @@ public class mxConnectPreview extends mxEventSource
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	protected mxPoint transformScreenPoint(double x, double y)
 	{
 		mxGraph graph = graphComponent.getGraph();
@@ -227,18 +192,12 @@ public class mxConnectPreview extends mxEventSource
 				/ scale - tr.getY()));
 	}
 
-	/**
-	 * 
-	 */
 	public void revalidate(mxCellState state)
 	{
 		state.getView().invalidate(state.getCell());
 		state.getView().validateCellState(state.getCell());
 	}
 
-	/**
-	 * 
-	 */
 	public void paint(Graphics g)
 	{
 		if (previewState != null)
@@ -288,17 +247,11 @@ public class mxConnectPreview extends mxEventSource
 				previewState.getCell());
 	}
 
-	/**
-	 *
-	 */
 	public Object stop(boolean commit)
 	{
 		return stop(commit, null);
 	}
 
-	/**
-	 *
-	 */
 	public Object stop(boolean commit, MouseEvent e)
 	{
 		Object result = (sourceState != null) ? sourceState.getCell() : null;

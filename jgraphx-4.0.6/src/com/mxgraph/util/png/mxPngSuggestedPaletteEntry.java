@@ -44,9 +44,6 @@ import java.io.Serializable;
 public class mxPngSuggestedPaletteEntry implements Serializable
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8711686482529372447L;
 
 	/** The name of the entry. */

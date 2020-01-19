@@ -1,23 +1,20 @@
 package com.mxgraph.shape;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Rectangle;
-import java.awt.geom.GeneralPath;
-import java.util.Map;
-
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Rectangle;
+import java.awt.geom.GeneralPath;
+import java.util.Map;
+
 public class mxLabelShape extends mxImageShape
 {
 
-	/**
-	 * 
-	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		super.paintShape(canvas, state);
@@ -59,9 +56,6 @@ public class mxLabelShape extends mxImageShape
 		canvas.getGraphics().fill(path);
 	}
 
-	/**
-	 * 
-	 */
 	public Rectangle getImageBounds(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		Map<String, Object> style = state.getStyle();
@@ -118,26 +112,17 @@ public class mxLabelShape extends mxImageShape
 		return imageBounds.getRectangle();
 	}
 
-	/**
-	 * 
-	 */
 	public Color getFillColor(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		return mxUtils.getColor(state.getStyle(), mxConstants.STYLE_FILLCOLOR);
 	}
 
-	/**
-	 * 
-	 */
 	public Color getStrokeColor(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		return mxUtils
 				.getColor(state.getStyle(), mxConstants.STYLE_STROKECOLOR);
 	}
 
-	/**
-	 * 
-	 */
 	public boolean hasGradient(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		return true;

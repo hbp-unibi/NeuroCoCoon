@@ -3,11 +3,11 @@
  */
 package com.mxgraph.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the geometry of a cell. For vertices, the geometry consists
@@ -25,9 +25,6 @@ import com.mxgraph.util.mxRectangle;
 public class mxGeometry extends mxRectangle
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2649828026610336589L;
 
 	/**

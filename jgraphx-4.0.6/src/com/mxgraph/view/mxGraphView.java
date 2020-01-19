@@ -3,12 +3,6 @@
  */
 package com.mxgraph.view;
 
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.model.mxIGraphModel;
@@ -23,6 +17,12 @@ import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxEdgeStyle.mxEdgeStyleFunction;
 import com.mxgraph.view.mxPerimeter.mxPerimeterFunction;
+
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements a view for the graph. This class is in charge of computing the
@@ -60,9 +60,7 @@ import com.mxgraph.view.mxPerimeter.mxPerimeterFunction;
  */
 public class mxGraphView extends mxEventSource
 {
-	/**
-	 *
-	 */
+
 	private static mxPoint EMPTY_POINT = new mxPoint();
 
 	/**
@@ -365,9 +363,6 @@ public class mxGraphView extends mxEventSource
 		validate();
 	}
 
-	/**
-	 * 
-	 */
 	public void revalidate()
 	{
 		invalidate();
@@ -1882,19 +1877,10 @@ public class mxGraphView extends mxEventSource
 	public static class mxCurrentRootChange implements mxUndoableChange
 	{
 
-		/**
-		 * 
-		 */
 		protected mxGraphView view;
 
-		/**
-		 * 
-		 */
 		protected Object root, previous;
 
-		/**
-		 * 
-		 */
 		protected boolean up;
 
 		/**
