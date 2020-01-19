@@ -447,17 +447,18 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			super(graph);
 
 			// Sets switches typically used in an editor
-			setPageVisible(true);
-			setGridVisible(true);
+			setPageVisible(false);
+			setGridVisible(false);
 			setToolTips(true);
-			getConnectionHandler().setCreateTarget(true);
+			getConnectionHandler().setCreateTarget(false);
 
 			// Loads the default stylesheet from an external file
 			mxCodec codec = new mxCodec();
 			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource(
 					"resources/default-style.xml")
 					.toString());
-			codec.decode(doc.getDocumentElement(), graph.getStylesheet());
+			if (doc != null)
+				codec.decode(doc.getDocumentElement(), graph.getStylesheet());
 
 			// Sets the background to white
 			getViewport().setOpaque(true);
@@ -534,7 +535,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			mxGeometry geo = getModel().getGeometry(cell);
 			mxCellState state = getView().getState(cell);
 
-			tip += "token=" + JavaScriptBridge.getHBPToken() + "<br>";
+			// tip += "token=" + JavaScriptBridge.getHBPToken() + "<br>";
 
 			if (getModel().isEdge(cell))
 			{
@@ -619,14 +620,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		/**
 		 * Overrides the method to use the currently selected edge template for
 		 * new edges.
-		 * 
-		 * @param parent
-		 * @param id
-		 * @param value
-		 * @param source
-		 * @param target
-		 * @param style
-		 * @return
 		 */
 		public Object createEdge(Object parent, String id, Object value,
 				Object source, Object target, String style)
@@ -642,12 +635,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			return super.createEdge(parent, id, value, source, target, style);
 		}
 
+
 	}
 
-	/**
-	 * 
-	 * @param args
-	 */
 	public static void main(String[] args)
 	{
 		// FIXME use SwingUtilities.invokeLater?

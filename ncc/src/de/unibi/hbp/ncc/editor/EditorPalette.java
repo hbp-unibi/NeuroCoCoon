@@ -201,15 +201,6 @@ public class EditorPalette extends JPanel
 		revalidate();
 	}
 
-	/**
-	 * 
-	 * @param name
-	 * @param icon
-	 * @param style
-	 * @param width
-	 * @param height
-	 * @param value
-	 */
 	public void addEdgeTemplate(final String name, ImageIcon icon,
 			String style, int width, int height, Object value)
 	{
@@ -224,15 +215,6 @@ public class EditorPalette extends JPanel
 		addTemplate(name, icon, cell);
 	}
 
-	/**
-	 * 
-	 * @param name
-	 * @param icon
-	 * @param style
-	 * @param width
-	 * @param height
-	 * @param value
-	 */
 	public void addTemplate(final String name, ImageIcon icon, String style,
 			int width, int height, Object value)
 	{
@@ -243,12 +225,6 @@ public class EditorPalette extends JPanel
 		addTemplate(name, icon, cell);
 	}
 
-	/**
-	 * 
-	 * @param name
-	 * @param icon
-	 * @param cell
-	 */
 	public void addTemplate(final String name, ImageIcon icon, mxCell cell)
 	{
 		mxRectangle bounds = (mxGeometry) cell.getGeometry().clone();
@@ -376,7 +352,7 @@ public class EditorPalette extends JPanel
 	/**
 	 * @param eventName
 	 * @param listener
-	 * @see mxEventSource#removeListener(String, mxIEventListener)
+	 * @see mxEventSource#removeListener(mxIEventListener, String)
 	 */
 	public void removeListener(mxIEventListener listener, String eventName)
 	{
