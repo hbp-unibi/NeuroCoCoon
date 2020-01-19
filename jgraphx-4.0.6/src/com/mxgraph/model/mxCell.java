@@ -3,12 +3,12 @@
  */
 package com.mxgraph.model;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Cells are the elements of the graph model. They represent the state
@@ -624,18 +624,9 @@ public class mxCell implements mxICell, Cloneable, Serializable
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder(64);
-		builder.append(getClass().getSimpleName());
-		builder.append(" [");
-		builder.append("id=");
-		builder.append(id);
-		builder.append(", value=");
-		builder.append(value);
-		builder.append(", geometry=");
-		builder.append(geometry);
-		builder.append("]");
-		
-		return builder.toString();
+
+		return getClass().getSimpleName() + " [id=" + id +
+				", value=" + value + ", geometry=" + geometry + "]";
 	}
 
 }

@@ -3,21 +3,21 @@ package de.unibi.hbp.ncc.lang;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeuronType extends NamedEntity<NeuronType> {
+public class NeuronType extends NamedEntity {
 
    public NeuronType (Namespace<NeuronType> namespace, String name) {
       super(namespace, name);
    }
 
-   protected final static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties =
-         addEntityProperties(new ArrayList<>(NamedEntity.entityProperties));
-
-   protected static List<PropertyDescriptor<? extends LanguageEntity, ?>> addEntityProperties (List<PropertyDescriptor<? extends LanguageEntity, ?>> superProps) {
-      return superProps;
-   }
+   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
 
    @Override
    public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
+      if (entityProperties == null) {
+         List<PropertyDescriptor<? extends LanguageEntity, ?>> list =
+               new ArrayList<>(super.getEntityProperties());
+         entityProperties = list;
+      }
       return entityProperties;
    }
 }

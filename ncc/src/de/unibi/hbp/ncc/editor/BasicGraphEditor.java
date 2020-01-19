@@ -45,7 +45,6 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -190,7 +189,7 @@ public class BasicGraphEditor extends JPanel
 		statusBar = createStatusBar();
 
 		// Display some useful information about repaint events
-		installRepaintListener();
+		// installRepaintListener();
 
 		// Puts everything together
 		setLayout(new BorderLayout());
@@ -271,25 +270,18 @@ public class BasicGraphEditor extends JPanel
 	{
 		final EditorPalette palette = new EditorPalette();
 		final JScrollPane scrollPane = new JScrollPane(palette);
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		libraryPane.add(title, scrollPane);
 
 		// Updates the widths of the palettes if the container size changes
 		libraryPane.addComponentListener(new ComponentAdapter()
 		{
-			/**
-			 * 
-			 */
 			public void componentResized(ComponentEvent e)
 			{
-				int w = scrollPane.getWidth()
-						- scrollPane.getVerticalScrollBar().getWidth();
+				int w = scrollPane.getWidth() - scrollPane.getVerticalScrollBar().getWidth();
 				palette.setPreferredWidth(w);
 			}
-
 		});
 
 		return palette;
@@ -301,17 +293,11 @@ public class BasicGraphEditor extends JPanel
 	protected void mouseWheelMoved(MouseWheelEvent e)
 	{
 		if (e.getWheelRotation() < 0)
-		{
 			graphComponent.zoomIn();
-		}
 		else
-		{
 			graphComponent.zoomOut();
-		}
 
-		status(mxResources.get("scale") + ": "
-				+ (int) (100 * graphComponent.getGraph().getView().getScale())
-				+ "%");
+		status(mxResources.get("scale") + ": " + (int) (100 * graphComponent.getGraph().getView().getScale()) + "%");
 	}
 
 	/**
@@ -319,54 +305,27 @@ public class BasicGraphEditor extends JPanel
 	 */
 	protected void showOutlinePopupMenu(MouseEvent e)
 	{
-		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(),
-				graphComponent);
-		JCheckBoxMenuItem item = new JCheckBoxMenuItem(
-				mxResources.get("magnifyPage"));
+		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
+		JCheckBoxMenuItem item = new JCheckBoxMenuItem(mxResources.get("magnifyPage"));
 		item.setSelected(graphOutline.isFitPage());
-
-		item.addActionListener(new ActionListener()
-		{
-			/**
-			 * 
-			 */
-			public void actionPerformed(ActionEvent e)
-			{
-				graphOutline.setFitPage(!graphOutline.isFitPage());
-				graphOutline.repaint();
-			}
+		item.addActionListener(actionEvent -> {
+			graphOutline.setFitPage(!graphOutline.isFitPage());
+			graphOutline.repaint();
 		});
 
-		JCheckBoxMenuItem item2 = new JCheckBoxMenuItem(
-				mxResources.get("showLabels"));
+		JCheckBoxMenuItem item2 = new JCheckBoxMenuItem(mxResources.get("showLabels"));
 		item2.setSelected(graphOutline.isDrawLabels());
 
-		item2.addActionListener(new ActionListener()
-		{
-			/**
-			 * 
-			 */
-			public void actionPerformed(ActionEvent e)
-			{
-				graphOutline.setDrawLabels(!graphOutline.isDrawLabels());
-				graphOutline.repaint();
-			}
+		item2.addActionListener(actionEvent -> {
+			graphOutline.setDrawLabels(!graphOutline.isDrawLabels());
+			graphOutline.repaint();
 		});
 
-		JCheckBoxMenuItem item3 = new JCheckBoxMenuItem(
-				mxResources.get("buffering"));
+		JCheckBoxMenuItem item3 = new JCheckBoxMenuItem(mxResources.get("buffering"));
 		item3.setSelected(graphOutline.isTripleBuffered());
-
-		item3.addActionListener(new ActionListener()
-		{
-			/**
-			 * 
-			 */
-			public void actionPerformed(ActionEvent e)
-			{
-				graphOutline.setTripleBuffered(!graphOutline.isTripleBuffered());
-				graphOutline.repaint();
-			}
+		item3.addActionListener(actionEvent -> {
+			graphOutline.setTripleBuffered(!graphOutline.isTripleBuffered());
+			graphOutline.repaint();
 		});
 
 		JPopupMenu menu = new JPopupMenu();
@@ -383,8 +342,7 @@ public class BasicGraphEditor extends JPanel
 	 */
 	protected void showGraphPopupMenu(MouseEvent e)
 	{
-		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(),
-				graphComponent);
+		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
 		EditorPopupMenu menu = new EditorPopupMenu(BasicGraphEditor.this);
 		menu.show(graphComponent, pt.x, pt.y);
 
@@ -399,26 +357,12 @@ public class BasicGraphEditor extends JPanel
 		status(e.getX() + ", " + e.getY());
 	}
 
-	/**
-	 * 
-	 */
 	protected void installListeners()
 	{
 		// Installs mouse wheel listener for zooming
-		MouseWheelListener wheelTracker = new MouseWheelListener()
-		{
-			/**
-			 * 
-			 */
-			public void mouseWheelMoved(MouseWheelEvent e)
-			{
-				if (e.getSource() instanceof mxGraphOutline
-						|| e.isControlDown())
-				{
-					BasicGraphEditor.this.mouseWheelMoved(e);
-				}
-			}
-
+		MouseWheelListener wheelTracker = e -> {
+			if (e.getSource() instanceof mxGraphOutline || e.isControlDown())
+				BasicGraphEditor.this.mouseWheelMoved(e);
 		};
 
 		// Handles mouse wheel events in the outline and graph component
@@ -429,24 +373,16 @@ public class BasicGraphEditor extends JPanel
 		graphOutline.addMouseListener(new MouseAdapter()
 		{
 
-			/**
-			 * 
-			 */
 			public void mousePressed(MouseEvent e)
 			{
 				// Handles context menu on the Mac where the trigger is on mousepressed
 				mouseReleased(e);
 			}
 
-			/**
-			 * 
-			 */
 			public void mouseReleased(MouseEvent e)
 			{
 				if (e.isPopupTrigger())
-				{
 					showOutlinePopupMenu(e);
-				}
 			}
 
 		});
@@ -455,24 +391,16 @@ public class BasicGraphEditor extends JPanel
 		graphComponent.getGraphControl().addMouseListener(new MouseAdapter()
 		{
 
-			/**
-			 * 
-			 */
 			public void mousePressed(MouseEvent e)
 			{
 				// Handles context menu on the Mac where the trigger is on mousepressed
 				mouseReleased(e);
 			}
 
-			/**
-			 * 
-			 */
 			public void mouseReleased(MouseEvent e)
 			{
 				if (e.isPopupTrigger())
-				{
 					showGraphPopupMenu(e);
-				}
 			}
 
 		});
@@ -503,25 +431,17 @@ public class BasicGraphEditor extends JPanel
 				});
 	}
 
-	/**
-	 * 
-	 */
 	public void setCurrentFile(File file)
 	{
 		File oldValue = currentFile;
 		currentFile = file;
-
-		firePropertyChange("currentFile", oldValue, file);
-
 		if (oldValue != file)
 		{
+			firePropertyChange("currentFile", oldValue, file);
 			updateTitle();
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public File getCurrentFile()
 	{
 		return currentFile;
@@ -536,10 +456,9 @@ public class BasicGraphEditor extends JPanel
 		boolean oldValue = this.modified;
 		this.modified = modified;
 
-		firePropertyChange("modified", oldValue, modified);
-
 		if (oldValue != modified)
 		{
+			firePropertyChange("modified", oldValue, modified);
 			updateTitle();
 		}
 	}
@@ -548,42 +467,15 @@ public class BasicGraphEditor extends JPanel
 	 * 
 	 * @return whether or not the current graph has been modified
 	 */
-	public boolean isModified()
-	{
-		return modified;
-	}
+	public boolean isModified() { return modified; }
 
-	/**
-	 * 
-	 */
-	public mxGraphComponent getGraphComponent()
-	{
-		return graphComponent;
-	}
+	public mxGraphComponent getGraphComponent() { return graphComponent; }
 
-	/**
-	 * 
-	 */
-	public mxGraphOutline getGraphOutline()
-	{
-		return graphOutline;
-	}
+	public mxGraphOutline getGraphOutline() { return graphOutline; }
 	
-	/**
-	 * 
-	 */
-	public JTabbedPane getLibraryPane()
-	{
-		return libraryPane;
-	}
+	public JTabbedPane getLibraryPane() { return libraryPane; }
 
-	/**
-	 * 
-	 */
-	public mxUndoManager getUndoManager()
-	{
-		return undoManager;
-	}
+	public mxUndoManager getUndoManager() { return undoManager; }
 
 	/**
 	 * 
@@ -629,30 +521,18 @@ public class BasicGraphEditor extends JPanel
 		statusBar.setText(msg);
 	}
 
-	/**
-	 * 
-	 */
 	public void updateTitle()
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
 
 		if (frame != null)
 		{
-			String title = (currentFile != null) ? currentFile
-					.getAbsolutePath() : mxResources.get("newDiagram");
-
-			if (modified)
-			{
-				title += "*";
-			}
-
+			String title = (currentFile != null) ? currentFile.getAbsolutePath() : mxResources.get("newDiagram");
+			if (modified) title += "*";
 			frame.setTitle(title + " - " + appTitle);
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void about()
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
@@ -672,22 +552,14 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void exit()
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
 
 		if (frame != null)
-		{
 			frame.dispose();
-		}
 	}
 
-	/**
-	 * 
-	 */
 	public void setLookAndFeel(String clazz)
 	{
 		JFrame frame = (JFrame) SwingUtilities.windowForComponent(this);
@@ -709,16 +581,13 @@ public class BasicGraphEditor extends JPanel
 		}
 	}
 
-	/**
-	 * 
-	 */
-	public JFrame createFrame(JMenuBar menuBar)
+	public JFrame createFrame(JMenuBar menuBar, int width, int height)
 	{
 		JFrame frame = new JFrame();
 		frame.getContentPane().add(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setJMenuBar(menuBar);
-		frame.setSize(870, 640);
+		frame.setSize(width, height);
 
 		// Updates the frame title
 		updateTitle();
@@ -747,8 +616,7 @@ public class BasicGraphEditor extends JPanel
 					final mxGraph graph = graphComponent.getGraph();
 					Object cell = graph.getSelectionCell();
 
-					if (cell == null
-							|| graph.getModel().getChildCount(cell) == 0)
+					if (cell == null || graph.getModel().getChildCount(cell) == 0)
 					{
 						cell = graph.getDefaultParent();
 					}
@@ -758,24 +626,12 @@ public class BasicGraphEditor extends JPanel
 					{
 						long t0 = System.currentTimeMillis();
 						layout.execute(cell);
-						status("Layout: " + (System.currentTimeMillis() - t0)
-								+ " ms");
+						status("Layout: " + (System.currentTimeMillis() - t0) + " ms");
 					}
 					finally
 					{
-						mxMorphing morph = new mxMorphing(graphComponent, 20,
-								1.2, 20);
-
-						morph.addListener(mxEvent.DONE, new mxIEventListener()
-						{
-
-							public void invoke(Object sender, mxEventObject evt)
-							{
-								graph.getModel().endUpdate();
-							}
-
-						});
-
+						mxMorphing morph = new mxMorphing(graphComponent, 20, 1.2, 20);
+						morph.addListener(mxEvent.DONE, (sender, evt) -> graph.getModel().endUpdate());
 						morph.startAnimation();
 					}
 
@@ -787,13 +643,10 @@ public class BasicGraphEditor extends JPanel
 		{
 			return new AbstractAction(mxResources.get(key))
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
-					JOptionPane.showMessageDialog(graphComponent,
-							mxResources.get("noLayout"));
+					JOptionPane.showMessageDialog(graphComponent, mxResources.get("noLayout"));
 				}
-
 			};
 		}
 	}
@@ -809,93 +662,77 @@ public class BasicGraphEditor extends JPanel
 		{
 			mxGraph graph = graphComponent.getGraph();
 
-			if (ident.equals("verticalHierarchical"))
-			{
-				layout = new mxHierarchicalLayout(graph);
+			switch (ident) {
+				case "verticalHierarchical":
+					layout = new mxHierarchicalLayout(graph);
+					break;
+				case "horizontalHierarchical":
+					layout = new mxHierarchicalLayout(graph, JLabel.WEST);
+					break;
+				case "verticalTree":
+					layout = new mxCompactTreeLayout(graph, false);
+					break;
+				case "horizontalTree":
+					layout = new mxCompactTreeLayout(graph, true);
+					break;
+				case "parallelEdges":
+					layout = new mxParallelEdgeLayout(graph);
+					break;
+				case "placeEdgeLabels":
+					layout = new mxEdgeLabelLayout(graph);
+					break;
+				case "organicLayout":
+					layout = new mxOrganicLayout(graph);
+					break;
 			}
-			else if (ident.equals("horizontalHierarchical"))
-			{
-				layout = new mxHierarchicalLayout(graph, JLabel.WEST);
-			}
-			else if (ident.equals("verticalTree"))
-			{
-				layout = new mxCompactTreeLayout(graph, false);
-			}
-			else if (ident.equals("horizontalTree"))
-			{
-				layout = new mxCompactTreeLayout(graph, true);
-			}
-			else if (ident.equals("parallelEdges"))
-			{
-				layout = new mxParallelEdgeLayout(graph);
-			}
-			else if (ident.equals("placeEdgeLabels"))
-			{
-				layout = new mxEdgeLabelLayout(graph);
-			}
-			else if (ident.equals("organicLayout"))
-			{
-				layout = new mxOrganicLayout(graph);
-			}
-			if (ident.equals("verticalPartition"))
-			{
-				layout = new mxPartitionLayout(graph, false)
-				{
-					/**
-					 * Overrides the empty implementation to return the size of the
-					 * graph control.
-					 */
-					public mxRectangle getContainerSize()
-					{
-						return graphComponent.getLayoutAreaSize();
-					}
-				};
-			}
-			else if (ident.equals("horizontalPartition"))
-			{
-				layout = new mxPartitionLayout(graph, true)
-				{
-					/**
-					 * Overrides the empty implementation to return the size of the
-					 * graph control.
-					 */
-					public mxRectangle getContainerSize()
-					{
-						return graphComponent.getLayoutAreaSize();
-					}
-				};
-			}
-			else if (ident.equals("verticalStack"))
-			{
-				layout = new mxStackLayout(graph, false)
-				{
-					/**
-					 * Overrides the empty implementation to return the size of the
-					 * graph control.
-					 */
-					public mxRectangle getContainerSize()
-					{
-						return graphComponent.getLayoutAreaSize();
-					}
-				};
-			}
-			else if (ident.equals("horizontalStack"))
-			{
-				layout = new mxStackLayout(graph, true)
-				{
-					/**
-					 * Overrides the empty implementation to return the size of the
-					 * graph control.
-					 */
-					public mxRectangle getContainerSize()
-					{
-						return graphComponent.getLayoutAreaSize();
-					}
-				};
-			}
-			else if (ident.equals("circleLayout"))
-			{
-				layout = new mxCircleLayout(graph);
+			switch (ident) {
+				case "verticalPartition":
+					layout = new mxPartitionLayout(graph, false) {
+						/**
+						 * Overrides the empty implementation to return the size of the
+						 * graph control.
+						 */
+						public mxRectangle getContainerSize () {
+							return graphComponent.getLayoutAreaSize();
+						}
+					};
+					break;
+				case "horizontalPartition":
+					layout = new mxPartitionLayout(graph, true) {
+						/**
+						 * Overrides the empty implementation to return the size of the
+						 * graph control.
+						 */
+						public mxRectangle getContainerSize () {
+							return graphComponent.getLayoutAreaSize();
+						}
+					};
+					break;
+				case "verticalStack":
+					layout = new mxStackLayout(graph, false) {
+						/**
+						 * Overrides the empty implementation to return the size of the
+						 * graph control.
+						 */
+						public mxRectangle getContainerSize () {
+							return graphComponent.getLayoutAreaSize();
+						}
+					};
+					break;
+				case "horizontalStack":
+					layout = new mxStackLayout(graph, true) {
+						/**
+						 * Overrides the empty implementation to return the size of the
+						 * graph control.
+						 */
+						public mxRectangle getContainerSize () {
+							return graphComponent.getLayoutAreaSize();
+						}
+					};
+					break;
+				case "circleLayout":
+					layout = new mxCircleLayout(graph);
+					break;
 			}
 		}
 

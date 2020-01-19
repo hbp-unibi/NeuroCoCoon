@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
+public class Namespace<T extends NamedEntity> implements Iterable<T> {
+   private Class<T> memberClazz;
    private Map<String, T> members;
    private String generatedNamesPrefix;
    private int nameGenerator;
@@ -12,7 +13,7 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
 
    private static final int MAX_GENERATOR_VALUE = 9999;
 
-   Namespace (String generatedNamesPrefix, String pythonDiscriminator) {
+   Namespace (Class<T> clazz, String generatedNamesPrefix, String pythonDiscriminator) {
       if (pythonDiscriminator.isEmpty() || pythonDiscriminator.startsWith("_") || pythonDiscriminator.endsWith("_"))
          throw new IllegalArgumentException("invalid Python name fragment");
       this.pythonDiscriminator = pythonDiscriminator;
@@ -28,10 +29,18 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
          throw new LanguageException("duplicate name " + member.getName());
    }
 
+   void castAndAdd (NamedEntity entity) {
+      add(memberClazz.cast(entity));
+   }
+
    void remove (String memberName) {
       T oldValue = members.remove(memberName);
       if (oldValue == null)
          throw new LanguageException("name " + memberName + " does not exist");
+   }
+
+   T get (String name) {
+      return members.get(name);
    }
 
    @Override

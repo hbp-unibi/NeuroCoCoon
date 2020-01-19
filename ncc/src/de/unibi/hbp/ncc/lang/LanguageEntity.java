@@ -21,7 +21,8 @@ public abstract class LanguageEntity {
          referencedEntities = null;
    }
 
-   protected void changeReference (LanguageEntity oldTarget, LanguageEntity newTarget) {
+   protected <E extends LanguageEntity> void changeReference (E oldTarget, E newTarget) {
+      // TODO or better not enforce same type? consequences/differences vs. using LanguageEntity instead of E
       if (Objects.equals(oldTarget, newTarget))
          return;  // a no-op
       if (oldTarget == null)

@@ -2,9 +2,6 @@
  * Copyright (c) 2006-2012, JGraph Ltd */
 package de.unibi.hbp.ncc;
 
-import de.unibi.hbp.ncc.editor.BasicGraphEditor;
-import de.unibi.hbp.ncc.editor.EditorMenuBar;
-import de.unibi.hbp.ncc.editor.EditorPalette;
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
@@ -22,7 +19,9 @@ import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
-import de.unibi.hbp.ncc.env.JavaScriptBridge;
+import de.unibi.hbp.ncc.editor.BasicGraphEditor;
+import de.unibi.hbp.ncc.editor.EditorMenuBar;
+import de.unibi.hbp.ncc.editor.EditorPalette;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
@@ -30,7 +29,6 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.Point;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -654,8 +652,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		mxConstants.W3C_SHADOWCOLOR = "#D3D3D3";
 
 		NeuroCoCoonEditor editor = new NeuroCoCoonEditor();
-		JFrame frame = editor.createFrame(new EditorMenuBar(editor));
-		frame.setSize(1200, 800);
+		JFrame frame = editor.createFrame(new EditorMenuBar(editor), 1200, 800);
 		frame.setVisible(true);
 	}
 }

@@ -3,30 +3,25 @@ package de.unibi.hbp.ncc.lang;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeuronPopulation extends NamedEntity<NeuronPopulation> {
+public class NeuronPopulation extends NamedEntity {
    private int neuronCount;
-
-   protected final static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties =
-         addEntityProperties(new ArrayList<>(NamedEntity.entityProperties));
-
-   protected static List<PropertyDescriptor<? extends LanguageEntity, ?>> addEntityProperties (List<PropertyDescriptor<? extends LanguageEntity, ?>> superProps) {
-      PropertyDescriptor<NeuronPopulation, Integer> neuronCountProperty =
-            new PropertyDescriptor<>("Neuron Count", Integer.class,
-                                     NeuronPopulation::setNeuronCount, NeuronPopulation::getNeuronCount,
-                                     NeuronPopulation::validateNeuronCount, null);
-
-      superProps.add(neuronCountProperty);
-      return superProps;
-   }
-
-   @Override
-   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
-      return entityProperties;
-   }
 
    public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, int neuronCount) {
       super(namespace, name);
       this.neuronCount = neuronCount;
+   }
+
+   public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name) {
+      this(namespace, name, 1);
+   }
+
+   public NeuronPopulation (Namespace<NeuronPopulation> namespace, int neuronCount) {
+      super(namespace);
+      this.neuronCount = neuronCount;
+   }
+
+   public NeuronPopulation (Namespace<NeuronPopulation> namespace) {
+      this(namespace, 1);
    }
 
    public int getNeuronCount () {
@@ -37,7 +32,24 @@ public class NeuronPopulation extends NamedEntity<NeuronPopulation> {
       this.neuronCount = neuronCount;
    }
 
-   public static String validateNeuronCount (int neuronCount) {
+   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
+
+   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
+      if (entityProperties == null) {
+         IntegerPropertyDescriptor<NeuronPopulation> neuronCountProperty =
+               new IntegerPropertyDescriptor<>(NeuronPopulation.class, "Neuron Count",
+                                               NeuronPopulation::setNeuronCount, NeuronPopulation::getNeuronCount,
+                                               NeuronPopulation::checkNeuronCount);
+
+         List<PropertyDescriptor<? extends LanguageEntity, ?>> list =
+               new ArrayList<>(super.getEntityProperties());
+         list.add(neuronCountProperty);
+         entityProperties = list;
+      }
+      return entityProperties;
+   }
+
+   public static String checkNeuronCount (int neuronCount) {
       if (neuronCount < 1)
          return "Neuron count must be strictly positive";
       else

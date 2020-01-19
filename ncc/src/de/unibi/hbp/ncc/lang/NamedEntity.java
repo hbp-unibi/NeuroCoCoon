@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public abstract class NamedEntity<T extends NamedEntity<T>> extends LanguageEntity implements DisplayNamed {
+public abstract class NamedEntity extends LanguageEntity implements DisplayNamed {
    private String name;
-   private Namespace<T> namespace;
+   private Namespace<? extends NamedEntity> namespace;
 
-   protected NamedEntity (Namespace<T> namespace, String name) {
+
+   protected NamedEntity (Namespace<? extends NamedEntity> namespace, String name) {
       this.namespace = namespace;
       setName(name);
-      namespace.add((T) this);
+      this.namespace.castAndAdd(this);
       // would be problematic, if T were no the concrete NamedEntity subclass itself
    }
 
-   protected NamedEntity (Namespace<T> namespace) {
+   protected NamedEntity (Namespace<? extends NamedEntity> namespace) {
       this(namespace, namespace.generateName());
    }
 
@@ -45,7 +46,7 @@ public abstract class NamedEntity<T extends NamedEntity<T>> extends LanguageEnti
       String newNormalizedName = normalizedName(name);
       return !namespace.contains(newNormalizedName) ||
             normalizedName(getName()).equals(newNormalizedName);
-      // allow renaming , if name does not change (after normalization), i.e. name "conflict" with the entity itself
+      // allow renaming, if name does not change (after normalization), i.e. name "conflict" with the entity itself
    }
 
    public void renameTo (String name) {
@@ -55,7 +56,7 @@ public abstract class NamedEntity<T extends NamedEntity<T>> extends LanguageEnti
          return;  // a no-op
       namespace.remove(getName());
       setName(name);
-      namespace.add((T) this);
+      this.namespace.castAndAdd(this);
    }
 
    @Override
@@ -81,16 +82,20 @@ public abstract class NamedEntity<T extends NamedEntity<T>> extends LanguageEnti
 
    }
 
-   protected final static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties = addEntityProperties(new ArrayList<>());
+   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
 
-   protected static List<PropertyDescriptor<? extends LanguageEntity, ?>> addEntityProperties (List<PropertyDescriptor<? extends LanguageEntity, ?>> superProps) {
-      PropertyDescriptor<NamedEntity<?>, String> nameProperty =
-            new PropertyDescriptor<>("Name", String.class,
-                                     NamedEntity::renameTo, NamedEntity::getName,
-                                     NamedEntity::checkValidName, NamedEntity::checkConflictingName);
-
-      superProps.add(nameProperty);
-      return superProps;
+   @Override
+   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
+      if (entityProperties == null) {
+         StringPropertyDescriptor<NamedEntity> nameProperty =
+               new StringPropertyDescriptor<>(NamedEntity.class, "Name",
+                                              NamedEntity::renameTo, NamedEntity::getName,
+                                              NamedEntity::checkValidName, NamedEntity::checkConflictingName);
+         List<PropertyDescriptor<? extends LanguageEntity, ?>> list = new ArrayList<>();
+         list.add(nameProperty);
+         entityProperties = list;
+      }
+      return entityProperties;
    }
 
    private String checkConflictingName (String name) {

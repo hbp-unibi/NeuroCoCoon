@@ -10,7 +10,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class PropertyDescriptor<E, V> {
+public class PropertyDescriptor<E extends LanguageEntity, V> {
+   private final Class<E> entityType;
    private final String propertyName;
    private final Class<V> valueType;
    private final BiConsumer<E, V> setter;  // may be null for read-only properties
@@ -22,9 +23,10 @@ public class PropertyDescriptor<E, V> {
    private Function<E, Collection<V>> contextDependentEnumerator;
    private Predicate<E> editablePredicate;
 
-   PropertyDescriptor (String propertyName, Class<V> valueType,
+   PropertyDescriptor (Class<E> entityType, String propertyName, Class<V> valueType,
                        BiConsumer<E, V> setter, Function<E, V> getter,
                        Function<V, String> simpleValidator, BiFunction<E, V, String> contextDependentValidator) {
+      this.entityType = entityType;
       this.propertyName = propertyName;
       this.valueType = valueType;
       this.setter = setter;
@@ -33,25 +35,25 @@ public class PropertyDescriptor<E, V> {
       this.contextDependentValidator = contextDependentValidator;
    }
 
-   PropertyDescriptor (String propertyName, Class<V> valueType,
+   PropertyDescriptor (Class<E> entityType, String propertyName, Class<V> valueType,
                        BiConsumer<E, V> setter, Function<E, V> getter) {  // no validation (beyond enumeration values)
-      this(propertyName, valueType, setter, getter, null, null);
+      this(entityType, propertyName, valueType, setter, getter, null, null);
    }
 
-   PropertyDescriptor (String propertyName, Class<V> valueType,
+   PropertyDescriptor (Class<E> entityType, String propertyName, Class<V> valueType,
                        BiConsumer<E, V> setter, Function<E, V> getter,
                        Function<V, String> simpleValidator) {
-      this(propertyName, valueType, setter, getter, simpleValidator, null);
+      this(entityType, propertyName, valueType, setter, getter, simpleValidator, null);
    }
 
-   PropertyDescriptor (String propertyName, Class<V> valueType,
+   PropertyDescriptor (Class<E> entityType, String propertyName, Class<V> valueType,
                        BiConsumer<E, V> setter, Function<E, V> getter,
                        BiFunction<E, V, String> contextDependentValidator) {
-      this(propertyName, valueType, setter, getter, null, contextDependentValidator);
+      this(entityType, propertyName, valueType, setter, getter, null, contextDependentValidator);
    }
 
-   PropertyDescriptor (String propertyName, Class<V> valueType, Function<E, V> getter) {
-      this(propertyName, valueType, null, getter, null, null);
+   PropertyDescriptor (Class<E> entityType, String propertyName, Class<V> valueType, Function<E, V> getter) {
+      this(entityType, propertyName, valueType, null, getter, null, null);
    }
 
    PropertyDescriptor<E, V> addEnumerationValues (Collection<V> enumerationValues) {
@@ -124,12 +126,24 @@ public class PropertyDescriptor<E, V> {
       return null;
    }
 
+   public String castBothAndValidate (LanguageEntity entity, Object value) {
+      return validate(entityType.cast(entity), valueType.cast(value));
+   }
+
    public boolean isValid (E entity, V value) {
       return validate(entity, value) == null;
    }
 
+   public boolean castBothAndIsValid (LanguageEntity entity, Object value) {
+      return isValid(entityType.cast(entity), valueType.cast(value));
+   }
+
    public boolean isEditable (E entity) {
       return !isReadOnly() && (editablePredicate == null || editablePredicate.test(entity));
+   }
+
+   public boolean castAndIsEditable (LanguageEntity entity) {
+      return isEditable(entityType.cast(entity));
    }
 
    public void setValue (E entity, V value) {
@@ -143,8 +157,16 @@ public class PropertyDescriptor<E, V> {
          throw new LanguageException("value " + value + " is invalid for property " + propertyName);
    }
 
+   public void castBothAndSetValue (LanguageEntity entity, Object value) {
+      setValue(entityType.cast(entity), valueType.cast(value));
+   }
+
    public V getValue (E entity) {
       return getter.apply(entity);
+   }
+
+   public V castAndGetValue (LanguageEntity entity) {
+      return getValue(entityType.cast(entity));
    }
 
 }

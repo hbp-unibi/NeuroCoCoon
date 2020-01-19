@@ -1438,9 +1438,6 @@ public class EditorActions
 	@SuppressWarnings("serial")
 	public static class ImportAction extends AbstractAction
 	{
-		/**
-		 * 
-		 */
 		protected String lastDir;
 
 		/**
@@ -1489,8 +1486,7 @@ public class EditorActions
 
 			if (editor != null)
 			{
-				String wd = (lastDir != null) ? lastDir : System
-						.getProperty("user.dir");
+				String wd = (lastDir != null) ? lastDir : System.getProperty("user.dir");
 
 				JFileChooser fc = new JFileChooser(wd);
 
@@ -1510,30 +1506,20 @@ public class EditorActions
 					{
 						if (fc.getSelectedFile().isDirectory())
 						{
-							EditorPalette palette = editor.insertPalette(fc
-									.getSelectedFile().getName());
+							EditorPalette palette = editor.insertPalette(fc.getSelectedFile().getName());
 
-							for (File f : fc.getSelectedFile().listFiles(
-									new FilenameFilter()
-									{
-										public boolean accept(File dir,
-												String name)
-										{
-											return name.toLowerCase().endsWith(
-													".shape");
-										}
-									}))
+							for (File f: fc.getSelectedFile().listFiles(new FilenameFilter() {
+								public boolean accept(File dir, String name) {
+									return name.toLowerCase().endsWith(".shape");
+								}
+							}))
 							{
-								String nodeXml = mxUtils.readFile(f
-										.getAbsolutePath());
-								addStencilShape(palette, nodeXml, f.getParent()
-										+ File.separator);
+								String nodeXml = mxUtils.readFile(f.getAbsolutePath());
+								addStencilShape(palette, nodeXml, f.getParent() + File.separator);
 							}
 
-							JComponent scrollPane = (JComponent) palette
-									.getParent().getParent();
-							editor.getLibraryPane().setSelectedComponent(
-									scrollPane);
+							JComponent scrollPane = (JComponent) palette.getParent().getParent();
+							editor.getLibraryPane().setSelectedComponent(scrollPane);
 
 							// FIXME: Need to update the size of the palette to force a layout
 							// update. Re/in/validate of palette or parent does not work.
@@ -1541,13 +1527,10 @@ public class EditorActions
 						}
 						else
 						{
-							String nodeXml = mxUtils.readFile(fc
-									.getSelectedFile().getAbsolutePath());
+							String nodeXml = mxUtils.readFile(fc.getSelectedFile().getAbsolutePath());
 							String name = addStencilShape(null, nodeXml, null);
 
-							JOptionPane.showMessageDialog(editor, mxResources
-									.get("stencilImported",
-											new String[] { name }));
+							JOptionPane.showMessageDialog(editor, mxResources.get("stencilImported", new String[] { name }));
 						}
 					}
 					catch (IOException e1)
@@ -1559,20 +1542,11 @@ public class EditorActions
 		}
 	}
 
-	/**
-	 *
-	 */
 	@SuppressWarnings("serial")
 	public static class OpenAction extends AbstractAction
 	{
-		/**
-		 * 
-		 */
 		protected String lastDir;
 
-		/**
-		 * 
-		 */
 		protected void resetEditor(BasicGraphEditor editor)
 		{
 			editor.setModified(false);
@@ -1598,8 +1572,7 @@ public class EditorActions
 					Document document = mxXmlUtils.parseXml(URLDecoder.decode(
 							value, "UTF-8"));
 					mxCodec codec = new mxCodec(document);
-					codec.decode(document.getDocumentElement(), editor
-							.getGraphComponent().getGraph().getModel());
+					codec.decode(document.getDocumentElement(), editor.getGraphComponent().getGraph().getModel());
 					editor.setCurrentFile(file);
 					resetEditor(editor);
 
@@ -1607,8 +1580,7 @@ public class EditorActions
 				}
 			}
 
-			JOptionPane.showMessageDialog(editor,
-					mxResources.get("imageContainsNoDiagramData"));
+			JOptionPane.showMessageDialog(editor, mxResources.get("imageContainsNoDiagramData"));
 		}
 
 		/**
@@ -1810,10 +1782,6 @@ public class EditorActions
 		 */
 		protected String labelPosition, alignment;
 
-		/**
-		 * 
-		 * @param key
-		 */
 		public SetLabelPositionAction(String labelPosition, String alignment)
 		{
 			this.labelPosition = labelPosition;
@@ -1869,18 +1837,11 @@ public class EditorActions
 		 */
 		protected String value;
 
-		/**
-		 * 
-		 * @param key
-		 */
 		public SetStyleAction(String value)
 		{
 			this.value = value;
 		}
 
-		/**
-		 * 
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
 			mxGraph graph = mxGraphActions.getGraph(e);
@@ -1998,10 +1959,6 @@ public class EditorActions
 		 */
 		protected String align;
 
-		/**
-		 * 
-		 * @param key
-		 */
 		public AlignCellsAction(String align)
 		{
 			this.align = align;

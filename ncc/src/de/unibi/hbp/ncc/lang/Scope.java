@@ -5,8 +5,8 @@ public class Scope {
    private Namespace<NeuronType> neuronTypes;
 
    public Scope () {
-      neuronPopulations = new Namespace<>("Population", "pop");
-      neuronTypes = new Namespace<>("Neuron Type", "nty");
+      neuronPopulations = new Namespace<>(NeuronPopulation.class, "Population", "pop");
+      neuronTypes = new Namespace<>(NeuronType.class, "Neuron Type", "nty");
    }
 
    public Namespace<NeuronPopulation> getNeuronPopulations () {

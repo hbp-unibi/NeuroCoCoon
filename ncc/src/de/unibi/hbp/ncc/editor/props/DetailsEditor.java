@@ -67,13 +67,13 @@ public class DetailsEditor {
       }
    }
 
-   static class PropertiesTableModel<E extends LanguageEntity> extends AbstractTableModel {
-      private E subject;
-      List<PropertyDescriptor<E, ?>> properties;
+   static class PropertiesTableModel extends AbstractTableModel {
+      private LanguageEntity subject;
+      List<PropertyDescriptor<? extends LanguageEntity, ?>> properties;
 
-      PropertiesTableModel (E subject) {
+      PropertiesTableModel (LanguageEntity subject) {
          this.subject = subject;
-         properties = (List) subject.getEntityProperties();  // FIXME generify this correctly?
+         properties = subject.getEntityProperties();
       }
 
       @Override
@@ -91,22 +91,23 @@ public class DetailsEditor {
          if (columnIndex == 0)
             return properties.get(rowIndex).getPropertyName();
          else
-            return properties.get(rowIndex).getValue(subject);
+            return properties.get(rowIndex).castAndGetValue(subject);
       }
 
       @Override
-      public void setValueAt (Object aValue, int rowIndex, int columnIndex) {
+      public void setValueAt (Object value, int rowIndex, int columnIndex) {
          assert columnIndex == 1 : "only value column can be edited";
-         properties.get(rowIndex).setValue(subject, null /* FIXME this must be aValue */);
+         properties.get(rowIndex).castBothAndSetValue(subject, value);
          fireTableCellUpdated(rowIndex, columnIndex);
       }
 
       @Override
       public boolean isCellEditable (int rowIndex, int columnIndex) {
-         return columnIndex == 1 && properties.get(rowIndex).isEditable(subject);
+         return columnIndex == 1 && properties.get(rowIndex).castAndIsEditable(subject);
       }
 
    }
+
    static class CustomTableModel extends AbstractTableModel {
 
       private String[][] data = new String[][] {
