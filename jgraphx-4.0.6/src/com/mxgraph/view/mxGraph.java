@@ -2158,54 +2158,38 @@ public class mxGraph extends mxEventSource
 			boolean moveParent)
 	{
 		if (cells == null)
-		{
 			cells = getSelectionCells();
-		}
 
 		model.beginUpdate();
-		try
-		{
-			for (int i = 0; i < cells.length; i++)
-			{
-				mxGeometry geo = getCellGeometry(cells[i]);
+		try {
+			for (Object cell: cells) {
+				mxGeometry geo = getCellGeometry(cell);
 
-				if (geo != null)
-				{
-					Object[] children = getChildCells(cells[i]);
+				if (geo != null) {
+					Object[] children = getChildCells(cell);
 
-					if (children != null && children.length > 0)
-					{
-						mxRectangle childBounds = getBoundingBoxFromGeometry(
-								children);
+					if (children != null && children.length > 0) {
+						mxRectangle childBounds = getBoundingBoxFromGeometry(children);
 
-						if (childBounds.getWidth() > 0
-								&& childBounds.getHeight() > 0)
-						{
-							mxRectangle size = (isSwimlane(cells[i]))
-									? getStartSize(cells[i])
+						if (childBounds.getWidth() > 0 && childBounds.getHeight() > 0) {
+							mxRectangle size = isSwimlane(cell)
+									? getStartSize(cell)
 									: new mxRectangle();
 
 							geo = (mxGeometry) geo.clone();
 
-							if (moveParent)
-							{
-								geo.setX(geo.getX() + childBounds.getX()
-										- size.getWidth() - border);
-								geo.setY(geo.getY() + childBounds.getY()
-										- size.getHeight() - border);
+							if (moveParent) {
+								geo.setX(geo.getX() + childBounds.getX() - size.getWidth() - border);
+								geo.setY(geo.getY() + childBounds.getY() - size.getHeight() - border);
 							}
 
-							geo.setWidth(childBounds.getWidth()
-									+ size.getWidth() + 2 * border);
-							geo.setHeight(childBounds.getHeight()
-									+ size.getHeight() + 2 * border);
+							geo.setWidth(childBounds.getWidth() + size.getWidth() + 2 * border);
+							geo.setHeight(childBounds.getHeight() + size.getHeight() + 2 * border);
 
-							model.setGeometry(cells[i], geo);
+							model.setGeometry(cell, geo);
 							moveCells(children,
-									-childBounds.getX() + size.getWidth()
-											+ border,
-									-childBounds.getY() + size.getHeight()
-											+ border);
+									  -childBounds.getX() + size.getWidth() + border,
+									  -childBounds.getY() + size.getHeight() + border);
 						}
 					}
 				}
@@ -2241,7 +2225,6 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] cloneCells(Object[] cells)
 	{
-
 		return cloneCells(cells, true);
 	}
 
@@ -2277,8 +2260,7 @@ public class mxGraph extends mxEventSource
 					if (!allowInvalidEdges && model.isEdge(clones[i])
 							&& getEdgeValidationError(clones[i],
 									model.getTerminal(clones[i], true),
-									model.getTerminal(clones[i],
-											false)) != null)
+									model.getTerminal(clones[i], false)) != null)
 					{
 						clones[i] = null;
 					}
@@ -2289,8 +2271,7 @@ public class mxGraph extends mxEventSource
 						if (g != null)
 						{
 							mxCellState state = view.getState(cells[i]);
-							mxCellState pstate = view
-									.getState(model.getParent(cells[i]));
+							mxCellState pstate = view.getState(model.getParent(cells[i]));
 
 							if (state != null && pstate != null)
 							{
@@ -2300,46 +2281,35 @@ public class mxGraph extends mxEventSource
 								if (model.isEdge(clones[i]))
 								{
 									// Checks if the source is cloned or sets the terminal point
-									Object src = model.getTerminal(cells[i],
-											true);
+									Object src = model.getTerminal(cells[i], true);
 
 									while (src != null && !tmp.contains(src))
-									{
 										src = model.getParent(src);
-									}
 
 									if (src == null)
 									{
 										mxPoint pt = state.getAbsolutePoint(0);
 										g.setTerminalPoint(
 												new mxPoint(
-														pt.getX() / scale
-																- trans.getX(),
-														pt.getY() / scale
-																- trans.getY()),
+														pt.getX() / scale - trans.getX(),
+														pt.getY() / scale - trans.getY()),
 												true);
 									}
 
 									// Checks if the target is cloned or sets the terminal point
-									Object trg = model.getTerminal(cells[i],
-											false);
+									Object trg = model.getTerminal(cells[i], false);
 
 									while (trg != null && !tmp.contains(trg))
-									{
 										trg = model.getParent(trg);
-									}
 
 									if (trg == null)
 									{
 										mxPoint pt = state.getAbsolutePoint(
-												state.getAbsolutePointCount()
-														- 1);
+												state.getAbsolutePointCount() - 1);
 										g.setTerminalPoint(
 												new mxPoint(
-														pt.getX() / scale
-																- trans.getX(),
-														pt.getY() / scale
-																- trans.getY()),
+														pt.getX() / scale - trans.getX(),
+														pt.getY() / scale - trans.getY()),
 												false);
 									}
 
@@ -2348,12 +2318,7 @@ public class mxGraph extends mxEventSource
 
 									if (points != null)
 									{
-										Iterator<mxPoint> it = points
-												.iterator();
-
-										while (it.hasNext())
-										{
-											mxPoint pt = it.next();
+										for (mxPoint pt: points) {
 											pt.setX(pt.getX() + dx);
 											pt.setY(pt.getY() + dy);
 										}

@@ -75,6 +75,11 @@ public abstract class NamedEntity extends LanguageEntity implements DisplayNamed
          return getName();
    }
 
+   @Override
+   public String toString () {  // used for tooltips
+      return getDisplayName();
+   }
+
    private static final String PYTHON_USER_NAME_PREFIX = "_usr_";  // we disallow leading underscores
 
    public String getPythonName () {
@@ -112,4 +117,23 @@ public abstract class NamedEntity extends LanguageEntity implements DisplayNamed
          return null;
    }
 
+   @Override
+   public Object clone () {
+      NamedEntity clone = (NamedEntity) super.clone();
+      // TODO adjust name of clone
+      String cloneName = clone.getName();
+      int copySuffixPos = cloneName.indexOf(" Copy");  // TODO should check for " Copy( \d+)?$" suffix
+      if (copySuffixPos >= 0)
+         cloneName = cloneName.substring(0, copySuffixPos);
+      cloneName += " Copy";
+      if (clone.namespace.contains(normalizedName(cloneName))) {
+         int counter = 2;
+         while (clone.namespace.contains(normalizedName((cloneName + " " + copySuffixPos))))
+            counter += 1;
+         cloneName += " " + counter;
+      }
+      clone.name = cloneName;
+      clone.namespace.castAndAdd(clone);
+      return clone;
+   }
 }

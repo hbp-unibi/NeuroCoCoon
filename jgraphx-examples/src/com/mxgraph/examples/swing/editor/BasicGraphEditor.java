@@ -558,7 +558,7 @@ public class BasicGraphEditor extends JPanel
 		if (frame != null)
 		{
 			String title = (currentFile != null) ? currentFile
-					.getAbsolutePath() : mxResources.get("newDiagram");
+					.getAbsolutePath() : mxResources.get("newNetwork");
 
 			if (modified)
 			{

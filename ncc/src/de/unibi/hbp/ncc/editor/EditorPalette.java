@@ -13,6 +13,8 @@ import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+import de.unibi.hbp.ncc.lang.EntityCreator;
+import de.unibi.hbp.ncc.lang.LanguageEntity;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -35,6 +37,7 @@ import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.function.Supplier;
 
 public class EditorPalette extends JPanel
 {
@@ -183,10 +186,9 @@ public class EditorPalette extends JPanel
 	}
 
 	public void addTemplate(final String name, ImageIcon icon, String style,
-			int width, int height, Object value)
+			int width, int height, EntityCreator<?> value)
 	{
-		mxCell cell = new mxCell(value, new mxGeometry(0, 0, width, height),
-				style);
+		mxCell cell = new mxCell(value, new mxGeometry(0, 0, width, height), style);
 		cell.setVertex(true);
 
 		addTemplate(name, icon, cell);

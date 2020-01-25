@@ -54,7 +54,6 @@ public class EditorMenuBar extends JMenuBar
 
 		menu.add(editor.bind(mxResources.get("new"), new NewAction(), "/de/unibi/hbp/ncc/images/new.gif"));
 		menu.add(editor.bind(mxResources.get("openFile"), new OpenAction(), "/de/unibi/hbp/ncc/images/open.gif"));
-		menu.add(editor.bind(mxResources.get("importStencil"), new ImportAction(), "/de/unibi/hbp/ncc/images/open.gif"));
 
 		menu.addSeparator();
 

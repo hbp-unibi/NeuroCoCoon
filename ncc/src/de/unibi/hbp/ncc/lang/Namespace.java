@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Namespace<T extends NamedEntity> implements Iterable<T> {
+   private Scope containingScope;  // for access to sibling namespaces
+   private Namespace<T> parent;  // would be used for nested namespaces
    private Class<T> memberClazz;
    private Map<String, T> members;
    private String generatedNamesPrefix;
@@ -13,16 +15,18 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
 
    private static final int MAX_GENERATOR_VALUE = 9999;
 
-   Namespace (Class<T> clazz, String generatedNamesPrefix, String pythonDiscriminator) {
+   Namespace (Scope containingScope, Class<T> clazz, String generatedNamesPrefix, String pythonDiscriminator) {
+      this.containingScope = containingScope;
+      this.memberClazz = clazz;
+      this.members = new HashMap<>();
+      this.generatedNamesPrefix = generatedNamesPrefix.trim() + " ";
+      this.nameGenerator = 0;
       if (pythonDiscriminator.isEmpty() || pythonDiscriminator.startsWith("_") || pythonDiscriminator.endsWith("_"))
          throw new IllegalArgumentException("invalid Python name fragment");
       this.pythonDiscriminator = pythonDiscriminator;
-      members = new HashMap<>();
-      this.generatedNamesPrefix = generatedNamesPrefix.trim() + " ";
-      nameGenerator = 0;
    }
 
-   // TODO should name validation been done here?
+   // TODO should name validation (and normalization?) been done here?
    void add (T member) {
       T oldValue = members.put(member.getName(), member);
       if (oldValue != null)
@@ -51,6 +55,8 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
    public boolean contains (String name) {
       return members.containsKey(name);
    }
+
+   public Scope getContainingScope () { return containingScope; }
 
    String generateName () {
       String result;

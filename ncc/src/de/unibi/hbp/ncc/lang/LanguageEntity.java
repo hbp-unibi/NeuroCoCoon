@@ -1,12 +1,17 @@
 package de.unibi.hbp.ncc.lang;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class LanguageEntity {
+public abstract class LanguageEntity implements Cloneable, Serializable {
+   private boolean predefined;  // such entities cannot be deleted
    private List<LanguageEntity> referencedEntities;  // created lazily on demand
+
+   public boolean isPredefined () { return predefined; }
+   public void makePredefined () { predefined = true; }
 
    protected void addReferenceTo (LanguageEntity target) {
       if (referencedEntities == null)
@@ -61,4 +66,18 @@ public abstract class LanguageEntity {
       return referencedEntities != null && referencedEntities.contains(target);
    }
 
+   @Override
+   public Object clone () {
+      try {
+         LanguageEntity clone = (LanguageEntity) super.clone();
+         clone.predefined = false;  // a copy of a predefined entity is user modifiable
+         if (this.referencedEntities != null)
+            clone.referencedEntities = new ArrayList<>(this.referencedEntities);
+         return clone;
+      }
+      catch (CloneNotSupportedException cnse) {
+         // cnse.printStackTrace(System.err);
+         throw new RuntimeException("LanguageEntity should be cloneable", cnse);
+      }
+   }
 }

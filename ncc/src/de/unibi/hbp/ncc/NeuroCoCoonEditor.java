@@ -22,6 +22,10 @@ import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
+import de.unibi.hbp.ncc.lang.EntityCreator;
+import de.unibi.hbp.ncc.lang.LanguageEntity;
+import de.unibi.hbp.ncc.lang.NeuronPopulation;
+import de.unibi.hbp.ncc.lang.Program;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
@@ -30,8 +34,8 @@ import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.Point;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor
 {
@@ -47,7 +51,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 	public NeuroCoCoonEditor ()
 	{
-		this("NeuroCoCoon Editor", new CustomGraphComponent(new CustomGraph()));
+		this("NeuroCoCoon Editor",
+			 new ProgramGraphComponent(new ProgramGraph(new Program())));
 	}
 
 	public NeuroCoCoonEditor (String appTitle, mxGraphComponent component)
@@ -56,13 +61,13 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		final mxGraph graph = graphComponent.getGraph();
 
 		// Creates the shapes palette
-		EditorPalette shapesPalette = insertPalette(mxResources.get("shapes"));
-		EditorPalette imagesPalette = insertPalette(mxResources.get("images"));
-		EditorPalette symbolsPalette = insertPalette(mxResources.get("symbols"));
+		EditorPalette basicPalette = insertPalette(mxResources.get("basic"));
+		EditorPalette modulesPalette = insertPalette(mxResources.get("modules"));
+		// EditorPalette symbolsPalette = insertPalette(mxResources.get("symbols"));
 
 		// Sets the edge template to be used for creating new edges if an edge
 		// is clicked in the shape palette
-		shapesPalette.addListener(mxEvent.SELECT, new mxIEventListener()
+		basicPalette.addListener(mxEvent.SELECT, new mxIEventListener()
 		{
 			public void invoke(Object sender, mxEventObject evt)
 			{
@@ -75,7 +80,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 					if (graph.getModel().isEdge(cell))
 					{
-						((CustomGraph) graph).setEdgeTemplate(cell);
+						((ProgramGraph) graph).setEdgeTemplate(cell);
 					}
 				}
 			}
@@ -83,14 +88,15 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		});
 
 		// Adds some template cells for dropping into the graph
-		shapesPalette
+		/*
+		basicPalette
 				.addTemplate(
 						"Container",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/swimlane.png")),
 						"swimlane", 280, 280, "Container");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Icon",
 						new ImageIcon(
@@ -98,7 +104,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/rounded.png")),
 						"icon;image=/de/unibi/hbp/ncc/images/wrench.png",
 						70, 70, "Icon");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Label",
 						new ImageIcon(
@@ -106,84 +112,82 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/rounded.png")),
 						"label;image=/de/unibi/hbp/ncc/images/gear.png",
 						130, 50, "Label");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Rectangle",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/rectangle.png")),
 						null, 160, 120, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Rounded Rectangle",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/rounded.png")),
 						"rounded=1", 160, 120, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Double Rectangle",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/doublerectangle.png")),
 						"rectangle;shape=doubleRectangle", 160, 120, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Ellipse",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/ellipse.png")),
 						"ellipse", 160, 160, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Double Ellipse",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/doubleellipse.png")),
 						"ellipse;shape=doubleEllipse", 160, 160, "");
-		shapesPalette
-				.addTemplate(
-						"Triangle",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/triangle.png")),
-						"triangle", 120, 160, "");
-		shapesPalette
+		 */
+		basicPalette.addTemplate("Spike Source",
+								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
+								 "triangle", 60, 80, new NeuronPopulation.Creator());
+		/*
+		basicPalette
 				.addTemplate(
 						"Rhombus",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/rhombus.png")),
 						"rhombus", 160, 160, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Horizontal Line",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/hline.png")),
 						"line", 160, 10, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Hexagon",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/hexagon.png")),
 						"shape=hexagon", 160, 120, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Cylinder",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/cylinder.png")),
 						"shape=cylinder", 120, 160, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Actor",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/actor.png")),
 						"shape=actor", 120, 160, "");
-		shapesPalette
+		basicPalette
 				.addTemplate(
 						"Cloud",
 						new ImageIcon(
@@ -191,35 +195,35 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/cloud.png")),
 						"ellipse;shape=cloud", 160, 120, "");
 
-		shapesPalette
+		basicPalette
 				.addEdgeTemplate(
 						"Straight",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/straight.png")),
 						"straight", 120, 120, "");
-		shapesPalette
+		basicPalette
 				.addEdgeTemplate(
 						"Horizontal Connector",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/connect.png")),
 						null, 100, 100, "");
-		shapesPalette
+		basicPalette
 				.addEdgeTemplate(
 						"Vertical Connector",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/vertical.png")),
 						"vertical", 100, 100, "");
-		shapesPalette
+		basicPalette
 				.addEdgeTemplate(
 						"Entity Relation",
 						new ImageIcon(
 								NeuroCoCoonEditor.class
 										.getResource("images/entity.png")),
 						"entity", 100, 100, "");
-		shapesPalette
+		basicPalette
 				.addEdgeTemplate(
 						"Arrow",
 						new ImageIcon(
@@ -227,7 +231,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/arrow.png")),
 						"arrow", 120, 120, "");
 
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Bell",
 						new ImageIcon(
@@ -235,7 +239,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/bell.png")),
 						"image;image=/de/unibi/hbp/ncc/images/bell.png",
 						50, 50, "Bell");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Box",
 						new ImageIcon(
@@ -243,7 +247,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/box.png")),
 						"image;image=/de/unibi/hbp/ncc/images/box.png",
 						50, 50, "Box");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Cube",
 						new ImageIcon(
@@ -251,7 +255,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/cube_green.png")),
 						"image;image=/de/unibi/hbp/ncc/images/cube_green.png",
 						50, 50, "Cube");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"User",
 						new ImageIcon(
@@ -259,7 +263,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/dude3.png")),
 						"roundImage;image=/de/unibi/hbp/ncc/images/dude3.png",
 						50, 50, "User");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Earth",
 						new ImageIcon(
@@ -267,7 +271,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/earth.png")),
 						"roundImage;image=/de/unibi/hbp/ncc/images/earth.png",
 						50, 50, "Earth");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Gear",
 						new ImageIcon(
@@ -275,7 +279,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/gear.png")),
 						"roundImage;image=/de/unibi/hbp/ncc/images/gear.png",
 						50, 50, "Gear");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Home",
 						new ImageIcon(
@@ -283,7 +287,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/house.png")),
 						"image;image=/de/unibi/hbp/ncc/images/house.png",
 						50, 50, "Home");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Package",
 						new ImageIcon(
@@ -291,7 +295,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/package.png")),
 						"image;image=/de/unibi/hbp/ncc/images/package.png",
 						50, 50, "Package");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Printer",
 						new ImageIcon(
@@ -299,7 +303,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/printer.png")),
 						"image;image=/de/unibi/hbp/ncc/images/printer.png",
 						50, 50, "Printer");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Server",
 						new ImageIcon(
@@ -307,7 +311,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/server.png")),
 						"image;image=/de/unibi/hbp/ncc/images/server.png",
 						50, 50, "Server");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Workplace",
 						new ImageIcon(
@@ -315,7 +319,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/workplace.png")),
 						"image;image=/de/unibi/hbp/ncc/images/workplace.png",
 						50, 50, "Workplace");
-		imagesPalette
+		modulesPalette
 				.addTemplate(
 						"Wrench",
 						new ImageIcon(
@@ -420,18 +424,18 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/timer.png")),
 						"roundImage;image=/de/unibi/hbp/ncc/images/timer.png",
 						80, 80, "Timer");
+		 */
 	}
 
-	public static class CustomGraphComponent extends mxGraphComponent
+	public static class ProgramGraphComponent extends mxGraphComponent
 	{
 
-		private static final long serialVersionUID = -6833603133512882012L;
 
 		/**
 		 * 
 		 * @param graph
 		 */
-		public CustomGraphComponent(mxGraph graph)
+		public ProgramGraphComponent (mxGraph graph)
 		{
 			super(graph);
 
@@ -454,11 +458,12 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			getViewport().setBackground(Color.WHITE);
 		}
 
-		/**
+		/* *
 		 * Overrides drop behaviour to set the cell style if the target
 		 * is not a valid drop target and the cells are of the same
 		 * type (eg. both vertices or both edges). 
 		 */
+		/*
 		public Object[] importCells(Object[] cells, double dx, double dy,
 				Object target, Point location)
 		{
@@ -485,27 +490,32 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			return super.importCells(cells, dx, dy, target, location);
 		}
+		 */
 
 	}
 
 	/**
 	 * A graph that creates new edges from a given template edge.
 	 */
-	public static class CustomGraph extends mxGraph
+	public static class ProgramGraph extends mxGraph
 	{
 		/**
 		 * Holds the edge to be used as a template for inserting new edges.
 		 */
 		protected Object edgeTemplate;
 
+		private final Program program;
 		/**
 		 * Custom graph that defines the alternate edge style to be used when
 		 * the middle control point of edges is double clicked (flipped).
 		 */
-		public CustomGraph()
+		public ProgramGraph (Program program)
 		{
+			this.program = program;
 			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
 		}
+
+		public Program getProgram () { return program; }
 
 		/**
 		 * Sets the edge template to be used to inserting edges.
@@ -515,12 +525,30 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			edgeTemplate = template;
 		}
 
+		@Override
+		public Object[] cloneCells (Object[] cells, boolean allowInvalidEdges) {
+			Object[] clones =  super.cloneCells(cells, allowInvalidEdges);
+			for (Object clone: clones) {
+				if (clone instanceof mxCell) {
+					mxCell cell = (mxCell) clone;
+					Object value = cell.getValue();
+					if (value instanceof EntityCreator)
+						value = ((EntityCreator<?>) value).create(program.getGlobalScope());
+					else if (value instanceof LanguageEntity)
+						value = ((LanguageEntity) value).clone();
+					cell.setValue(value);
+					// TODO do something similar with the (transitive) children of the cell?
+				}
+			}
+			return clones;
+		}
+
 		/**
 		 * Prints out some useful information about the cell in the tooltip.
 		 */
 		public String getToolTipForCell(Object cell)
 		{
-			String tip = "<html>";
+			StringBuilder tip = new StringBuilder("<html>");
 			mxGeometry geo = getModel().getGeometry(cell);
 			mxCellState state = getView().getState(cell);
 
@@ -528,7 +556,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			if (getModel().isEdge(cell))
 			{
-				tip += "points={";
+				tip.append("points={");
 
 				if (geo != null)
 				{
@@ -536,22 +564,17 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 					if (points != null)
 					{
-						Iterator<mxPoint> it = points.iterator();
-
-						while (it.hasNext())
-						{
-							mxPoint point = it.next();
-							tip += "[x=" + numberFormat.format(point.getX())
-									+ ",y=" + numberFormat.format(point.getY())
-									+ "],";
+						for (mxPoint point: points) {
+							tip.append("[x=").append(numberFormat.format(point.getX()))
+									.append(",y=").append(numberFormat.format(point.getY()))
+									.append("],");
 						}
-
-						tip = tip.substring(0, tip.length() - 1);
+						tip.deleteCharAt(tip.length() - 1);
 					}
 				}
 
-				tip += "}<br>";
-				tip += "absPoints={";
+				tip.append("}<br>")
+						.append("absPoints={");
 
 				if (state != null)
 				{
@@ -559,51 +582,49 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					for (int i = 0; i < state.getAbsolutePointCount(); i++)
 					{
 						mxPoint point = state.getAbsolutePoint(i);
-						tip += "[x=" + numberFormat.format(point.getX())
-								+ ",y=" + numberFormat.format(point.getY())
-								+ "],";
+						tip.append("[x=").append(numberFormat.format(point.getX()))
+								.append(",y=").append(numberFormat.format(point.getY()))
+								.append("],");
 					}
-
-					tip = tip.substring(0, tip.length() - 1);
+					tip.deleteCharAt(tip.length() - 1);
 				}
 
-				tip += "}";
+				tip.append("}");
 			}
 			else
 			{
-				tip += "geo=[";
+				tip.append("geo=[");
 
 				if (geo != null)
 				{
-					tip += "x=" + numberFormat.format(geo.getX()) + ",y="
-							+ numberFormat.format(geo.getY()) + ",width="
-							+ numberFormat.format(geo.getWidth()) + ",height="
-							+ numberFormat.format(geo.getHeight());
+					tip.append("x=").append(numberFormat.format(geo.getX()))
+							.append(",y=").append(numberFormat.format(geo.getY()))
+							.append(",width=").append(numberFormat.format(geo.getWidth()))
+							.append(",height=").append(numberFormat.format(geo.getHeight()));
 				}
 
-				tip += "]<br>";
-				tip += "state=[";
+				tip.append("]<br>")
+						.append("state=[");
 
 				if (state != null)
 				{
-					tip += "x=" + numberFormat.format(state.getX()) + ",y="
-							+ numberFormat.format(state.getY()) + ",width="
-							+ numberFormat.format(state.getWidth())
-							+ ",height="
-							+ numberFormat.format(state.getHeight());
+					tip.append("x=").append(numberFormat.format(state.getX()))
+							.append(",y=").append(numberFormat.format(state.getY()))
+							.append(",width=").append(numberFormat.format(state.getWidth()))
+							.append(",height=").append(numberFormat.format(state.getHeight()));
 				}
 
-				tip += "]";
+				tip.append("]");
 			}
 
 			mxPoint trans = getView().getTranslate();
 
-			tip += "<br>scale=" + numberFormat.format(getView().getScale())
-					+ ", translate=[x=" + numberFormat.format(trans.getX())
-					+ ",y=" + numberFormat.format(trans.getY()) + "]";
-			tip += "</html>";
+			tip.append("<br>scale=").append(numberFormat.format(getView().getScale()))
+					.append(", translate=[x=").append(numberFormat.format(trans.getX()))
+					.append(",y=").append(numberFormat.format(trans.getY())).append("]");
+			tip.append("</html>");
 
-			return tip;
+			return tip.toString();
 		}
 
 		/**
@@ -611,7 +632,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		 * new edges.
 		 */
 		public Object createEdge(Object parent, String id, Object value,
-				Object source, Object target, String style)
+								 Object source, Object target, String style)
 		{
 			if (edgeTemplate != null)
 			{

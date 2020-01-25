@@ -5,6 +5,10 @@ public class Program {
 
    public Program () {
       global = new Scope();
+      NeuronType defNeuronType = new NeuronType(global.getNeuronTypes(), "Default");
+      defNeuronType.makePredefined();
+      SynapseType defSynapseType = new SynapseType(global.getSynapseTypes(), "Default");
+      defSynapseType.makePredefined();
    }
 
    public Scope getGlobalScope () {

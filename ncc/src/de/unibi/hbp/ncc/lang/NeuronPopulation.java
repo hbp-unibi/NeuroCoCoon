@@ -2,26 +2,35 @@ package de.unibi.hbp.ncc.lang;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class NeuronPopulation extends NamedEntity {
+   private NeuronType type;
    private int neuronCount;
 
-   public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, int neuronCount) {
+   public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, NeuronType type, int neuronCount) {
       super(namespace, name);
+      this.type = Objects.requireNonNull(type);
       this.neuronCount = neuronCount;
-   }
-
-   public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name) {
-      this(namespace, name, 1);
-   }
-
-   public NeuronPopulation (Namespace<NeuronPopulation> namespace, int neuronCount) {
-      super(namespace);
-      this.neuronCount = neuronCount;
+      addReferenceTo(type);
    }
 
    public NeuronPopulation (Namespace<NeuronPopulation> namespace) {
-      this(namespace, 1);
+      super(namespace);
+      this.type = Objects.requireNonNull(namespace.getContainingScope().getNeuronTypes().get("Default"));
+      this.neuronCount = 1;
+   }
+
+   public static class Creator implements EntityCreator<NeuronPopulation> {
+      @Override
+      public NeuronPopulation create (Scope scope) {
+         return new NeuronPopulation(scope.getNeuronPopulations());
+      }
+
+      @Override
+      public String toString () {  // used by drag&drop tooltips
+         return "Neuron Population";
+      }
    }
 
    public int getNeuronCount () {
