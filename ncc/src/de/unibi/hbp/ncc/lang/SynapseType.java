@@ -10,14 +10,15 @@ import java.util.List;
 public class SynapseType extends NamedEntity<SynapseType> {
 
    public enum SynapseKind implements DisplayNamed {
-      ALL_TO_ALL("All:All"),
-      ONE_TO_ONE("One:One"),
-      FIXED_PROBABILITY("Probability");
+      ALL_TO_ALL("All:All", "straight;strokeWidth=4"),
+      ONE_TO_ONE("One:One", "straight"),
+      FIXED_PROBABILITY("Probability", "straight;dashed=1");
 
-      private String displayName;
+      private String displayName, edgeStyle;
 
-      SynapseKind (String displayName) {
+      SynapseKind (String displayName, String edgeStyle) {
          this.displayName = displayName;
+         this.edgeStyle = edgeStyle;
       }
 
       @Override
@@ -33,6 +34,10 @@ public class SynapseType extends NamedEntity<SynapseType> {
             return "p = " + type.probability.getValue();
          else
             return displayName;
+      }
+
+      String getEdgeStyle (SynapseType type) {
+         return edgeStyle;
       }
    }
 
@@ -53,8 +58,8 @@ public class SynapseType extends NamedEntity<SynapseType> {
       };
    }
 
-   public SynapseType (Namespace<SynapseType> namespace, String name) {
-      this(namespace, name, SynapseKind.ALL_TO_ALL, 1.0, 0.5);
+   public SynapseType (Namespace<SynapseType> namespace, String name, SynapseKind kind) {
+      this(namespace, name, kind, 1.0, 0.5);
    }
 
    public SynapseType (SynapseType orig) {
@@ -81,6 +86,8 @@ public class SynapseType extends NamedEntity<SynapseType> {
    public String getSummary () {
       return synapseKind.getValue().getSummary(this);
    }
+
+   public String getEdgeStyle () { return synapseKind.getValue().getEdgeStyle(this); }
 
    // @Override
    public SynapseType duplicate () {

@@ -2,8 +2,6 @@ package de.unibi.hbp.ncc.lang.props;
 
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
-import de.unibi.hbp.ncc.lang.NamedEntity;
-import de.unibi.hbp.ncc.lang.Namespace;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
@@ -13,7 +11,6 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import java.awt.Component;
 import java.util.EnumSet;
-import java.util.Vector;
 
 public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
    private E[] allEnumValues;
@@ -49,7 +46,7 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
    public TableCellEditor getTableCellEditor (JTable table) {
       JComboBox<E> comboBox = new JComboBox<>(allEnumValues);
       comboBox.setRenderer(new SmartListCellRenderer());
-      // comboBox.setEditable(false);
+      comboBox.setEditable(false);
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
    }

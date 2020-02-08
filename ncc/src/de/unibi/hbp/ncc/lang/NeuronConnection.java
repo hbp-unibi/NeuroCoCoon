@@ -28,7 +28,7 @@ public class NeuronConnection extends LanguageEntity {
 
    public NeuronConnection (Namespace<SynapseType> synapseTypeNamespace, SynapseType synapseType) {
       super();
-      if (globalSynapseTypeNamespace == null)
+      if (synapseTypeNamespace == null)
          synapseTypeNamespace = globalSynapseTypeNamespace;
       this.synapseTypeNamespace = synapseTypeNamespace;
       if (synapseType == null)
@@ -37,8 +37,8 @@ public class NeuronConnection extends LanguageEntity {
                                                 Objects.requireNonNull(synapseType), synapseTypeNamespace);
    }
 
-   public NeuronConnection (Namespace<SynapseType> namespace) {
-      this(namespace, null);
+   public NeuronConnection (SynapseType synapseType) {
+      this(null, synapseType);
    }
 
    public NeuronConnection () {

@@ -90,8 +90,7 @@ public class EditorToolBar extends JToolBar
 		GraphicsEnvironment env = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		List<String> fonts = new ArrayList<String>();
-		fonts.addAll(Arrays.asList(new String[] { "Helvetica", "Verdana",
-				"Times New Roman", "Garamond", "Courier New", "-" }));
+		fonts.addAll(Arrays.asList("Helvetica", "Verdana", "Times New Roman", "Garamond", "Courier New", "-"));
 		fonts.addAll(Arrays.asList(env.getAvailableFontFamilyNames()));
 
 		final JComboBox fontCombo = new JComboBox(fonts.toArray());

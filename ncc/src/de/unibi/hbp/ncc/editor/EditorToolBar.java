@@ -7,11 +7,14 @@ import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraphView;
+import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
 import de.unibi.hbp.ncc.editor.EditorActions.NewAction;
 import de.unibi.hbp.ncc.editor.EditorActions.OpenAction;
 import de.unibi.hbp.ncc.editor.EditorActions.SaveAction;
 import de.unibi.hbp.ncc.env.NmpiClient;
+import de.unibi.hbp.ncc.lang.Namespace;
+import de.unibi.hbp.ncc.lang.SynapseType;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -34,6 +37,7 @@ public class EditorToolBar extends JToolBar
 	private Action checkAction;
 	private JLabel jobStatusDisplay;
 	private NmpiClient.Platform currentPlatform;
+	private SynapseType currentSynapseType;
 
 	public EditorToolBar(final BasicGraphEditor editor, int orientation)
 	{
@@ -146,7 +150,26 @@ public class EditorToolBar extends JToolBar
 		});
 		addSeparator();
 
-		checkAction = editor.bind("Check", new RunAction() /* FIXME use CheckAction */, "/de/unibi/hbp/ncc/images/check.png");
+		NeuroCoCoonEditor.ProgramGraph programGraph = (NeuroCoCoonEditor.ProgramGraph) editor.getGraphComponent().getGraph();
+		Namespace<SynapseType> synapseTypes = programGraph.getProgram().getGlobalScope().getSynapseTypes();
+
+		final JComboBox<SynapseType> synapseTypeCombo = new JComboBox<>(synapseTypes.getModel());
+		synapseTypeCombo.setEditable(false);
+		synapseTypeCombo.setMinimumSize(new Dimension(120, 0));
+		synapseTypeCombo.setPreferredSize(new Dimension(120, 0));
+		synapseTypeCombo.setMaximumSize(new Dimension(120, 100));
+		currentSynapseType = synapseTypeCombo.getModel().getElementAt(0);
+		synapseTypeCombo.setSelectedItem(currentSynapseType);
+		synapseTypeCombo.addActionListener(e -> {
+			Object selected = synapseTypeCombo.getSelectedItem();
+			if (selected instanceof SynapseType)
+				currentSynapseType = (SynapseType) selected;
+		});
+		add(new JLabel("Synapses:"));
+		add(synapseTypeCombo);
+		addSeparator();
+
+		checkAction = editor.bind("Check", new CheckAction(), "/de/unibi/hbp/ncc/images/check.png");
 		add(checkAction);
 		add(editor.bind("Run", new RunAction(), "/de/unibi/hbp/ncc/images/run.png"));
 		final JComboBox<NmpiClient.Platform> platformCombo = new JComboBox<>(NmpiClient.Platform.values());
@@ -156,13 +179,10 @@ public class EditorToolBar extends JToolBar
 		platformCombo.setMaximumSize(new Dimension(120, 100));
 		currentPlatform = NmpiClient.Platform.SPINNAKER;
 		platformCombo.setSelectedItem(currentPlatform);
-		platformCombo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed (ActionEvent e) {
-				Object selected = platformCombo.getSelectedItem();
-				if (selected instanceof NmpiClient.Platform)
-					currentPlatform = (NmpiClient.Platform) selected;
-			}
+		platformCombo.addActionListener(e -> {
+			Object selected = platformCombo.getSelectedItem();
+			if (selected instanceof NmpiClient.Platform)
+				currentPlatform = (NmpiClient.Platform) selected;
 		});
 		add(platformCombo);
 
@@ -176,6 +196,8 @@ public class EditorToolBar extends JToolBar
 	}
 
 	public NmpiClient.Platform getCurrentPlatform () { return currentPlatform; }
+
+	public SynapseType getCurrentSynapseType () { return currentSynapseType; }
 
 	enum StatusLevel {
 		PLACEHOLDER(Color.GRAY), NEUTRAL(Color.BLACK), GOOD(Color.GREEN.darker()), BAD(Color.RED.darker());

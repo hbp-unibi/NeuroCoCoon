@@ -8,7 +8,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
-import java.util.Vector;
+import java.util.Objects;
 
 public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditableProp<E> implements NameProp<E> {
    private Namespace<E> targetNamespace;
@@ -16,7 +16,7 @@ public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditablePr
    public EditableNameProp (String propName, Class<E> valueClass, LanguageEntity owner,
                             E value, Namespace<E> targetNamespace) {
       super(propName, valueClass, owner, value);
-      this.targetNamespace = targetNamespace;
+      this.targetNamespace = Objects.requireNonNull(targetNamespace);
    }
 
    @Override
@@ -34,8 +34,8 @@ public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditablePr
 
    @Override
    public TableCellEditor getTableCellEditor (JTable table) {
-      JComboBox<E> comboBox = new JComboBox<>(new Vector<>(targetNamespace.getAllMembersSorted()));
-      // comboBox.setEditable(false);
+      JComboBox<E> comboBox = new JComboBox<>(targetNamespace.getModel());
+      comboBox.setEditable(false);
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
    }

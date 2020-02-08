@@ -5,15 +5,10 @@ package de.unibi.hbp.ncc;
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxGraphTransferable;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
@@ -23,22 +18,22 @@ import com.mxgraph.view.mxGraphSelectionModel;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
+import de.unibi.hbp.ncc.editor.EditorToolBar;
 import de.unibi.hbp.ncc.lang.EntityCreator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronPopulation;
 import de.unibi.hbp.ncc.lang.Program;
+import de.unibi.hbp.ncc.lang.SynapseType;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import java.awt.Color;
-import java.awt.Point;
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor
 {
@@ -57,32 +52,17 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		this("NeuroCoCoon Editor", new ProgramGraphComponent(new ProgramGraph(new Program())));
 	}
 
-	public NeuroCoCoonEditor (String appTitle, mxGraphComponent component)
+	public NeuroCoCoonEditor (String appTitle, ProgramGraphComponent component)
 	{
 		super(appTitle, component);
+		component.getProgramGraph().setToolBar(getEditorToolBar());
+
 		final mxGraph graph = graphComponent.getGraph();
 
 		// Creates the shapes palette
 		EditorPalette basicPalette = insertPalette(mxResources.get("basic"));
 		EditorPalette modulesPalette = insertPalette(mxResources.get("modules"));
 		// EditorPalette symbolsPalette = insertPalette(mxResources.get("symbols"));
-
-		// Sets the edge template to be used for creating new edges if an edge
-		// is clicked in the shape palette
-		basicPalette.addListener(mxEvent.SELECT, (sender, evt) -> {
-			Object tmp = evt.getProperty("transferable");
-
-			if (tmp instanceof mxGraphTransferable)
-			{
-				mxGraphTransferable t = (mxGraphTransferable) tmp;
-				Object cell = t.getCells()[0];
-
-				if (graph.getModel().isEdge(cell))
-				{
-					((ProgramGraph) graph).setEdgeTemplate(cell);
-				}
-			}
-		});
 
 		graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> {
 			mxGraphSelectionModel model = (mxGraphSelectionModel) sender;
@@ -176,9 +156,11 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
 								 "rhombus;fillColor=#ddff88;strokeColor=#bbdd77",
 								 60, 80, NeuronPopulation.CREATOR);
+		/*
 		basicPalette.addEdgeTemplate("Connection",
 									 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/straight.png")),
 									 "straight", 120, 120, NeuronConnection.CREATOR);
+		 */
 
 		/*
 		basicPalette
@@ -458,14 +440,12 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 	public static class ProgramGraphComponent extends mxGraphComponent
 	{
+		private final ProgramGraph programGraph;
 
-		/**
-		 * 
-		 * @param graph
-		 */
-		public ProgramGraphComponent (mxGraph graph)
+		public ProgramGraphComponent (ProgramGraph graph)
 		{
 			super(graph);
+			programGraph = graph;
 
 			// Sets switches typically used in an editor
 			setPageVisible(false);
@@ -483,6 +463,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			getViewport().setOpaque(true);
 			getViewport().setBackground(Color.WHITE);
 		}
+
+		public ProgramGraph getProgramGraph () { return programGraph; }
 
 		/* *
 		 * Overrides drop behaviour to set the cell style if the target
@@ -525,12 +507,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	 */
 	public static class ProgramGraph extends mxGraph
 	{
-		/**
-		 * Holds the edge to be used as a template for inserting new edges.
-		 */
-		protected Object edgeTemplate;
-
 		private final Program program;
+		private EditorToolBar toolBar;
+
 		/**
 		 * Custom graph that defines the alternate edge style to be used when
 		 * the middle control point of edges is double clicked (flipped).
@@ -541,15 +520,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
 		}
 
-		public Program getProgram () { return program; }
+		void setToolBar (EditorToolBar toolBar) { this.toolBar = toolBar; }
 
-		/**
-		 * Sets the edge template to be used to inserting edges.
-		 */
-		public void setEdgeTemplate(Object template)
-		{
-			edgeTemplate = template;
-		}
+		public Program getProgram () { return program; }
 
 		@Override
 		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
@@ -680,15 +653,12 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		public Object createEdge(Object parent, String id, Object value,
 								 Object source, Object target, String style)
 		{
-			if (edgeTemplate != null)
-			{
-				mxCell edge = (mxCell) cloneCells(new Object[] { edgeTemplate })[0];
-				edge.setId(id);
 
-				return edge;
-			}
+			SynapseType synapseType = toolBar.getCurrentSynapseType();
 
-			return super.createEdge(parent, id, value, source, target, style);
+			mxCell edge = (mxCell) super.createEdge(parent, id, value, source, target, synapseType.getEdgeStyle());
+			edge.setValue(new NeuronConnection(synapseType));
+			return edge;
 		}
 
 
