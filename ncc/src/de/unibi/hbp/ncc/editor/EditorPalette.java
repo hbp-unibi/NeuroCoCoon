@@ -48,12 +48,12 @@ public class EditorPalette extends JPanel
 
 	protected mxEventSource eventSource = new mxEventSource(this);
 
-	protected Color gradientColor = new Color(117, 195, 173);
+	protected Color gradientColor = new Color(208, 208, 208);
 
 	@SuppressWarnings("serial")
 	public EditorPalette()
 	{
-		setBackground(new Color(149, 230, 190));
+		setBackground(new Color(248, 248, 248));
 		setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
 
 		// Clears the current selection when the background is clicked
@@ -171,8 +171,8 @@ public class EditorPalette extends JPanel
 		revalidate();
 	}
 
-	public void addEdgeTemplate(final String name, ImageIcon icon,
-			String style, int width, int height, Object value)
+	public void addEdgeTemplate(final String name, ImageIcon icon, String style, int width, int height,
+								EntityCreator<?> value)
 	{
 		mxGeometry geometry = new mxGeometry(0, 0, width, height);
 		geometry.setTerminalPoint(new mxPoint(0, height), true);
@@ -185,8 +185,8 @@ public class EditorPalette extends JPanel
 		addTemplate(name, icon, cell);
 	}
 
-	public void addTemplate(final String name, ImageIcon icon, String style,
-			int width, int height, EntityCreator<?> value)
+	public void addTemplate(final String name, ImageIcon icon, String style, int width, int height,
+							EntityCreator<?> value)
 	{
 		mxCell cell = new mxCell(value, new mxGeometry(0, 0, width, height), style);
 		cell.setVertex(true);

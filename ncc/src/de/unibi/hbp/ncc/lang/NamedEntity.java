@@ -1,34 +1,77 @@
 package de.unibi.hbp.ncc.lang;
 
-import java.util.ArrayList;
+import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.StringProp;
+
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public abstract class NamedEntity extends LanguageEntity implements DisplayNamed {
-   private String name;
-   private Namespace<? extends NamedEntity> namespace;
+public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEntity
+      implements DisplayNamed, Serializable, Comparable<NamedEntity<?>> {
+   private EditableProp<String> nameProp;
+   private Namespace<E> namespace;
 
+   protected Object writeReplace() throws ObjectStreamException {
+      return new EntityName(namespace.getId(), getName());
+   }
 
-   protected NamedEntity (Namespace<? extends NamedEntity> namespace, String name) {
+   protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
+      list.add(nameProp);
+      return list;
+   }
+
+   protected NamedEntity (Namespace<E> namespace, String name) {
       this.namespace = namespace;
-      setName(name);
+      if (name == null)
+         name = namespace.generateName();
+      this.nameProp = new StringProp("Name", this, name) {
+         @Override
+         public boolean isValid (String proposedValue) {
+            return isValidName(proposedValue);
+         }
+
+         @Override
+         public EnumSet<Impact> getChangeImpact () {
+            return EnumSet.of(Impact.CELL_LABEL);
+         }
+      };
       this.namespace.castAndAdd(this);
-      // would be problematic, if T were no the concrete NamedEntity subclass itself
+      // would be problematic, if T were not the concrete NamedEntity subclass itself
    }
 
-   protected NamedEntity (Namespace<? extends NamedEntity> namespace) {
-      this(namespace, namespace.generateName());
+   protected NamedEntity (Namespace<E> namespace) {
+      this(namespace, null);
    }
+
+   protected String getCopiedName () {
+      String copiedName = getName();
+      int copySuffixPos = copiedName.indexOf(" Copy");  // TODO should check for " Copy( \d+)?$" suffix
+      if (copySuffixPos >= 0)
+         copiedName = copiedName.substring(0, copySuffixPos);
+      copiedName += " Copy";
+      if (namespace.contains(normalizedName(copiedName))) {
+         int counter = 2;
+         while (namespace.contains(normalizedName((copiedName + " " + copySuffixPos))))
+            counter += 1;
+         copiedName += " " + counter;
+      }
+      return copiedName;
+   }
+
+   protected Namespace<E> getNamespace () { return namespace; }
 
    public String getName () {
-      return name;
+      return nameProp.getValue();
    }
 
    // conservative ASCII identifiers with embedded individual spaces or underscores
    // (no leading, trailing or multiple consecutive spaces or underscores allowed)
    private static final Pattern IDENTIFIER_REGEXP = Pattern.compile("[A-Za-z]([_ ]?[A-Za-z0-9])*");
 
-   public static boolean isValidName (String name) {
+   private static boolean isValidName (String name) {
       return IDENTIFIER_REGEXP.matcher(name).matches();
    }
 
@@ -37,9 +80,7 @@ public abstract class NamedEntity extends LanguageEntity implements DisplayNamed
    }
 
    private void setName (String name) {
-      if (!isValidName(name))
-         throw new LanguageException("name " + name + " is invalid");
-      this.name = name;
+      nameProp.setValue(name);
    }
 
    public boolean canRenameTo (String name) {
@@ -76,6 +117,11 @@ public abstract class NamedEntity extends LanguageEntity implements DisplayNamed
    }
 
    @Override
+   public int compareTo (NamedEntity<?> other) {
+      return this.getName().compareTo(other.getName());
+   }
+
+   @Override
    public String toString () {  // used for tooltips
       return getDisplayName();
    }
@@ -85,55 +131,5 @@ public abstract class NamedEntity extends LanguageEntity implements DisplayNamed
    public String getPythonName () {
       return PYTHON_USER_NAME_PREFIX + namespace.getPythonDiscriminator() + "_" + normalizedName(getName());
 
-   }
-
-   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
-
-   @Override
-   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
-      if (entityProperties == null) {
-         StringPropertyDescriptor<NamedEntity> nameProperty =
-               new StringPropertyDescriptor<>(NamedEntity.class, "Name",
-                                              NamedEntity::renameTo, NamedEntity::getName,
-                                              NamedEntity::checkValidName, NamedEntity::checkConflictingName);
-         List<PropertyDescriptor<? extends LanguageEntity, ?>> list = new ArrayList<>();
-         list.add(nameProperty);
-         entityProperties = list;
-      }
-      return entityProperties;
-   }
-
-   private String checkConflictingName (String name) {
-      if (!canRenameTo(name))
-         return "Conflicting name " + name;
-      else
-         return null;
-   }
-
-   private static String checkValidName (String name) {
-      if (!isValidName(name))
-         return "Invalid name " + name;
-      else
-         return null;
-   }
-
-   @Override
-   public Object clone () {
-      NamedEntity clone = (NamedEntity) super.clone();
-      // TODO adjust name of clone
-      String cloneName = clone.getName();
-      int copySuffixPos = cloneName.indexOf(" Copy");  // TODO should check for " Copy( \d+)?$" suffix
-      if (copySuffixPos >= 0)
-         cloneName = cloneName.substring(0, copySuffixPos);
-      cloneName += " Copy";
-      if (clone.namespace.contains(normalizedName(cloneName))) {
-         int counter = 2;
-         while (clone.namespace.contains(normalizedName((cloneName + " " + copySuffixPos))))
-            counter += 1;
-         cloneName += " " + counter;
-      }
-      clone.name = cloneName;
-      clone.namespace.castAndAdd(clone);
-      return clone;
    }
 }

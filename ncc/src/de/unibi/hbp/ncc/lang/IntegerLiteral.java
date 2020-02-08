@@ -8,14 +8,4 @@ public class IntegerLiteral extends Literal<Integer> implements IntegerReadOnlyV
       super(value);
    }
 
-   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
-
-   @Override
-   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
-      if (entityProperties == null) {
-         entityProperties = buildEntityProperties(IntegerLiteral.class, Integer.class);
-      }
-      return entityProperties;
-   }
-
 }

@@ -5,6 +5,8 @@ public class Program {
 
    public Program () {
       global = new Scope();
+      NeuronPopulation.setGlobalNamespace(global.getNeuronPopulations());
+      NeuronConnection.setGlobalSynapseTypeNamespace(global.getSynapseTypes());
       NeuronType defNeuronType = new NeuronType(global.getNeuronTypes(), "Default");
       defNeuronType.makePredefined();
       SynapseType defSynapseType = new SynapseType(global.getSynapseTypes(), "Default");

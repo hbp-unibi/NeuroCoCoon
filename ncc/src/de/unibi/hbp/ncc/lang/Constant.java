@@ -3,16 +3,16 @@ package de.unibi.hbp.ncc.lang;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Constant<T> extends NamedEntity implements Value<T> {
+public abstract class Constant<T extends Number> extends NamedEntity<Constant<Number>> implements Value<T> {
 
    private T value;
 
-   public Constant (Namespace<? extends NamedEntity> namespace, String name, T value) {
+   public Constant (Namespace<Constant<Number>> namespace, String name, T value) {
       super(namespace, name);
       setValue(value);
    }
 
-   public Constant (Namespace<? extends NamedEntity> namespace) {
+   public Constant (Namespace<Constant<Number>> namespace) {
       super(namespace);
    }
 
@@ -25,15 +25,4 @@ public abstract class Constant<T> extends NamedEntity implements Value<T> {
    public T getValue () {
       return value;
    }
-
-   protected List<PropertyDescriptor<? extends LanguageEntity, ?>> buildEntityProperties (
-         Class<? extends Constant<T>> entityType, Class<T> valueType) {
-      PropertyDescriptor<? extends Constant<T>, T> valueProperty =
-            new PropertyDescriptor<>(entityType, "Value", valueType,
-                                     Constant<T>::setValue, Constant<T>::getValue);
-      List<PropertyDescriptor<? extends LanguageEntity, ?>> list = new ArrayList<>(super.getEntityProperties());
-      list.add(valueProperty);
-      return list;
-   }
-
 }

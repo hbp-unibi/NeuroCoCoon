@@ -66,14 +66,12 @@ public class mxUtils
 	/**
 	 * True if the machine is a Mac.
 	 */
-	public static boolean IS_MAC = System.getProperty("os.name").toLowerCase()
-			.indexOf("mac") >= 0;
+	public static boolean IS_MAC = System.getProperty("os.name").toLowerCase().contains("mac");
 
 	/**
 	 * True if the machine is running a linux kernel.
 	 */
-	public static boolean IS_LINUX = System.getProperty("os.name")
-			.toLowerCase().indexOf("linux") >= 0;
+	public static boolean IS_LINUX = System.getProperty("os.name").toLowerCase().contains("linux");
 
 	/**
 	 * Static Graphics used for Font Metrics.

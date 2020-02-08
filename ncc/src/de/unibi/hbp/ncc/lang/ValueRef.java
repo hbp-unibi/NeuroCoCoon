@@ -1,6 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
-public class ValueRef<T> implements ReadOnlyValue<T> {
+public class ValueRef<T extends Number> implements ReadOnlyValue<T> {
    private Literal<T> literal;
    private Constant<T> constant;
 
@@ -24,13 +24,4 @@ public class ValueRef<T> implements ReadOnlyValue<T> {
          return literal.getPythonRepresentation();
    }
 
-   void addTo (LanguageEntity owner) {
-      if (constant != null)
-         owner.addReferenceTo(constant);
-   }
-
-   void updateRemoveFrom (LanguageEntity owner) {
-      if (constant != null)
-         owner.removeReferenceTo(constant);
-   }
 }

@@ -15,11 +15,9 @@ public class Scope {
    public Namespace<NeuronPopulation> getNeuronPopulations () {
       return neuronPopulations;
    }
-
    public Namespace<NeuronType> getNeuronTypes () {
       return neuronTypes;
    }
-
    public Namespace<SynapseType> getSynapseTypes () {
       return synapseTypes;
    }

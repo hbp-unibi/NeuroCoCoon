@@ -8,14 +8,4 @@ public class DoubleLiteral extends Literal<Double> implements DoubleReadOnlyValu
       super(value);
    }
 
-   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
-
-   @Override
-   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
-      if (entityProperties == null) {
-         entityProperties = buildEntityProperties(DoubleLiteral.class, Double.class);
-      }
-      return entityProperties;
-   }
-
 }

@@ -4,23 +4,13 @@ import java.util.List;
 
 public class DoubleConstant extends Constant<Double> implements DoubleValue {
 
-   public DoubleConstant (Namespace<? extends NamedEntity> namespace, String name, Double value) {
+   public DoubleConstant (Namespace<Constant<Number>> namespace, String name, Double value) {
       super(namespace, name, value);
    }
 
-   public DoubleConstant (Namespace<? extends NamedEntity> namespace) {
+   public DoubleConstant (Namespace<Constant<Number>> namespace) {
       super(namespace);
       setValue(0.0);
-   }
-
-   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
-
-   @Override
-   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
-      if (entityProperties == null) {
-         entityProperties = buildEntityProperties(DoubleConstant.class, Double.class);
-      }
-      return entityProperties;
    }
 
 }

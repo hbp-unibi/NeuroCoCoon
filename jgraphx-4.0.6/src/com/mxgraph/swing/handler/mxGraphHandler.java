@@ -545,10 +545,8 @@ public class mxGraphHandler extends mxMouseAdapter implements
 		if (cells != null && cells.length > 0)
 		{
 			Image img = mxCellRenderer.createBufferedImage(
-					graphComponent.getGraph(), cells, graphComponent.getGraph()
-							.getView().getScale(), null,
-					graphComponent.isAntiAlias(), null,
-					graphComponent.getCanvas());
+					graphComponent.getGraph(), cells, graphComponent.getGraph().getView().getScale(), null,
+					graphComponent.isAntiAlias(), null, graphComponent.getCanvas());
 
 			if (img != null)
 			{
@@ -607,8 +605,7 @@ public class mxGraphHandler extends mxMouseAdapter implements
 	{
 		JComponent component = getDropTarget(e);
 		TransferHandler th = component.getTransferHandler();
-		boolean isLocal = th instanceof mxGraphTransferHandler
-				&& ((mxGraphTransferHandler) th).isLocalDrag();
+		boolean isLocal = th instanceof mxGraphTransferHandler && ((mxGraphTransferHandler) th).isLocalDrag();
 
 		if (isLocal)
 		{
@@ -616,8 +613,7 @@ public class mxGraphHandler extends mxMouseAdapter implements
 		}
 		else
 		{
-			canImport = graphComponent.isImportEnabled()
-					&& th.canImport(component, e.getCurrentDataFlavors());
+			canImport = graphComponent.isImportEnabled() && th.canImport(component, e.getCurrentDataFlavors());
 		}
 
 		if (canImport)
@@ -631,8 +627,7 @@ public class mxGraphHandler extends mxMouseAdapter implements
 
 				if (t.isDataFlavorSupported(mxGraphTransferable.dataFlavor))
 				{
-					mxGraphTransferable gt = (mxGraphTransferable) t
-							.getTransferData(mxGraphTransferable.dataFlavor);
+					mxGraphTransferable gt = (mxGraphTransferable) t.getTransferData(mxGraphTransferable.dataFlavor);
 					dragCells = gt.getCells();
 
 					if (gt.getBounds() != null)
@@ -640,13 +635,9 @@ public class mxGraphHandler extends mxMouseAdapter implements
 						mxGraph graph = graphComponent.getGraph();
 						double scale = graph.getView().getScale();
 						transferBounds = gt.getBounds();
-						int w = (int) Math.ceil((transferBounds.getWidth() + 1)
-								* scale);
-						int h = (int) Math
-								.ceil((transferBounds.getHeight() + 1) * scale);
-						setPreviewBounds(new Rectangle(
-								(int) transferBounds.getX(),
-								(int) transferBounds.getY(), w, h));
+						int w = (int) Math.ceil((transferBounds.getWidth() + 1) * scale);
+						int h = (int) Math.ceil((transferBounds.getHeight() + 1) * scale);
+						setPreviewBounds(new Rectangle((int) transferBounds.getX(), (int) transferBounds.getY(), w, h));
 
 						if (imagePreview)
 						{
@@ -656,14 +647,12 @@ public class mxGraphHandler extends mxMouseAdapter implements
 							{
 								if (!isLivePreview())
 								{
-									updateDragImage(graph
-											.getMovableCells(dragCells));
+									updateDragImage(graph.getMovableCells(dragCells));
 								}
 							}
 							else
 							{
-								Object[] tmp = graphComponent
-										.getImportableCells(dragCells);
+								Object[] tmp = graphComponent.getImportableCells(dragCells);
 								updateDragImage(tmp);
 
 								// Shows no drag icon if import is allowed but none

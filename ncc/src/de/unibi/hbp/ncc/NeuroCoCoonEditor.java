@@ -19,11 +19,13 @@ import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphSelectionModel;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.lang.EntityCreator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
+import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronPopulation;
 import de.unibi.hbp.ncc.lang.Program;
 import org.w3c.dom.Document;
@@ -34,6 +36,7 @@ import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.Point;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -51,8 +54,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 	public NeuroCoCoonEditor ()
 	{
-		this("NeuroCoCoon Editor",
-			 new ProgramGraphComponent(new ProgramGraph(new Program())));
+		this("NeuroCoCoon Editor", new ProgramGraphComponent(new ProgramGraph(new Program())));
 	}
 
 	public NeuroCoCoonEditor (String appTitle, mxGraphComponent component)
@@ -67,24 +69,38 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		// Sets the edge template to be used for creating new edges if an edge
 		// is clicked in the shape palette
-		basicPalette.addListener(mxEvent.SELECT, new mxIEventListener()
-		{
-			public void invoke(Object sender, mxEventObject evt)
+		basicPalette.addListener(mxEvent.SELECT, (sender, evt) -> {
+			Object tmp = evt.getProperty("transferable");
+
+			if (tmp instanceof mxGraphTransferable)
 			{
-				Object tmp = evt.getProperty("transferable");
+				mxGraphTransferable t = (mxGraphTransferable) tmp;
+				Object cell = t.getCells()[0];
 
-				if (tmp instanceof mxGraphTransferable)
+				if (graph.getModel().isEdge(cell))
 				{
-					mxGraphTransferable t = (mxGraphTransferable) tmp;
-					Object cell = t.getCells()[0];
+					((ProgramGraph) graph).setEdgeTemplate(cell);
+				}
+			}
+		});
 
-					if (graph.getModel().isEdge(cell))
-					{
-						((ProgramGraph) graph).setEdgeTemplate(cell);
+		graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> {
+			mxGraphSelectionModel model = (mxGraphSelectionModel) sender;
+			if (model.isEmpty())
+				detailsEditor.setSubject(graphComponent, null, null);
+			else {
+				Collection<?> added = (Collection<?>) evt.getProperty("removed");  // yes "added" and "removed" are swapped, see notice in mxGraphSelectionModel
+				if (added != null && !added.isEmpty()) {
+					Object tmp = added.iterator().next();
+					// System.err.println("selected: " + tmp);
+					if (tmp instanceof mxCell) {
+						mxCell cell = (mxCell) tmp;
+						Object value = cell.getValue();
+						if (value instanceof LanguageEntity)
+							detailsEditor.setSubject(graphComponent, cell, (LanguageEntity) value);
 					}
 				}
 			}
-
 		});
 
 		// Adds some template cells for dropping into the graph
@@ -148,9 +164,22 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 										.getResource("images/doubleellipse.png")),
 						"ellipse;shape=doubleEllipse", 160, 160, "");
 		 */
-		basicPalette.addTemplate("Spike Source",
+		basicPalette.addTemplate("Population",
 								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
-								 "triangle", 60, 80, new NeuronPopulation.Creator());
+								 "rectangle;fillColor=#ddddff;strokeColor=#bbbbdd",
+								 60, 80, NeuronPopulation.CREATOR);
+		basicPalette.addTemplate("Spikes",
+								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
+								 "triangle;fillColor=#ddffdd;strokeColor=#bbddbb",
+								 60, 80, NeuronPopulation.CREATOR);
+		basicPalette.addTemplate("Poisson",
+								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
+								 "rhombus;fillColor=#ddff88;strokeColor=#bbdd77",
+								 60, 80, NeuronPopulation.CREATOR);
+		basicPalette.addEdgeTemplate("Connection",
+									 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/straight.png")),
+									 "straight", 120, 120, NeuronConnection.CREATOR);
+
 		/*
 		basicPalette
 				.addTemplate(
@@ -430,7 +459,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	public static class ProgramGraphComponent extends mxGraphComponent
 	{
 
-
 		/**
 		 * 
 		 * @param graph
@@ -447,9 +475,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			// Loads the default stylesheet from an external file
 			mxCodec codec = new mxCodec();
-			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource(
-					"resources/default-style.xml")
-					.toString());
+			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource("resources/default-style.xml").toString());
 			if (doc != null)
 				codec.decode(doc.getDocumentElement(), graph.getStylesheet());
 
@@ -526,6 +552,25 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		}
 
 		@Override
+		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
+								boolean absolute, boolean constrain) {
+			for (Object obj: cells) {
+				if (obj instanceof mxCell) {
+					mxCell cell = (mxCell) obj;
+					Object value = cell.getValue();
+					if (value instanceof EntityCreator)
+						value = ((EntityCreator<?>) value).create();
+					else if (value instanceof NeuronPopulation)  // FIXME do this for all NamedEntities (or even LanguageEntities)
+						value = ((NeuronPopulation) value).duplicate();
+					cell.setValue(value);
+					// TODO do something similar with the (transitive) children of the cell?
+				}
+			}
+			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
+		}
+
+		/*
+		@Override
 		public Object[] cloneCells (Object[] cells, boolean allowInvalidEdges) {
 			Object[] clones =  super.cloneCells(cells, allowInvalidEdges);
 			for (Object clone: clones) {
@@ -533,15 +578,16 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					mxCell cell = (mxCell) clone;
 					Object value = cell.getValue();
 					if (value instanceof EntityCreator)
-						value = ((EntityCreator<?>) value).create(program.getGlobalScope());
-					else if (value instanceof LanguageEntity)
-						value = ((LanguageEntity) value).clone();
+						value = ((EntityCreator<?>) value).create();
+					else if (value instanceof NeuronPopulation)  // FIXME do this for all NamedEntities (or even LanguageEntities)
+						value = ((NeuronPopulation) value).duplicate();
 					cell.setValue(value);
 					// TODO do something similar with the (transitive) children of the cell?
 				}
 			}
 			return clones;
 		}
+*/
 
 		/**
 		 * Prints out some useful information about the cell in the tooltip.

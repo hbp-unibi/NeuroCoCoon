@@ -79,6 +79,7 @@ public class BasicGraphEditor extends JPanel
 	protected mxGraphComponent graphComponent;
 	protected mxGraphOutline graphOutline;
 	protected JTabbedPane libraryPane;
+	protected DetailsEditor detailsEditor;
 	protected EditorToolBar editorToolBar;
 	protected mxUndoManager undoManager;
 	protected String appTitle;
@@ -156,8 +157,9 @@ public class BasicGraphEditor extends JPanel
 		inner.setDividerSize(6);
 		inner.setBorder(null);
 
+		detailsEditor = new DetailsEditor();
 		JTabbedPane inspector = new JTabbedPane();
-		inspector.addTab("Inspector", new DetailsEditor().getComponent());
+		inspector.addTab("Inspector", detailsEditor.getComponent());
 		inspector.addTab("Neurons", new JLabel("Not implemented yet"));
 		inspector.addTab("Synapses", new JLabel("Not implemented yet"));
 		inspector.addTab("Plots", new JLabel("Not implemented yet"));

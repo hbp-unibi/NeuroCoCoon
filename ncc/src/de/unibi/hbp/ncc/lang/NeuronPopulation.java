@@ -1,30 +1,66 @@
 package de.unibi.hbp.ncc.lang;
 
-import java.util.ArrayList;
+import de.unibi.hbp.ncc.lang.props.EditableNameProp;
+import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.IntegerProp;
+
 import java.util.List;
 import java.util.Objects;
 
-public class NeuronPopulation extends NamedEntity {
-   private NeuronType type;
-   private int neuronCount;
+public class NeuronPopulation extends NamedEntity<NeuronPopulation> {
+   private EditableNameProp<NeuronType> neuronType;
+   private IntegerProp neuronCount;
 
-   public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, NeuronType type, int neuronCount) {
+   private static Namespace<NeuronPopulation> globalNamespace;
+
+   public static void setGlobalNamespace (Namespace<NeuronPopulation> ns) { globalNamespace = ns; }
+
+   @Override
+   protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
+      super.addEditableProps(list);
+      list.add(neuronType);
+      list.add(neuronCount);
+      return list;
+   }
+
+   @Override
+   protected List<EditableProp<?>> addIndirectEditableProps (List<EditableProp<?>> list) {
+      return neuronType.getValue().addExportedEditableProps(list);
+   }
+
+   public NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, NeuronType neuronType, int neuronCount) {
       super(namespace, name);
-      this.type = Objects.requireNonNull(type);
-      this.neuronCount = neuronCount;
-      addReferenceTo(type);
+      Namespace<NeuronType> neuronTypes = globalNamespace.getContainingScope().getNeuronTypes();
+      if (neuronType == null)
+         neuronType = neuronTypes.get("Default");
+      this.neuronType = new EditableNameProp<NeuronType>("Neuron Type", NeuronType.class, this,
+                                                         Objects.requireNonNull(neuronType), neuronTypes);
+      this.neuronCount = new IntegerProp("Neuron Count", this, neuronCount) {
+         @Override
+         public boolean isValid (Integer proposedValue) {
+            return proposedValue >= 1;
+         }
+      };
    }
 
    public NeuronPopulation (Namespace<NeuronPopulation> namespace) {
-      super(namespace);
-      this.type = Objects.requireNonNull(namespace.getContainingScope().getNeuronTypes().get("Default"));
-      this.neuronCount = 1;
+      this(namespace, null, null, 1);
    }
 
-   public static class Creator implements EntityCreator<NeuronPopulation> {
+   public NeuronPopulation () {
+      this(globalNamespace);
+   }
+
+   protected NeuronPopulation (NeuronPopulation orig) {
+      this(orig.getNamespace(), orig.getCopiedName(), orig.neuronType.getValue(), orig.neuronCount.getValue());
+   }
+
+   public static final EntityCreator<NeuronPopulation> CREATOR = new Creator();
+
+   private static class Creator implements EntityCreator<NeuronPopulation> {
       @Override
-      public NeuronPopulation create (Scope scope) {
-         return new NeuronPopulation(scope.getNeuronPopulations());
+      public NeuronPopulation create () {
+         return new NeuronPopulation();
       }
 
       @Override
@@ -34,34 +70,15 @@ public class NeuronPopulation extends NamedEntity {
    }
 
    public int getNeuronCount () {
-      return neuronCount;
+      return neuronCount.getValue();
    }
 
    public void setNeuronCount (int neuronCount) {
-      this.neuronCount = neuronCount;
+      this.neuronCount.setValue(neuronCount);
    }
 
-   private static List<PropertyDescriptor<? extends LanguageEntity, ?>> entityProperties;
-
-   public List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties () {
-      if (entityProperties == null) {
-         IntegerPropertyDescriptor<NeuronPopulation> neuronCountProperty =
-               new IntegerPropertyDescriptor<>(NeuronPopulation.class, "Neuron Count",
-                                               NeuronPopulation::setNeuronCount, NeuronPopulation::getNeuronCount,
-                                               NeuronPopulation::checkNeuronCount);
-
-         List<PropertyDescriptor<? extends LanguageEntity, ?>> list =
-               new ArrayList<>(super.getEntityProperties());
-         list.add(neuronCountProperty);
-         entityProperties = list;
-      }
-      return entityProperties;
-   }
-
-   public static String checkNeuronCount (int neuronCount) {
-      if (neuronCount < 1)
-         return "Neuron count must be strictly positive";
-      else
-         return null;
+   // @Override
+   public NeuronPopulation duplicate () {
+      return new NeuronPopulation(this);
    }
 }

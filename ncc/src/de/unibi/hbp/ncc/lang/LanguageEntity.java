@@ -1,83 +1,73 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.NameProp;
+import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class LanguageEntity implements Cloneable, Serializable {
-   private boolean predefined;  // such entities cannot be deleted
-   private List<LanguageEntity> referencedEntities;  // created lazily on demand
+public abstract class LanguageEntity {
+   private boolean predefined;  // such entities cannot be deleted and all their properties cannot be edited
+
+   protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
+      return list;
+   }
+
+   protected List<EditableProp<?>> addIndirectEditableProps (List<EditableProp<?>> list) { return list; }
+
+   protected List<ReadOnlyProp<?>> addReadOnlyProps (List<ReadOnlyProp<?>> list) {
+      return list;
+   }
+
+   public List<ReadOnlyProp<?>> getReadOnlyProps () {
+      return addReadOnlyProps(new ArrayList<>());
+   }
+   public List<EditableProp<?>> getEditableProps () {
+      return addEditableProps(new ArrayList<>());
+   }
+   public List<EditableProp<?>> getIndirectEditableProps () { return addIndirectEditableProps(new ArrayList<>()); }
+   public List<EditableProp<?>> getDirectAndIndirectEditableProps () {
+      return addIndirectEditableProps(addEditableProps(new ArrayList<>()));
+   }
 
    public boolean isPredefined () { return predefined; }
    public void makePredefined () { predefined = true; }
 
-   protected void addReferenceTo (LanguageEntity target) {
-      if (referencedEntities == null)
-         referencedEntities = new ArrayList<>();
-      referencedEntities.add(target);  // allows multiple references to the same target
-   }
-
-   protected void removeReferenceTo (LanguageEntity target) {
-      if (referencedEntities == null || !referencedEntities.remove(target))
-         throw new LanguageException(this.toString() + " had no reference to " + target);
-      if (referencedEntities.isEmpty())
-         referencedEntities = null;
-   }
-
-   protected <E extends LanguageEntity> void changeReference (E oldTarget, E newTarget) {
-      // TODO or better not enforce same type? consequences/differences vs. using LanguageEntity instead of E
-      if (Objects.equals(oldTarget, newTarget))
-         return;  // a no-op
-      if (oldTarget == null)
-         addReferenceTo(newTarget);
-      else if (newTarget == null)
-         removeReferenceTo(oldTarget);
-      else {
-         int pos;
-         if (referencedEntities == null || (pos = referencedEntities.indexOf(oldTarget)) < 0)
-            throw new LanguageException(this.toString() + " had no reference to " + oldTarget);
-         referencedEntities.set(pos, newTarget);
+   private List<LanguageEntity> addReferencedEntities (List<LanguageEntity> list, List<? extends ReadOnlyProp<?>> props) {
+      for (ReadOnlyProp<?> prop: props) {
+         if (prop instanceof NameProp)
+            list.add(((NameProp<?>) prop).getTargetEntity());
       }
+      return list;
    }
 
-   public abstract List<PropertyDescriptor<? extends LanguageEntity, ?>> getEntityProperties ();
+   protected List<LanguageEntity> addReferencedEntities (List<LanguageEntity> list) {
+      return addReferencedEntities(addReferencedEntities(list, getReadOnlyProps()), getEditableProps());
+   }
 
    public Iterable<LanguageEntity> getReferencedEntities () {
-      if (referencedEntities != null)
-         return referencedEntities;
-      else
-         return Collections.emptyList();
+      return addReferencedEntities(new ArrayList<>());
    }
 
    public int countReferencedEntities () {
-      if (referencedEntities != null)
-         return referencedEntities.size();
-      else
-         return 0;
+      return addReferencedEntities(new ArrayList<>()).size();
    }
 
    public boolean hasReferencedEntities () {
-      return referencedEntities != null && !referencedEntities.isEmpty();
+      return !addReferencedEntities(new ArrayList<>()).isEmpty();
+
    }
 
    public boolean hasReferenceTo (LanguageEntity target) {
-      return referencedEntities != null && referencedEntities.contains(target);
+      return addReferencedEntities(new ArrayList<>()).contains(target);
    }
 
-   @Override
-   public Object clone () {
-      try {
-         LanguageEntity clone = (LanguageEntity) super.clone();
-         clone.predefined = false;  // a copy of a predefined entity is user modifiable
-         if (this.referencedEntities != null)
-            clone.referencedEntities = new ArrayList<>(this.referencedEntities);
-         return clone;
-      }
-      catch (CloneNotSupportedException cnse) {
-         // cnse.printStackTrace(System.err);
-         throw new RuntimeException("LanguageEntity should be cloneable", cnse);
-      }
-   }
+   // @Override
+   // public Object clone () { return this; }
+
+   // public abstract LanguageEntity duplicate ();
 }

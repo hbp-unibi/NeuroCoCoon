@@ -22,8 +22,7 @@ import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class mxGraphTransferable implements Transferable, UIResource,
-		Serializable
+public class mxGraphTransferable implements Transferable, UIResource, Serializable
 {
 
 	private static final long serialVersionUID = 5123819419918087664L;
