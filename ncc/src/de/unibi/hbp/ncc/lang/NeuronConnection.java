@@ -3,6 +3,7 @@ package de.unibi.hbp.ncc.lang;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
+import java.io.ObjectStreamException;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,6 +14,10 @@ public class NeuronConnection extends LanguageEntity {
    private static Namespace<SynapseType> globalSynapseTypeNamespace;
 
    public static void setGlobalSynapseTypeNamespace (Namespace<SynapseType> ns) { globalSynapseTypeNamespace = ns; }
+
+   protected Object writeReplace() throws ObjectStreamException {
+      return new SerializedNeuronConnection(synapseTypeNamespace.getId(), synapseType.getValue().getName());
+   }
 
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
@@ -32,7 +37,7 @@ public class NeuronConnection extends LanguageEntity {
          synapseTypeNamespace = globalSynapseTypeNamespace;
       this.synapseTypeNamespace = synapseTypeNamespace;
       if (synapseType == null)
-         synapseType = globalSynapseTypeNamespace.get("Default");
+         synapseType = globalSynapseTypeNamespace.get("All Default");
       this.synapseType = new EditableNameProp<>("Synapse Type", SynapseType.class, this,
                                                 Objects.requireNonNull(synapseType), synapseTypeNamespace);
    }

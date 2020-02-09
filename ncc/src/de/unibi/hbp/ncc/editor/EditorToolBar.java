@@ -12,6 +12,7 @@ import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
 import de.unibi.hbp.ncc.editor.EditorActions.NewAction;
 import de.unibi.hbp.ncc.editor.EditorActions.OpenAction;
 import de.unibi.hbp.ncc.editor.EditorActions.SaveAction;
+import de.unibi.hbp.ncc.editor.props.ComboBoxModelAdapter;
 import de.unibi.hbp.ncc.env.NmpiClient;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.SynapseType;
@@ -153,7 +154,8 @@ public class EditorToolBar extends JToolBar
 		NeuroCoCoonEditor.ProgramGraph programGraph = (NeuroCoCoonEditor.ProgramGraph) editor.getGraphComponent().getGraph();
 		Namespace<SynapseType> synapseTypes = programGraph.getProgram().getGlobalScope().getSynapseTypes();
 
-		final JComboBox<SynapseType> synapseTypeCombo = new JComboBox<>(synapseTypes.getModel());
+		final JComboBox<SynapseType> synapseTypeCombo =
+				new JComboBox<>(new ComboBoxModelAdapter<>(synapseTypes.getListModel()));
 		synapseTypeCombo.setEditable(false);
 		synapseTypeCombo.setMinimumSize(new Dimension(120, 0));
 		synapseTypeCombo.setPreferredSize(new Dimension(120, 0));

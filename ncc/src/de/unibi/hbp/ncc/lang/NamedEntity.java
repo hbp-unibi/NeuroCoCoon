@@ -7,6 +7,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEntity
@@ -15,7 +16,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
    private Namespace<E> namespace;
 
    protected Object writeReplace() throws ObjectStreamException {
-      return new EntityName(namespace.getId(), getName());
+      return new SerializedEntityName(namespace.getId(), getName());
    }
 
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
@@ -30,7 +31,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       this.nameProp = new StringProp("Name", this, name) {
          @Override
          public boolean isValid (String proposedValue) {
-            return isValidName(proposedValue);
+            return isValidName(proposedValue) && canRenameTo(proposedValue);
          }
 
          @Override
@@ -46,15 +47,17 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       this(namespace, null);
    }
 
+   private static final Pattern COPY_SUFFIX_REGEXP = Pattern.compile(" Copy( \\d+)?$");
+
    protected String getCopiedName () {
       String copiedName = getName();
-      int copySuffixPos = copiedName.indexOf(" Copy");  // TODO should check for " Copy( \d+)?$" suffix
-      if (copySuffixPos >= 0)
-         copiedName = copiedName.substring(0, copySuffixPos);
+      Matcher matcher = COPY_SUFFIX_REGEXP.matcher(copiedName);
+      if (matcher.find())
+         copiedName = copiedName.substring(0, matcher.start());
       copiedName += " Copy";
       if (namespace.contains(normalizedName(copiedName))) {
          int counter = 2;
-         while (namespace.contains(normalizedName((copiedName + " " + copySuffixPos))))
+         while (namespace.contains(normalizedName((copiedName + " " + counter))))
             counter += 1;
          copiedName += " " + counter;
       }

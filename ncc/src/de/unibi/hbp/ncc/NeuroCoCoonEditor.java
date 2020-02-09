@@ -19,16 +19,22 @@ import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
+import de.unibi.hbp.ncc.editor.props.DetailsEditor;
+import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
 import de.unibi.hbp.ncc.lang.EntityCreator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronPopulation;
+import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.Program;
+import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.SynapseType;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.text.NumberFormat;
@@ -47,15 +53,26 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	 */
 	public static final NumberFormat numberFormat = NumberFormat.getInstance();
 
+	private ProgramGraphComponent programGraphComponent;
+	private DetailsEditor detailsEditor;
+	private MasterDetailsEditor<NeuronType> neuronTypeEditor;
+	private MasterDetailsEditor<SynapseType> synapseTypeEditor;
+
 	public NeuroCoCoonEditor ()
 	{
 		this("NeuroCoCoon Editor", new ProgramGraphComponent(new ProgramGraph(new Program())));
 	}
 
-	public NeuroCoCoonEditor (String appTitle, ProgramGraphComponent component)
-	{
+	public NeuroCoCoonEditor (String appTitle, ProgramGraphComponent component) {
 		super(appTitle, component);
-		component.getProgramGraph().setToolBar(getEditorToolBar());
+		programGraphComponent = component;
+	}
+
+	@Override
+	public void initialize () {
+		super.initialize();
+
+		programGraphComponent.getProgramGraph().setToolBar(getEditorToolBar());
 
 		final mxGraph graph = graphComponent.getGraph();
 
@@ -438,6 +455,21 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		 */
 	}
 
+	@Override
+	protected void addInspectorTabs (JTabbedPane inspector) {
+		detailsEditor = new DetailsEditor();
+		inspector.addTab("Inspector", detailsEditor.getComponent());
+		Scope global = programGraphComponent.getProgramGraph().getProgram().getGlobalScope();
+		neuronTypeEditor = new MasterDetailsEditor<>(global.getNeuronTypes(),
+													 ns -> new NeuronType(ns, null));
+		inspector.addTab("Neurons", neuronTypeEditor.getComponent());
+		synapseTypeEditor = new MasterDetailsEditor<>(global.getSynapseTypes(),
+													  ns -> new SynapseType(ns, null, SynapseType.ConnectorKind.ALL_TO_ALL));
+		inspector.addTab("Synapses", synapseTypeEditor.getComponent());
+		inspector.addTab("Plots", new JLabel("Not implemented yet"));
+		super.addInspectorTabs(inspector);
+	}
+
 	public static class ProgramGraphComponent extends mxGraphComponent
 	{
 		private final ProgramGraph programGraph;
@@ -531,11 +563,15 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 				if (obj instanceof mxCell) {
 					mxCell cell = (mxCell) obj;
 					Object value = cell.getValue();
+					LanguageEntity duplicatedValue = null;
 					if (value instanceof EntityCreator)
-						value = ((EntityCreator<?>) value).create();
-					else if (value instanceof NeuronPopulation)  // FIXME do this for all NamedEntities (or even LanguageEntities)
-						value = ((NeuronPopulation) value).duplicate();
-					cell.setValue(value);
+						duplicatedValue = ((EntityCreator<?>) value).create();
+					else if (value instanceof LanguageEntity)
+						duplicatedValue = ((LanguageEntity) value).duplicate();
+					if (duplicatedValue != null) {
+						cell.setValue(duplicatedValue);
+						duplicatedValue.setOwningCell(cell);
+					}
 					// TODO do something similar with the (transitive) children of the cell?
 				}
 			}
@@ -680,6 +716,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		mxConstants.W3C_SHADOWCOLOR = "#D3D3D3";
 
 		NeuroCoCoonEditor editor = new NeuroCoCoonEditor();
+		editor.initialize();  // moved from constructor so that subclass object fields have been initialized already
 		JFrame frame = editor.createFrame(new EditorMenuBar(editor), 1200, 800);
 		frame.setVisible(true);
 	}

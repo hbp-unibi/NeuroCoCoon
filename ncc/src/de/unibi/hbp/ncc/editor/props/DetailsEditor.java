@@ -8,17 +8,13 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Color;
@@ -54,6 +50,10 @@ public class DetailsEditor {
 
    public void setSubject (mxGraphComponent graphComponent, mxCell cell, LanguageEntity subject) {
       tableModel.setSubject(graphComponent, cell, subject);
+   }
+
+   public void setSubject (LanguageEntity subject) {  // for entities without a visual representation
+      tableModel.setSubject(null, null, subject);
    }
 
    public JComponent getComponent () { return component; }
@@ -123,6 +123,7 @@ public class DetailsEditor {
       }
 
       void setSubject (mxGraphComponent graphComponent, mxCell cell, LanguageEntity subject) {
+         assert (graphComponent == null) == (cell == null) : "graph and cell are needed together";
          this.graphComponent = graphComponent;
          this.cell = cell;
          if (!Objects.equals(this.subject, subject))
@@ -148,6 +149,8 @@ public class DetailsEditor {
       }
 
       void notifyCell (EditableProp.Impact impact) {
+         if (graphComponent == null)
+            return;
          if (impact == EditableProp.Impact.CELL_LABEL)
             graphComponent.labelChanged(cell, subject, null);
          else if (impact == EditableProp.Impact.CELL_APPEARANCE)

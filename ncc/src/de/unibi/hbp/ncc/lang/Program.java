@@ -10,11 +10,11 @@ public class Program {
       NeuronConnection.setGlobalSynapseTypeNamespace(synapseTypes);
       NeuronType defNeuronType = new NeuronType(global.getNeuronTypes(), "Default");
       defNeuronType.makePredefined();
-      SynapseType defAllSynapseType = new SynapseType(synapseTypes, "All Default", SynapseType.SynapseKind.ALL_TO_ALL);
+      SynapseType defAllSynapseType = new SynapseType(synapseTypes, "All Default", SynapseType.ConnectorKind.ALL_TO_ALL);
       defAllSynapseType.makePredefined();
-      SynapseType defOneSynapseType = new SynapseType(synapseTypes, "One Default", SynapseType.SynapseKind.ONE_TO_ONE);
+      SynapseType defOneSynapseType = new SynapseType(synapseTypes, "One Default", SynapseType.ConnectorKind.ONE_TO_ONE);
       defOneSynapseType.makePredefined();
-      SynapseType defProbSynapseType = new SynapseType(synapseTypes, "Prob Default", SynapseType.SynapseKind.FIXED_PROBABILITY);
+      SynapseType defProbSynapseType = new SynapseType(synapseTypes, "Prob Default", SynapseType.ConnectorKind.FIXED_PROBABILITY);
       defProbSynapseType.makePredefined();
    }
 

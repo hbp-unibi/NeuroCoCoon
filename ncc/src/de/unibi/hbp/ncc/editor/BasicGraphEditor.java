@@ -23,7 +23,6 @@ import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 import com.mxgraph.view.mxGraph;
-import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -79,7 +78,6 @@ public class BasicGraphEditor extends JPanel
 	protected mxGraphComponent graphComponent;
 	protected mxGraphOutline graphOutline;
 	protected JTabbedPane libraryPane;
-	protected DetailsEditor detailsEditor;
 	protected EditorToolBar editorToolBar;
 	protected mxUndoManager undoManager;
 	protected String appTitle;
@@ -110,13 +108,15 @@ public class BasicGraphEditor extends JPanel
 		}
 	};
 
-	public BasicGraphEditor(String appTitle, mxGraphComponent component)
-	{
+	public BasicGraphEditor(String appTitle, mxGraphComponent component) {
 		// Stores and updates the frame title
 		this.appTitle = appTitle;
 
 		// Stores a reference to the graph and creates the command history
 		graphComponent = component;
+	}
+
+	public void initialize () {
 		final mxGraph graph = graphComponent.getGraph();
 		undoManager = createUndoManager();
 
@@ -157,12 +157,8 @@ public class BasicGraphEditor extends JPanel
 		inner.setDividerSize(6);
 		inner.setBorder(null);
 
-		detailsEditor = new DetailsEditor();
 		JTabbedPane inspector = new JTabbedPane();
-		inspector.addTab("Inspector", detailsEditor.getComponent());
-		inspector.addTab("Neurons", new JLabel("Not implemented yet"));
-		inspector.addTab("Synapses", new JLabel("Not implemented yet"));
-		inspector.addTab("Plots", new JLabel("Not implemented yet"));
+		addInspectorTabs(inspector);
 
 		JSplitPane graphAndInspector = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphComponent, inspector);
 		graphAndInspector.setOneTouchExpandable(true);
@@ -196,6 +192,8 @@ public class BasicGraphEditor extends JPanel
 		installListeners();
 		updateTitle();
 	}
+
+	protected void addInspectorTabs (JTabbedPane inspector) {}
 
 	protected mxUndoManager createUndoManager()
 	{

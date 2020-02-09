@@ -3,17 +3,13 @@ package de.unibi.hbp.ncc.lang;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
-public class EntityName implements Serializable {
+public class SerializedEntityName implements Serializable {
    private int namespaceId;
    private String name;
 
-   public EntityName (int namespaceId, String name) {
+   SerializedEntityName (int namespaceId, String name) {
       this.namespaceId = namespaceId;
       this.name = name;
-   }
-
-   public String getName () {
-      return name;
    }
 
    Object readResolve() throws ObjectStreamException {

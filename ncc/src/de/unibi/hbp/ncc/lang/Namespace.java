@@ -1,13 +1,12 @@
 package de.unibi.hbp.ncc.lang;
 
 import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
+import javax.swing.ListModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    private Scope containingScope;  // for access to sibling namespaces
@@ -18,7 +17,7 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    private int nameGenerator;
    private String pythonDiscriminator;
    private int id;  // for data transfer
-   private NamespaceModel model;  // created lazily on demand
+   private NamespaceModel listModel;  // created lazily on demand
 
    private static List<Namespace<?>> byId = new ArrayList<>();
 
@@ -46,8 +45,8 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       T oldValue = members.put(member.getName(), member);
       if (oldValue != null)
          throw new LanguageException("duplicate name " + member.getName());
-      if (model != null)
-         model.addElement(member);
+      if (listModel != null)
+         listModel.addElement(member);
    }
 
    void castAndAdd (NamedEntity<T> entity) {
@@ -58,8 +57,8 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       T oldValue = members.remove(memberName);
       if (oldValue == null)
          throw new LanguageException("name " + memberName + " does not exist");
-      if (model != null)
-         model.removeElement(oldValue);
+      if (listModel != null)
+         listModel.removeElement(oldValue);
    }
 
    public T get (String name) {
@@ -71,10 +70,10 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       return members.values().iterator();
    }
 
-   public ComboBoxModel<T> getModel () {
-      if (model == null)
-         model = new NamespaceModel();
-      return model;
+   public ListModel<T> getListModel () {
+      if (listModel == null)
+         listModel = new NamespaceModel();
+      return listModel;
    }
 
    public boolean contains (String name) {
@@ -101,8 +100,7 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    }
 
 
-   private class NamespaceModel extends AbstractListModel<T> implements ComboBoxModel<T> {
-      private Object selectedObject;
+   private class NamespaceModel extends AbstractListModel<T> {
       private List<T> elements;
 
       NamespaceModel () {
@@ -123,15 +121,6 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
          assert pos >= 0;
          fireIntervalRemoved(this, pos, pos);
       }
-
-      public void setSelectedItem(Object anObject) {
-         if (!Objects.equals(anObject, selectedObject)) {
-            selectedObject = anObject;
-            fireContentsChanged(this, -1, -1);
-         }
-      }
-
-      public Object getSelectedItem() { return selectedObject; }
 
       @Override
       public int getSize () {

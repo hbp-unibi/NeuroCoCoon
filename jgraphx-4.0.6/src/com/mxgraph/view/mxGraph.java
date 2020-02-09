@@ -6724,8 +6724,7 @@ public class mxGraph extends mxEventSource
 		boolean oldValue = portsEnabled;
 		portsEnabled = value;
 
-		changeSupport.firePropertyChange("portsEnabled", oldValue,
-				portsEnabled);
+		changeSupport.firePropertyChange("portsEnabled", oldValue, portsEnabled);
 	}
 
 	/**
@@ -6767,8 +6766,7 @@ public class mxGraph extends mxEventSource
 		String oldValue = alternateEdgeStyle;
 		alternateEdgeStyle = value;
 
-		changeSupport.firePropertyChange("alternateEdgeStyle", oldValue,
-				alternateEdgeStyle);
+		changeSupport.firePropertyChange("alternateEdgeStyle", oldValue, alternateEdgeStyle);
 	}
 
 	/**

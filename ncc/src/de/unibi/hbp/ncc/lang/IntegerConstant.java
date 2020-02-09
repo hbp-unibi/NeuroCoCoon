@@ -1,7 +1,5 @@
 package de.unibi.hbp.ncc.lang;
 
-import java.util.List;
-
 public class IntegerConstant extends Constant<Integer> implements IntegerValue {
 
    public IntegerConstant (Namespace<Constant<Number>> namespace, String name, Integer value) {
@@ -13,4 +11,9 @@ public class IntegerConstant extends Constant<Integer> implements IntegerValue {
       setValue(0);
    }
 
+   @Override
+   public LanguageEntity duplicate () {
+      throw new UnsupportedOperationException();
+      // FIXME implement this or remove the class
+   }
 }

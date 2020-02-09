@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang.props;
 
+import de.unibi.hbp.ncc.editor.props.ComboBoxModelAdapter;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
@@ -34,7 +35,7 @@ public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditablePr
 
    @Override
    public TableCellEditor getTableCellEditor (JTable table) {
-      JComboBox<E> comboBox = new JComboBox<>(targetNamespace.getModel());
+      JComboBox<E> comboBox = new JComboBox<>(new ComboBoxModelAdapter<>(targetNamespace.getListModel()));
       comboBox.setEditable(false);
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
