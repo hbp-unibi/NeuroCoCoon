@@ -10,7 +10,20 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="jgraphx-4.0.6" />
     <orderEntry type="library" name="cheerpj-dom" level="project" />
-    <orderEntry type="library" name="loader" level="application" />
+    <orderEntry type="module-library">
+      <library name="cheerpj-js-loader" type="javaScript">
+        <properties>
+          <sourceFilesUrls>
+            <item url="file://$APPLICATION_CONFIG_DIR$/javascript/extLibs/http_cjrtnc.leaningtech.com_1.4_loader.js" />
+          </sourceFilesUrls>
+        </properties>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib/http_cjrtnc.leaningtech.com_1.4_loader.js" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="ST-4.2 Local" level="project" />
     <orderEntry type="library" name="com.eclipsesource.minimal-json:minimal-json:0.9.5" level="project" />
     <orderEntry type="library" name="org.antlr:ST4:4.3" level="project" />
