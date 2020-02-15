@@ -2,13 +2,12 @@ package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxIGraphModel;
+import de.unibi.hbp.ncc.graph.AbstractCellsCollector;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,14 +72,14 @@ public class SynapseType extends NamedEntity<SynapseType> {
    private EditableEnumProp<SynapseKind> synapseKind;
 
    public SynapseType (Namespace<SynapseType> namespace, String name, ConnectorKind connectorKind,
-                      double weight, double delay, double probability,
+                       double weight, double delay, double probability,
                        SynapseKind synapseKind) {
       super(namespace, name);
       this.connectorKind = new EditableEnumProp<>("Connector", ConnectorKind.class, this,
                                                   Objects.requireNonNull(connectorKind))
-            .setImpact(EnumSet.of(EditableProp.Impact.OTHER_PROPS_VISIBILITY));
+            .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
       this.weight = new DoubleProp("Weight", this, weight)
-            .setImpact(EnumSet.of(EditableProp.Impact.DEPENDENT_CELLS_STYLE));
+            .setImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
       this.delay = new NonNegativeDoubleProp("Delay", this, delay).setUnit("ms");
       this.probability = new NonNegativeDoubleProp("Probability", this, probability) {
          @Override
@@ -89,12 +88,16 @@ public class SynapseType extends NamedEntity<SynapseType> {
          }
       };
       this.synapseKind = new EditableEnumProp<>("Synapse Kind", SynapseKind.class, this,
-                                                  Objects.requireNonNull(synapseKind))
-            .setImpact(EnumSet.of(EditableProp.Impact.OTHER_PROPS_VISIBILITY));
+                                                Objects.requireNonNull(synapseKind))
+            .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
    }
 
    public SynapseType (Namespace<SynapseType> namespace, String name, ConnectorKind kind) {
       this(namespace, name, kind, 1.0, 0.0, 0.5, SynapseKind.STATIC);
+   }
+
+   public SynapseType (Namespace<SynapseType> namespace) {  // default for New button in master/detail editor
+      this(namespace, null, ConnectorKind.ALL_TO_ALL);
    }
 
    public SynapseType (SynapseType orig) {
@@ -124,22 +127,13 @@ public class SynapseType extends NamedEntity<SynapseType> {
 
    @Override
    public List<mxCell> getDependentCells (mxIGraphModel graphModel) {
-      List<mxCell> dependentEdges = new ArrayList<>();
-      Object root = graphModel.getRoot();
-      int count = graphModel.getChildCount(root);
-      for (int i = 0; i < count; i++) {
-         Object obj = graphModel.getChildAt(root, i);
-         if (obj instanceof mxCell) {
-            mxCell cell = (mxCell) obj;
-            Object value = cell.getValue();
-            if (value instanceof NeuronConnection) {
-               NeuronConnection connection = (NeuronConnection) value;
-               if (this.equals(connection.getSynapseType()))
-                  dependentEdges.add(cell);
-            }
+      return new AbstractCellsCollector() {
+         @Override
+         protected boolean matches (mxCell cell, LanguageEntity entity) {
+            return entity instanceof NeuronConnection &&
+                  SynapseType.this.equals(((NeuronConnection) entity).getSynapseType());
          }
-      }
-      return dependentEdges;  // TODO add impact level for multiple dependent cells
+      }.getMatchingCells(graphModel);
    }
 
    public String getSummary () {

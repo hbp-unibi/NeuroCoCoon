@@ -126,18 +126,14 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	private static final long serialVersionUID = -30203858391633447L;
 
 	public static final int GRID_STYLE_DOT = 0;
-
 	public static final int GRID_STYLE_CROSS = 1;
-
 	public static final int GRID_STYLE_LINE = 2;
-
 	public static final int GRID_STYLE_DASHED = 3;
 
 	public static final int ZOOM_POLICY_NONE = 0;
-
 	public static final int ZOOM_POLICY_PAGE = 1;
-
 	public static final int ZOOM_POLICY_WIDTH = 2;
+	public static final int ZOOM_POLICY_HEIGHT = 3;
 
 	public static ImageIcon DEFAULT_EXPANDED_ICON = null;
 
@@ -156,14 +152,11 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	static
 	{
 		DEFAULT_EXPANDED_ICON = new ImageIcon(
-				mxGraphComponent.class
-						.getResource("/com/mxgraph/swing/images/expanded.gif"));
+				mxGraphComponent.class.getResource("/com/mxgraph/swing/images/expanded.gif"));
 		DEFAULT_COLLAPSED_ICON = new ImageIcon(
-				mxGraphComponent.class
-						.getResource("/com/mxgraph/swing/images/collapsed.gif"));
+				mxGraphComponent.class.getResource("/com/mxgraph/swing/images/collapsed.gif"));
 		DEFAULT_WARNING_ICON = new ImageIcon(
-				mxGraphComponent.class
-						.getResource("/com/mxgraph/swing/images/warning.gif"));
+				mxGraphComponent.class.getResource("/com/mxgraph/swing/images/warning.gif"));
 	}
 
 	protected mxGraph graph;
@@ -278,11 +271,8 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 * the mouse leaves the container that the graph exists in.
 	 */
 	protected boolean autoExtend = true;
-
 	protected boolean dragEnabled = true;
-
 	protected boolean importEnabled = true;
-
 	protected boolean exportEnabled = true;
 
 	/**
@@ -311,13 +301,10 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	protected int gridStyle = GRID_STYLE_DOT;
 
 	protected ImageIcon expandedIcon = DEFAULT_EXPANDED_ICON;
-
 	protected ImageIcon collapsedIcon = DEFAULT_COLLAPSED_ICON;
-
 	protected ImageIcon warningIcon = DEFAULT_WARNING_ICON;
 
 	protected boolean antiAlias = true;
-
 	protected boolean textAntiAlias = true;
 
 	/**
@@ -612,7 +599,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 					else
 					{
 						// Other languages use focus traversal here, in Java
-						// we explicitely stop editing after a click elsewhere
+						// we explicitly stop editing after a click elsewhere
 						stopEditing(!invokesStopCellEditing);
 					}
 				}
@@ -1487,6 +1474,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		}
 	}
 
+	// TODO would need to implement ZOOM_POLICY_HEIGHT here, boolean page reflects PAGE versus WIDTH at the moment
 	public void zoom(final boolean page, final boolean center)
 	{
 		if (pageVisible && !zooming)
@@ -1516,8 +1504,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 				{
 					mxGraphView graphView = graph.getView();
 					final double scale = graphView.getScale();
-					mxPoint translate = (centerPage) ? getPageTranslate(newScale)
-							: new mxPoint();
+					mxPoint translate = (centerPage) ? getPageTranslate(newScale) : new mxPoint();
 					graphView.scaleAndTranslate(newScale, translate.getX(),
 							translate.getY());
 
@@ -3101,8 +3088,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 *            Optional image to be used for the overlay. Default is
 	 *            warningImageBasename.
 	 */
-	public mxICellOverlay setCellWarning(Object cell, String warning,
-			ImageIcon icon)
+	public mxICellOverlay setCellWarning(Object cell, String warning, ImageIcon icon)
 	{
 		return setCellWarning(cell, warning, icon, false);
 	}
@@ -3169,7 +3155,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 * cell still exists in the model. The entries are removed from the global
 	 * hashtable so that the remaining entries reflect those whose cell have
 	 * been removed from the model. If no state is available for a given cell
-	 * then its overlays are temporarly removed from the rendering control, but
+	 * then its overlays are temporarily removed from the rendering control, but
 	 * kept in the result.
 	 */
 	public Hashtable<Object, mxICellOverlay[]> updateCellOverlays(Object cell)
@@ -3182,16 +3168,14 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		{
 			if (state != null)
 			{
-				for (int i = 0; i < c.length; i++)
-				{
-					updateCellOverlayComponent(state, c[i]);
+				for (com.mxgraph.swing.util.mxICellOverlay mxICellOverlay: c) {
+					updateCellOverlayComponent(state, mxICellOverlay);
 				}
 			}
 			else
 			{
-				for (int i = 0; i < c.length; i++)
-				{
-					removeCellOverlayComponent(c[i], cell);
+				for (com.mxgraph.swing.util.mxICellOverlay mxICellOverlay: c) {
+					removeCellOverlayComponent(mxICellOverlay, cell);
 				}
 			}
 
@@ -3200,10 +3184,8 @@ public class mxGraphComponent extends JScrollPane implements Printable
 
 		int childCount = getGraph().getModel().getChildCount(cell);
 
-		for (int i = 0; i < childCount; i++)
-		{
-			result.putAll(updateCellOverlays(getGraph().getModel().getChildAt(
-					cell, i)));
+		for (int i = 0; i < childCount; i++) {
+			result.putAll(updateCellOverlays(getGraph().getModel().getChildAt(cell, i)));
 		}
 
 		return result;
@@ -3247,8 +3229,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 			if (c != null)
 			{
 				g.setColor(c);
-				mxUtils.fillClippedRect(g, 0, 0, getGraphControl().getWidth(),
-						getGraphControl().getHeight());
+				mxUtils.fillClippedRect(g, 0, 0, getGraphControl().getWidth(), getGraphControl().getHeight());
 			}
 
 			// Draws the page drop shadow

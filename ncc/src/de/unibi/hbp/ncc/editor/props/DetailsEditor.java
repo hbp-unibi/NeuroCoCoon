@@ -7,15 +7,12 @@ import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
-import javafx.scene.input.KeyCode;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -206,10 +203,8 @@ public class DetailsEditor {
          fireTableDataChanged();
       }
 
-      boolean isIndirectProp (int rowIndex) { return isIndirectProp(getAnyPropForRow(rowIndex)); }
+      boolean isIndirectProp (int rowIndex) { return !subject.equals(getAnyPropForRow(rowIndex).getEnclosingEntity()); }
 
-      boolean isIndirectProp (ReadOnlyProp<?> prop) { return !subject.equals(prop.getParentEntity()); }
-      
       @Override
       public int getRowCount () {
          return readOnlyProps.size() + editableProps.size();
@@ -232,25 +227,11 @@ public class DetailsEditor {
          return editableProps.get(rowIndex - readOnlyProps.size());
       }
 
-      private String getMarker (boolean isReadOnly, boolean isIndirect, boolean isPredefined) {
-         StringBuilder sb = new StringBuilder(2);
-         if (isIndirect) {
-            sb.append('\u279d');
-            if (isReadOnly || isPredefined)
-               sb.append('\u2008');
-         }
-         if (isReadOnly) sb.append('\u20e0');
-         else if (isPredefined) sb.append('\u29bf');
-         return sb.toString();
-      }
-
       @Override
       public Object getValueAt (int rowIndex, int columnIndex) {
          if (columnIndex == 0){
             ReadOnlyProp<?> prop = getAnyPropForRow(rowIndex);
-            return getMarker(!(prop instanceof EditableProp<?>),
-                             isIndirectProp(prop),
-                             prop.getParentEntity().isPredefined());
+            return VisualMarkers.getPropertyMarkers(prop, subject);
          }
          if (columnIndex == 1)
             return getAnyPropForRow(rowIndex).getPropName(true);
@@ -266,7 +247,7 @@ public class DetailsEditor {
             prop.setRawValue(value);
             fireTableCellUpdated(rowIndex, columnIndex);
             EnumSet<EditableProp.Impact> impact = prop.getChangeImpact();
-            LanguageEntity parent = prop.getParentEntity();
+            LanguageEntity parent = prop.getEnclosingEntity();
             mxCell cell = parent.getOwningCell();
             if (cell != null && impact.contains(EditableProp.Impact.CELL_LABEL)) {
                graphComponent.labelChanged(cell, subject, null);
@@ -293,7 +274,7 @@ public class DetailsEditor {
       @Override
       public boolean isCellEditable (int rowIndex, int columnIndex) {
          return columnIndex == 2 && rowIndex >= readOnlyProps.size() &&
-               !getAnyPropForRow(rowIndex).getParentEntity().isPredefined();
+               !getAnyPropForRow(rowIndex).getEnclosingEntity().isPredefined();
       }
 
    }

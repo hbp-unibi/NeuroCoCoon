@@ -22,7 +22,7 @@ public abstract class NeuronPopulation extends NamedEntity<NeuronPopulation>
       return list;
    }
 
-   protected NeuronPopulation (Namespace<NeuronPopulation> namespace, String name,int neuronCount) {
+   protected NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, int neuronCount) {
       super(namespace, name);
       this.neuronCount = new IntegerProp("Neuron Count", this, neuronCount) {
          @Override

@@ -2487,8 +2487,7 @@ public class mxGraph extends mxEventSource
 	public Object addCell(Object cell, Object parent, Integer index,
 			Object source, Object target)
 	{
-		return addCells(new Object[] { cell }, parent, index, source,
-				target)[0];
+		return addCells(new Object[] { cell }, parent, index, source, target)[0];
 	}
 
 	/**
@@ -2594,25 +2593,20 @@ public class mxGraph extends mxEventSource
 			model.beginUpdate();
 			try
 			{
-				mxCellState parentState = (absolute) ? view.getState(parent)
-						: null;
-				mxPoint o1 = (parentState != null) ? parentState.getOrigin()
-						: null;
+				mxCellState parentState = (absolute) ? view.getState(parent) : null;
+				mxPoint o1 = (parentState != null) ? parentState.getOrigin() : null;
 				mxPoint zero = new mxPoint(0, 0);
 
 				for (int i = 0; i < cells.length; i++)
 				{
 					if (cells[i] == null)
-					{
 						index--;
-					}
 					else
 					{
 						Object previous = model.getParent(cells[i]);
 
 						// Keeps the cell at its absolute location
-						if (o1 != null && cells[i] != parent
-								&& parent != previous)
+						if (o1 != null && cells[i] != parent && parent != previous)
 						{
 							mxCellState oldState = view.getState(previous);
 							mxPoint o2 = (oldState != null)
@@ -2643,41 +2637,31 @@ public class mxGraph extends mxEventSource
 						// Decrements all following indices
 						// if cell is already in parent
 						if (parent == previous)
-						{
 							index--;
-						}
 
 						model.add(parent, cells[i], index + i);
 
 						// Extends the parent
 						if (isExtendParentsOnAdd() && isExtendParent(cells[i]))
-						{
 							extendParent(cells[i]);
-						}
 
 						// Constrains the child
 						if (constrain)
-						{
 							constrainChild(cells[i]);
-						}
 
 						// Sets the source terminal
 						if (source != null)
-						{
 							cellConnected(cells[i], source, true, null);
-						}
 
 						// Sets the target terminal
 						if (target != null)
-						{
 							cellConnected(cells[i], target, false, null);
-						}
 					}
 				}
 
 				fireEvent(new mxEventObject(mxEvent.CELLS_ADDED, "cells", cells,
-						"parent", parent, "index", index, "source", source,
-						"target", target, "absolute", absolute));
+											"parent", parent, "index", index, "source", source,
+											"target", target, "absolute", absolute));
 
 			}
 			finally
@@ -6509,11 +6493,9 @@ public class mxGraph extends mxEventSource
 	public boolean isCellFoldable(Object cell, boolean collapse)
 	{
 		mxCellState state = view.getState(cell);
-		Map<String, Object> style = (state != null) ? state.getStyle()
-				: getCellStyle(cell);
+		Map<String, Object> style = (state != null) ? state.getStyle() : getCellStyle(cell);
 
-		return model.getChildCount(cell) > 0
-				&& mxUtils.isTrue(style, mxConstants.STYLE_FOLDABLE, true);
+		return model.getChildCount(cell) > 0 && mxUtils.isTrue(style, mxConstants.STYLE_FOLDABLE, true);
 	}
 
 	/**

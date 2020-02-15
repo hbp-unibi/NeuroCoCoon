@@ -26,8 +26,6 @@ import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class EditorToolBar extends JToolBar
 {
@@ -81,7 +79,8 @@ public class EditorToolBar extends JToolBar
 				.getView();
 		final JComboBox<String> zoomCombo = new JComboBox<>(new String[] {
 				"400%", "200%", "150%", "100%", "75%", "50%",
-				mxResources.get("page"), mxResources.get("width"), mxResources.get("actualSize") });
+				/* mxResources.get("height"), mxResources.get("width"), */
+				mxResources.get("actualSize") });
 		zoomCombo.setEditable(true);
 		zoomCombo.setMinimumSize(new Dimension(75, 0));
 		zoomCombo.setPreferredSize(new Dimension(75, 0));
@@ -111,39 +110,39 @@ public class EditorToolBar extends JToolBar
 		// Invokes once to sync with the actual zoom value
 		scaleTracker.invoke(null, null);
 
-		zoomCombo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
+		zoomCombo.addActionListener(e -> {
+			mxGraphComponent graphComponent = editor.getGraphComponent();
+
+			// zoomCombo is changed when the scale is changed in the diagram
+			// but the change is ignored here
+			if (!ignoreZoomChange)
 			{
-				mxGraphComponent graphComponent = editor.getGraphComponent();
+				Object selected = zoomCombo.getSelectedItem();
+				if (selected != null) {
+					String zoom = selected.toString();
 
-				// zoomCombo is changed when the scale is changed in the diagram
-				// but the change is ignored here
-				if (!ignoreZoomChange)
-				{
-					Object selected = zoomCombo.getSelectedItem();
-					if (selected != null) {
-						String zoom = selected.toString();
-
-						if (zoom.equals(mxResources.get("page"))) {
-							graphComponent.setPageVisible(true);
-							graphComponent.setZoomPolicy(mxGraphComponent.ZOOM_POLICY_PAGE);
+/*
+					if (zoom.equals(mxResources.get("height"))) {
+//						graphComponent.setPageVisible(true);
+						graphComponent.setZoomPolicy(mxGraphComponent.ZOOM_POLICY_HEIGHT);
+					}
+					else if (zoom.equals(mxResources.get("width"))) {
+//						graphComponent.setPageVisible(true);
+						graphComponent.setZoomPolicy(mxGraphComponent.ZOOM_POLICY_WIDTH);
+					}
+					else
+*/
+					if (zoom.equals(mxResources.get("actualSize"))) {
+						graphComponent.zoomActual();
+					}
+					else {
+						try {
+							zoom = zoom.replace("%", "");
+							double scale = Math.min(16, Math.max(0.01, Double.parseDouble(zoom) / 100));
+							graphComponent.zoomTo(scale, graphComponent.isCenterZoom());
 						}
-						else if (zoom.equals(mxResources.get("width"))) {
-							graphComponent.setPageVisible(true);
-							graphComponent.setZoomPolicy(mxGraphComponent.ZOOM_POLICY_WIDTH);
-						}
-						else if (zoom.equals(mxResources.get("actualSize"))) {
-							graphComponent.zoomActual();
-						}
-						else {
-							try {
-								zoom = zoom.replace("%", "");
-								double scale = Math.min(16, Math.max(0.01, Double.parseDouble(zoom) / 100));
-								graphComponent.zoomTo(scale, graphComponent.isCenterZoom());
-							}
-							catch (NumberFormatException ex) {
-								JOptionPane.showMessageDialog(editor, ex.getMessage());
-							}
+						catch (NumberFormatException ex) {
+							JOptionPane.showMessageDialog(editor, ex.getMessage());
 						}
 					}
 				}

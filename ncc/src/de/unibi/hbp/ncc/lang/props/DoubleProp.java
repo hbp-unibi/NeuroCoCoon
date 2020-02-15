@@ -1,7 +1,6 @@
 package de.unibi.hbp.ncc.lang.props;
 
 import de.unibi.hbp.ncc.editor.props.DoubleValueCellEditor;
-import de.unibi.hbp.ncc.editor.props.IntegerValueCellEditor;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 
 import javax.swing.JTable;
@@ -21,7 +20,13 @@ public class DoubleProp extends SimpleEditableProp<Double> {
    }
 
    @Override
-   public DoubleProp setImpact (EnumSet<Impact> impact) {  // to get the more precise co-variant return type
+   public DoubleProp setImpact (EnumSet<Impact> impactSet) {  // to get the more precise co-variant return type
+      super.setImpact(impactSet);
+      return this;
+   }
+
+   @Override
+   public DoubleProp setImpact (Impact impact) {  // to get the more precise co-variant return type
       super.setImpact(impact);
       return this;
    }

@@ -24,7 +24,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="ST-4.2 Local" level="project" />
     <orderEntry type="library" name="com.eclipsesource.minimal-json:minimal-json:0.9.5" level="project" />
     <orderEntry type="library" name="org.antlr:ST4:4.3" level="project" />
   </component>

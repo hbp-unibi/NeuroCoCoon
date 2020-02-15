@@ -15,6 +15,7 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    private Namespace<T> parent;  // would be used for nested namespaces
    private Class<T> memberClazz;
    private Map<String, T> members;
+   private T mostRecentlyAdded;
    private String generatedNamesPrefix;
    private int nameGenerator;
    private String pythonDiscriminator;
@@ -47,7 +48,8 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    void add (T member) {
       T oldValue = members.put(member.getName(), member);
       if (oldValue != null)
-         throw new LanguageException("duplicate name " + member.getName());
+         throw new LanguageException(member, "duplicate name " + member.getName());
+      mostRecentlyAdded = member;
       if (listModel != null)
          listModel.addElement(member);
    }
@@ -56,16 +58,36 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       add(memberClazz.cast(entity));
    }
 
-   void remove (String memberName) {
+   // TODO make this package scoped again and provide a public safe method (with reference checking) here instead [currently in MasterDetailsEditor]
+   public void remove (String memberName) {
       T oldValue = members.remove(memberName);
       if (oldValue == null)
          throw new LanguageException("name " + memberName + " does not exist");
+      if (oldValue.isPredefined())
+         throw new LanguageException(oldValue, "predefined member " + memberName + " must not be removed");
+      if (oldValue.equals(mostRecentlyAdded))
+         mostRecentlyAdded = null;
       if (listModel != null)
          listModel.removeElement(oldValue);
    }
 
    public T get (String name) {
       return members.get(name);
+   }
+
+   public boolean isEmpty () {
+      return members.isEmpty();
+   }
+
+   // this is only used for namespaces without predefined entities, otherwise we should support
+   // marking one of the predefined entities as a universal default entity explicitly
+   public T getFallbackDefault () {
+      if (members.isEmpty())
+         throw new IllegalStateException("empty namespace");
+      if (mostRecentlyAdded != null)
+         return mostRecentlyAdded;
+      else
+         return members.values().iterator().next();
    }
 
    @Override
@@ -93,12 +115,26 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
          result = generatedNamesPrefix + (++nameGenerator);
          if (nameGenerator > MAX_GENERATOR_VALUE)
             throw new LanguageException("failed to generate name for prefix " + generatedNamesPrefix);
-      }
-      while (members.containsKey(result));
+      } while (members.containsKey(result));
+      return result;
+   }
+
+   String generateSpecificName (String namePrefix) {
+      namePrefix = namePrefix.trim() + " ";
+      int numberGenerator = 0;
+      String result;
+      do {
+         result = namePrefix + (++numberGenerator);
+         if (numberGenerator > MAX_GENERATOR_VALUE)
+            throw new LanguageException("failed to generate name for specific prefix " + namePrefix);
+      } while (members.containsKey(result));
       return result;
    }
 
    String getGeneratedNamesPrefix () { return generatedNamesPrefix; }
+
+   // maybe this needs to be distinct from the generated names prefix?
+   public String getDescription () { return generatedNamesPrefix.toLowerCase(); }
 
    String getPythonDiscriminator () {
       return pythonDiscriminator;

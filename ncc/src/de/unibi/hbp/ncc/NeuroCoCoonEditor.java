@@ -5,6 +5,7 @@ package de.unibi.hbp.ncc;
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
@@ -21,10 +22,12 @@ import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
 import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
+import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.EntityCreator;
+import de.unibi.hbp.ncc.lang.GraphCellPostProcessor;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
+import de.unibi.hbp.ncc.lang.ModuleExample;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
-import de.unibi.hbp.ncc.lang.NeuronPopulation;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
 import de.unibi.hbp.ncc.lang.Program;
@@ -36,11 +39,11 @@ import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,6 +63,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	private DetailsEditor detailsEditor;
 	private MasterDetailsEditor<NeuronType> neuronTypeEditor;
 	private MasterDetailsEditor<SynapseType> synapseTypeEditor;
+	private MasterDetailsEditor<DataPlot> dataPlotEditor;
 
 	public NeuroCoCoonEditor ()
 	{
@@ -72,6 +76,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	}
 
 	public Program getProgram () { return programGraphComponent.getProgramGraph().getProgram(); }
+
+	public mxIGraphModel getGraphModel () { return programGraphComponent.getGraph().getModel(); }
 
 	@Override
 	public void initialize () {
@@ -119,6 +125,10 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/population.png")),
 								 "population",
 								 100, 60, StandardPopulation.CREATOR);
+		modulesPalette.addTemplate("Example",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/rectangle.png")),
+								   "module",
+								   100, 60, ModuleExample.CREATOR);
 	}
 
 	@Override
@@ -126,13 +136,12 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		detailsEditor = new DetailsEditor();
 		inspector.addTab("Inspector", detailsEditor.getComponent());
 		Scope global = programGraphComponent.getProgramGraph().getProgram().getGlobalScope();
-		neuronTypeEditor = new MasterDetailsEditor<>(global.getNeuronTypes(),
-													 ns -> new NeuronType(ns, null));
+		neuronTypeEditor = new MasterDetailsEditor<>(global.getNeuronTypes(), NeuronType::new, this);
 		inspector.addTab("Neurons", neuronTypeEditor.getComponent());
-		synapseTypeEditor = new MasterDetailsEditor<>(global.getSynapseTypes(),
-													  ns -> new SynapseType(ns, null, SynapseType.ConnectorKind.ALL_TO_ALL));
+		synapseTypeEditor = new MasterDetailsEditor<>(global.getSynapseTypes(), SynapseType::new, this);
 		inspector.addTab("Synapses", synapseTypeEditor.getComponent());
-		inspector.addTab("Plots", new JLabel("Not implemented yet"));
+		dataPlotEditor = new MasterDetailsEditor<>(global.getDataPlots(), DataPlot::new, this);
+		inspector.addTab("Plots", dataPlotEditor.getComponent());
 		super.addInspectorTabs(inspector);
 	}
 
@@ -147,7 +156,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			// Sets switches typically used in an editor
 			setPageVisible(false);
-			setGridVisible(false);
+			// setGridVisible(false);
+			// menu item for grid is based on gridEnabled property of graph
 			setToolTips(true);
 			getConnectionHandler().setCreateTarget(false);
 
@@ -216,7 +226,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		{
 			program.setGraphModel(this.getModel());
 			this.program = program;
-			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
+			setGridEnabled(false);
+//			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
 		}
 
 		void setToolBar (EditorToolBar toolBar) { this.toolBar = toolBar; }
@@ -226,13 +237,18 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		@Override
 		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
 								boolean absolute, boolean constrain) {
+			List<mxCell> postProcessing = new ArrayList<>(cells.length);
 			for (Object obj: cells) {
 				if (obj instanceof mxCell) {
 					mxCell cell = (mxCell) obj;
 					Object value = cell.getValue();
 					LanguageEntity duplicatedValue = null;
-					if (value instanceof EntityCreator)
+					if (value instanceof EntityCreator) {
 						duplicatedValue = ((EntityCreator<?>) value).create();
+						if (duplicatedValue instanceof GraphCellPostProcessor) {
+							postProcessing.add(cell);
+						}
+					}
 					else if (value instanceof LanguageEntity)
 						duplicatedValue = ((LanguageEntity) value).duplicate();
 					if (duplicatedValue != null) {
@@ -243,6 +259,25 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 				}
 			}
 			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
+			if (!postProcessing.isEmpty()) {
+				getModel().beginUpdate();
+				try {
+					for (mxCell cell: postProcessing) {
+						((GraphCellPostProcessor) cell.getValue()).adjustAndAdoptGraphCell(this, parent, cell);
+					}
+				}
+				finally {
+					getModel().endUpdate();
+				}
+			}
+		}
+
+		// Ports are not used as terminals for edges, they are
+		// only used to compute the graphical connection point
+		public boolean isPort(Object cell)
+		{
+			mxGeometry geo = getCellGeometry(cell);
+			return (geo != null) && geo.isRelative();
 		}
 
 		/*
@@ -270,6 +305,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		 */
 		public String getToolTipForCell(Object cell)
 		{
+			// FIXME this is much tto detailed
 			StringBuilder tip = new StringBuilder("<html>");
 			mxGeometry geo = getModel().getGeometry(cell);
 			mxCellState state = getView().getState(cell);

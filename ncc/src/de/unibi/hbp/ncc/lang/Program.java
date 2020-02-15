@@ -16,6 +16,7 @@ import java.util.List;
 public class Program extends LanguageEntity implements DisplayNamed, PythonNamed {
    private StringProp programNameProp;
    private DoubleProp timeStepProp;
+   // TODO add property for simulation time
    private final Scope global;
    private mxIGraphModel graphModel;
    private ErrorCollector lastDiagnostics;
@@ -41,6 +42,7 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       defOneSynapseType.makePredefined();
       SynapseType defProbSynapseType = new SynapseType(synapseTypes, "Prob Default", SynapseType.ConnectorKind.FIXED_PROBABILITY);
       defProbSynapseType.makePredefined();
+      NetworkModule.setGlobalNamespace(global.getModuleInstances());
    }
 
    public void setGraphModel (mxIGraphModel graphModel) { this.graphModel = graphModel; }

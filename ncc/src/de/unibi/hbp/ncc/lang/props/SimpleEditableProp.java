@@ -28,10 +28,16 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
       return this;
    }
 
-   public SimpleEditableProp<T> setImpact (EnumSet<Impact> impact) {
+   public SimpleEditableProp<T> setImpact (EnumSet<Impact> impactSet) {
       assert this.impact == null : "may only be set once at creation time";
-      assert !impact.isEmpty() : "impact must not be empty";
-      this.impact = Objects.requireNonNull(impact);
+      this.impact = Objects.requireNonNull(impactSet);
+      assert !impactSet.isEmpty() : "impact must not be empty";
+      return this;
+   }
+
+   public SimpleEditableProp<T> setImpact (Impact impact) {
+      assert this.impact == null : "may only be set once at creation time";
+      this.impact = EnumSet.of(Objects.requireNonNull(impact));
       return this;
    }
 
@@ -55,7 +61,7 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    }
 
    @Override
-   public LanguageEntity getParentEntity () {
+   public LanguageEntity getEnclosingEntity () {
       return owner;
    }
 

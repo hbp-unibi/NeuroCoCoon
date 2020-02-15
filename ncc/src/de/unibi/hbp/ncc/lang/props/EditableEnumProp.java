@@ -21,7 +21,13 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
    }
 
    @Override
-   public EditableEnumProp<E> setImpact (EnumSet<Impact> impact) {  // to get the more precise co-variant return type
+   public EditableEnumProp<E> setImpact (EnumSet<Impact> impactSet) {  // to get the more precise co-variant return type
+      super.setImpact(impactSet);
+      return this;
+   }
+
+   @Override
+   public EditableEnumProp<E> setImpact (Impact impact) {
       super.setImpact(impact);
       return this;
    }

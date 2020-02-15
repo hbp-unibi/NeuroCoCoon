@@ -6,6 +6,7 @@ import java.awt.Component;
 
 public class ErrorCollector {
 
+   // TODO see WarningAction on how to add markers to cells
    public enum Severity { NOTE, INFO, WARNING, ERROR, FATAL }
 
    public void record (LanguageEntity responsible, Severity severity, String message) {

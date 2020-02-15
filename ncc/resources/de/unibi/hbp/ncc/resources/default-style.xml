@@ -1,6 +1,7 @@
 <mxStylesheet>
 	<include name="/de/unibi/hbp/ncc/resources/basic-style.xml"/>
 	<add as="defaultVertex" extend="defaultVertex">
+		<add as="editable" value="0"/>
 		<add as="fillColor" value="#dddddd"/>
 		<add as="strokeColor" value="#bbbbbb"/>
 		<add as="strokeWidth" value="2"/>
@@ -9,6 +10,7 @@
 		<add as="fontFamily" value="SansSerif"/>
 	</add>
 	<add as="defaultEdge" extend="defaultEdge">
+		<add as="editable" value="0"/>
 		<add as="labelBackgroundColor" value="white"/>
 		<add as="rounded" value="1"/>
 		<add as="edgeStyle" value="elbowEdgeStyle"/>
@@ -32,6 +34,39 @@
 		<add as="shape" value="rhombus"/>
 		<add as="fillColor" value="#ddff88"/>
 		<add as="strokeColor" value="#bbdd77"/>
+	</add>
+	<add as="module" extend="defaultVertex">
+		<add as="foldable" value="0"/>
+		<add as="shape" value="rectangle"/>
+		<add as="rounded" value="1"/>
+		<add as="arcSize" value="5"/>
+		<add as="fillColor" value="#ffddff"/>
+		<add as="strokeColor" value="#ddbbdd"/>
+		<add as="strokeWidth" value="3"/>
+		<add as="verticalAlign" value="top"/>
+	</add>
+	<add as="portany" extend="defaultVertex">
+		<add as="shape" value="triangle"/>
+		<add as="perimeter" value="trianglePerimeter"/>
+		<add as="fillColor" value="#ff77ff"/>
+		<add as="strokeColor" value="#dd66dd"/>
+		<add as="strokeWidth" value="1"/>
+	</add>
+	<add as="portleft" extend="portany">
+		<add as="direction" value="east"/>
+		<add as="labelPosition" value="right"/>
+	</add>
+	<add as="portright" extend="portany">
+		<add as="direction" value="east"/>
+		<add as="labelPosition" value="left"/>
+	</add>
+	<add as="porttop" extend="portany">
+		<add as="direction" value="south"/>
+		<add as="verticalLabelPosition" value="bottom"/>
+	</add>
+	<add as="portbottom" extend="portany">
+		<add as="direction" value="south"/>
+		<add as="verticalLabelPosition" value="top"/>
 	</add>
 	<add as="straight" extend="defaultEdge">
 		<add as="shape" value="connector"/>

@@ -23,7 +23,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
-import javax.swing.UIManager;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -90,69 +89,50 @@ public class EditorMenuBar extends JMenuBar
 		menu.add(editor.bind(mxResources.get("selectAll"), mxGraphActions.getSelectAllAction()));
 		menu.add(editor.bind(mxResources.get("selectNone"), mxGraphActions.getSelectNoneAction()));
 
+/*
 		menu.addSeparator();
 
 		menu.add(editor.bind(mxResources.get("warning"), new WarningAction()));
 		menu.add(editor.bind(mxResources.get("edit"), mxGraphActions.getEditAction()));
+*/
 
 		// Creates the view menu
 		menu = add(new JMenu(mxResources.get("view")));
 
-		JMenuItem item = menu.add(new TogglePropertyItem(graphComponent, mxResources.get("pageLayout"), "PageVisible", true,
-				new ActionListener()
-				{
+		JMenuItem item = menu.add(
+				new TogglePropertyItem(graphComponent, mxResources.get("pageLayout"), "PageVisible", true,
+									   e -> {
+										   if (graphComponent.isPageVisible() && graphComponent.isCenterPage())
+										   {
+											   graphComponent.zoomAndCenter();
+										   }
+										   else
+										   {
+											   graphComponent.getGraphControl().updatePreferredSize();
+										   }
+									   }));
 
-					public void actionPerformed(ActionEvent e)
-					{
-						if (graphComponent.isPageVisible() && graphComponent.isCenterPage())
-						{
-							graphComponent.zoomAndCenter();
-						}
-						else
-						{
-							graphComponent.getGraphControl().updatePreferredSize();
-						}
-					}
-				}));
-
-		item.addActionListener(new ActionListener()
-		{
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent e)
+		item.addActionListener(e -> {
+			if (e.getSource() instanceof TogglePropertyItem)
 			{
-				if (e.getSource() instanceof TogglePropertyItem)
+				final mxGraphComponent graphComponent1 = editor.getGraphComponent();
+				TogglePropertyItem toggleItem = (TogglePropertyItem) e.getSource();
+
+				if (toggleItem.isSelected())
 				{
-					final mxGraphComponent graphComponent = editor.getGraphComponent();
-					TogglePropertyItem toggleItem = (TogglePropertyItem) e.getSource();
+					SwingUtilities.invokeLater(() -> {
+						graphComponent1.scrollToCenter(true);
+						graphComponent1.scrollToCenter(false);
+					});
+				}
+				else
+				{
+					// Resets the translation of the view
+					mxPoint tr = graphComponent1.getGraph().getView().getTranslate();
 
-					if (toggleItem.isSelected())
+					if (tr.getX() != 0 || tr.getY() != 0)
 					{
-						// Scrolls the view to the center
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							/*
-							 * (non-Javadoc)
-							 * @see java.lang.Runnable#run()
-							 */
-							public void run()
-							{
-								graphComponent.scrollToCenter(true);
-								graphComponent.scrollToCenter(false);
-							}
-						});
-					}
-					else
-					{
-						// Resets the translation of the view
-						mxPoint tr = graphComponent.getGraph().getView().getTranslate();
-
-						if (tr.getX() != 0 || tr.getY() != 0)
-						{
-							graphComponent.getGraph().getView().setTranslate(new mxPoint());
-						}
+						graphComponent1.getGraph().getView().setTranslate(new mxPoint());
 					}
 				}
 			}
@@ -185,19 +165,23 @@ public class EditorMenuBar extends JMenuBar
 		menu.add(editor.bind(mxResources.get("zoomIn"), mxGraphActions.getZoomInAction()));
 		menu.add(editor.bind(mxResources.get("zoomOut"), mxGraphActions.getZoomOutAction()));
 
+/*
 		menu.addSeparator();
 
-		menu.add(editor.bind(mxResources.get("page"), new ZoomPolicyAction(mxGraphComponent.ZOOM_POLICY_PAGE)));
+		menu.add(editor.bind(mxResources.get("height"), new ZoomPolicyAction(mxGraphComponent.ZOOM_POLICY_HEIGHT)));
 		menu.add(editor.bind(mxResources.get("width"), new ZoomPolicyAction(mxGraphComponent.ZOOM_POLICY_WIDTH)));
+*/
 
 		menu.addSeparator();
 
 		menu.add(editor.bind(mxResources.get("actualSize"), mxGraphActions.getZoomActualAction()));
 
+		/*
 		// Creates the format menu
 		menu = add(new JMenu(mxResources.get("format")));
 
 		populateFormatMenu(menu, editor);
+		 */
 
 		// Creates the shape menu
 		menu = add(new JMenu(mxResources.get("shape")));
@@ -211,14 +195,14 @@ public class EditorMenuBar extends JMenuBar
 
 		menu.addSeparator();
 
-		submenu = (JMenu) menu.add(new JMenu(mxResources.get("background")));
+//		submenu = (JMenu) menu.add(new JMenu(mxResources.get("background")));
 
-		submenu.add(editor.bind(mxResources.get("backgroundColor"), new BackgroundAction()));
-		submenu.add(editor.bind(mxResources.get("backgroundImage"), new BackgroundImageAction()));
+		menu.add(editor.bind(mxResources.get("backgroundColor"), new BackgroundAction()));
+//		menu.add(editor.bind(mxResources.get("backgroundImage"), new BackgroundImageAction()));
 
-		submenu.addSeparator();
+//		menu.addSeparator();
 
-		submenu.add(editor.bind(mxResources.get("pageBackground"), new PageBackgroundAction()));
+//		submenu.add(editor.bind(mxResources.get("pageBackground"), new PageBackgroundAction()));
 
 		submenu = (JMenu) menu.add(new JMenu(mxResources.get("grid")));
 
@@ -274,6 +258,8 @@ public class EditorMenuBar extends JMenuBar
 		submenu.add(editor.bind(mxResources.get("selectTree"), new SelectSpanningTreeAction(false)));
 		submenu.add(editor.bind(mxResources.get("selectDirectedTree"), new SelectSpanningTreeAction(true)));
 
+
+		/*
 		menu.addSeparator();
 
 		submenu = (JMenu) menu.add(new JMenu(mxResources.get("stylesheet")));
@@ -282,21 +268,17 @@ public class EditorMenuBar extends JMenuBar
 				new StylesheetAction("/de/unibi/hbp/ncc/resources/basic-style.xml")));
 		submenu.add(editor.bind(mxResources.get("defaultStyle"), new StylesheetAction(
 				"/de/unibi/hbp/ncc/resources/default-style.xml")));
+		 */
 
+		// TODO (nearly) all items in Options menu should have fixed values for our editor
 		// Creates the options menu
 		menu = add(new JMenu(mxResources.get("options")));
 
 		submenu = (JMenu) menu.add(new JMenu(mxResources.get("display")));
 		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("buffering"), "TripleBuffered", true));
 
-		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("preferPageSize"), "PreferPageSize", true, new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-				graphComponent.zoomAndCenter();
-			}
-		}));
+		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("preferPageSize"), "PreferPageSize", true,
+										   e -> graphComponent.zoomAndCenter()));
 
 		// TODO: This feature is not yet implemented
 		//submenu.add(new TogglePropertyItem(graphComponent, mxResources
@@ -378,6 +360,7 @@ public class EditorMenuBar extends JMenuBar
 		submenu.add(new TogglePropertyItem(graph, mxResources.get("allowLoops"), "AllowLoops"));
 		submenu.add(new TogglePropertyItem(graph, mxResources.get("multigraph"), "Multigraph"));
 
+		/*
 		// Creates the window menu
 		menu = add(new JMenu(mxResources.get("window")));
 
@@ -398,7 +381,9 @@ public class EditorMenuBar extends JMenuBar
 				}
 			});
 		}
+		 */
 
+		/*
 		// Creates a developer menu
 		menu = add(new JMenu("Generate"));
 		menu.add(editor.bind("Null Graph", new InsertGraph(GraphType.NULL, aGraph)));
@@ -450,22 +435,12 @@ public class EditorMenuBar extends JMenuBar
 		menu.add(editor.bind("Get sources", new AnalyzeGraph(AnalyzeType.GET_SOURCES, aGraph)));
 		menu.add(editor.bind("Get sinks", new AnalyzeGraph(AnalyzeType.GET_SINKS, aGraph)));
 		menu.add(editor.bind("Is biconnected", new AnalyzeGraph(AnalyzeType.IS_BICONNECTED, aGraph)));
-
+		 */
 		// Creates the help menu
 		menu = add(new JMenu(mxResources.get("help")));
 
 		item = menu.add(new JMenuItem(mxResources.get("aboutGraphEditor")));
-		item.addActionListener(new ActionListener()
-		{
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent e)
-			{
-				editor.about();
-			}
-		});
+		item.addActionListener(e -> editor.about());
 	}
 
 	/**

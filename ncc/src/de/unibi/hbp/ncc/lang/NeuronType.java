@@ -4,8 +4,6 @@ import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 public class NeuronType extends NamedEntity<NeuronType> {
@@ -62,7 +60,7 @@ public class NeuronType extends NamedEntity<NeuronType> {
                       double izhikevichA, double izhikevichB, double izhikevichC, double izhikevichD) {
       super(namespace, name);
       this.neuronKind = new EditableEnumProp<>("Neuron Kind", NeuronKind.class, this, neuronKind)
-            .setImpact(EnumSet.of(EditableProp.Impact.OTHER_PROPS_VISIBILITY));
+            .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
       this.vRest = new DoubleProp("v rest", this, vRest).setUnit("mV");
       this.vReset = new DoubleProp("v reset", this, vReset).setUnit("mV");
       this.vThresh = new DoubleProp("v thresh", this, vThresh).setUnit("mV");
@@ -87,11 +85,12 @@ public class NeuronType extends NamedEntity<NeuronType> {
            0.0,
            0.02, 0.2, -65.0, 2.0);
    }
+   public NeuronType (Namespace<NeuronType> namespace) { this(namespace, null); }
 
    public NeuronType (NeuronType orig) {
       this(orig.getNamespace(), orig.getCopiedName(), orig.neuronKind.getValue(),
-            orig.vRest.getValue(), orig.vReset.getValue(), orig.vThresh.getValue(), orig.eRevE.getValue(), orig.eRevI.getValue(),
-            orig.tauSynE.getValue(), orig.tauSynI.getValue(), orig.tauRefrac.getValue(), orig.tauM.getValue(), orig.cm.getValue(),
+           orig.vRest.getValue(), orig.vReset.getValue(), orig.vThresh.getValue(), orig.eRevE.getValue(), orig.eRevI.getValue(),
+           orig.tauSynE.getValue(), orig.tauSynI.getValue(), orig.tauRefrac.getValue(), orig.tauM.getValue(), orig.cm.getValue(),
            orig.iOffset.getValue(),
            orig.izhikevichA.getValue(), orig.izhikevichB.getValue(), orig.izhikevichC.getValue(), orig.izhikevichD.getValue());
    }

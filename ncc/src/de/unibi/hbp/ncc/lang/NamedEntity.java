@@ -96,7 +96,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
 
    public void renameTo (String name) {
       if (!canRenameTo(name))
-         throw new LanguageException("name " + name + " conflicts with an existing name");
+         throw new LanguageException(this, "name " + name + " conflicts with an existing name");
       if (getName().equals(name))
          return;  // a no-op
       namespace.remove(getName());

@@ -19,8 +19,7 @@ public class mxTriangleShape extends mxBasicShape
 		int y = temp.y;
 		int w = temp.width;
 		int h = temp.height;
-		String direction = mxUtils.getString(state.getStyle(),
-				mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST);
+		String direction = mxUtils.getString(state.getStyle(), mxConstants.STYLE_DIRECTION, mxConstants.DIRECTION_EAST);
 		Polygon triangle = new Polygon();
 
 		if (direction.equals(mxConstants.DIRECTION_NORTH))

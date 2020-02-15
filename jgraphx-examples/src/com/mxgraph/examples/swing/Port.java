@@ -80,7 +80,7 @@ public class Port extends JFrame
 			geo1.setRelative(true);
 
 			mxCell port1 = new mxCell(null, geo1,
-					"shape=ellipse;perimter=ellipsePerimeter");
+					"shape=ellipse;perimeter=ellipsePerimeter");
 			port1.setVertex(true);
 
 			mxGeometry geo2 = new mxGeometry(1.0, 0.5, PORT_DIAMETER,
@@ -89,7 +89,7 @@ public class Port extends JFrame
 			geo2.setRelative(true);
 
 			mxCell port2 = new mxCell(null, geo2,
-					"shape=ellipse;perimter=ellipsePerimeter");
+					"shape=ellipse;perimeter=ellipsePerimeter");
 			port2.setVertex(true);
 
 			graph.addCell(port1, v1);
