@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007, Gaudenz Alder
  */
 package com.mxgraph.view;
@@ -9,7 +9,6 @@ import com.mxgraph.canvas.mxImageCanvas;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.model.mxGraphModel.Filter;
 import com.mxgraph.model.mxGraphModel.mxChildChange;
 import com.mxgraph.model.mxGraphModel.mxCollapseChange;
 import com.mxgraph.model.mxGraphModel.mxGeometryChange;
@@ -45,9 +44,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -180,7 +177,7 @@ public class mxGraph extends mxEventSource
 
 	private static final Logger log = Logger.getLogger(mxGraph.class.getName());
 
-	/**
+	/*
 	 * Adds required resources.
 	 */
 	static
@@ -524,45 +521,30 @@ public class mxGraph extends mxEventSource
 	/**
 	 * Holds the list of bundles.
 	 */
-	protected static List<mxImageBundle> imageBundles = new LinkedList<mxImageBundle>();
+	protected static List<mxImageBundle> imageBundles = new ArrayList<>();
 
 	/**
 	 * Fires repaint events for full repaints.
 	 */
-	protected mxIEventListener fullRepaintHandler = new mxIEventListener()
-	{
-		public void invoke(Object sender, mxEventObject evt)
-		{
-			repaint();
-		}
-	};
+	protected mxIEventListener fullRepaintHandler = (sender, evt) -> repaint();
 
 	/**
 	 * Fires repaint events for full repaints.
 	 */
-	protected mxIEventListener updateOriginHandler = new mxIEventListener()
-	{
-		public void invoke(Object sender, mxEventObject evt)
+	protected mxIEventListener updateOriginHandler = (sender, evt) -> {
+		if (isAutoOrigin())
 		{
-			if (isAutoOrigin())
-			{
-				updateOrigin();
-			}
+			updateOrigin();
 		}
 	};
 
 	/**
 	 * Fires repaint events for model changes.
 	 */
-	protected mxIEventListener graphModelChangeHandler = new mxIEventListener()
-	{
-		public void invoke(Object sender, mxEventObject evt)
-		{
-			mxRectangle dirty = graphModelChanged((mxIGraphModel) sender,
-					(List<mxUndoableChange>) ((mxUndoableEdit) evt
-							.getProperty("edit")).getChanges());
-			repaint(dirty);
-		}
+	protected mxIEventListener graphModelChangeHandler = (sender, evt) -> {
+		mxRectangle dirty = graphModelChanged((mxIGraphModel) sender,
+											  ((mxUndoableEdit) evt.getProperty("edit")).getChanges());
+		repaint(dirty);
 	};
 
 	/**
@@ -702,16 +684,16 @@ public class mxGraph extends mxEventSource
 		if (view != null)
 		{
 			view.revalidate();
-		}
 
-		// Listens to changes in the view
-		view.addListener(mxEvent.SCALE, fullRepaintHandler);
-		view.addListener(mxEvent.SCALE, updateOriginHandler);
-		view.addListener(mxEvent.TRANSLATE, fullRepaintHandler);
-		view.addListener(mxEvent.SCALE_AND_TRANSLATE, fullRepaintHandler);
-		view.addListener(mxEvent.SCALE_AND_TRANSLATE, updateOriginHandler);
-		view.addListener(mxEvent.UP, fullRepaintHandler);
-		view.addListener(mxEvent.DOWN, fullRepaintHandler);
+			// Listens to changes in the view
+			view.addListener(mxEvent.SCALE, fullRepaintHandler);
+			view.addListener(mxEvent.SCALE, updateOriginHandler);
+			view.addListener(mxEvent.TRANSLATE, fullRepaintHandler);
+			view.addListener(mxEvent.SCALE_AND_TRANSLATE, fullRepaintHandler);
+			view.addListener(mxEvent.SCALE_AND_TRANSLATE, updateOriginHandler);
+			view.addListener(mxEvent.UP, fullRepaintHandler);
+			view.addListener(mxEvent.DOWN, fullRepaintHandler);
+		}
 
 		changeSupport.firePropertyChange("view", oldView, view);
 	}
@@ -760,50 +742,38 @@ public class mxGraph extends mxEventSource
 				}
 			}
 		}
-	};
-	
+	}
+
 	/**
 	 * Returns the cells to be selected for the given list of changes.
 	 */
 	public Object[] getSelectionCellsForChanges(List<mxUndoableChange> changes)
 	{
-		List<Object> cells = new ArrayList<Object>();
-		Iterator<mxUndoableChange> it = changes.iterator();
+		List<Object> cells = new ArrayList<>();
 
-		while (it.hasNext())
-		{
-			Object change = it.next();
-
-			if (change instanceof mxChildChange)
-			{
+		for (Object change : changes) {
+			if (change instanceof mxChildChange) {
 				addTopmostVerticesAndEdges(((mxChildChange) change).getChild(), cells);
 			}
-			else if (change instanceof mxTerminalChange)
-			{
+			else if (change instanceof mxTerminalChange) {
 				addTopmostVerticesAndEdges(((mxTerminalChange) change).getCell(), cells);
 			}
-			else if (change instanceof mxValueChange)
-			{
+			else if (change instanceof mxValueChange) {
 				addTopmostVerticesAndEdges(((mxValueChange) change).getCell(), cells);
 			}
-			else if (change instanceof mxStyleChange)
-			{
+			else if (change instanceof mxStyleChange) {
 				addTopmostVerticesAndEdges(((mxStyleChange) change).getCell(), cells);
 			}
-			else if (change instanceof mxGeometryChange)
-			{
+			else if (change instanceof mxGeometryChange) {
 				addTopmostVerticesAndEdges(((mxGeometryChange) change).getCell(), cells);
 			}
-			else if (change instanceof mxCollapseChange)
-			{
+			else if (change instanceof mxCollapseChange) {
 				addTopmostVerticesAndEdges(((mxCollapseChange) change).getCell(), cells);
 			}
-			else if (change instanceof mxVisibleChange)
-			{
+			else if (change instanceof mxVisibleChange) {
 				mxVisibleChange vc = (mxVisibleChange) change;
 
-				if (vc.isVisible())
-				{
+				if (vc.isVisible()) {
 					addTopmostVerticesAndEdges(((mxVisibleChange) change).getCell(), cells);
 				}
 			}
@@ -825,12 +795,9 @@ public class mxGraph extends mxEventSource
 		// Ignores dirty rectangle if there was a root change
 		if (!ignoreDirty)
 		{
-			Iterator<mxUndoableChange> it = changes.iterator();
 
-			while (it.hasNext())
-			{
-				if (it.next() instanceof mxRootChange)
-				{
+			for (mxUndoableChange change : changes) {
+				if (change instanceof mxRootChange) {
 					ignoreDirty = true;
 					break;
 				}
@@ -875,13 +842,11 @@ public class mxGraph extends mxEventSource
 	protected void updateSelection()
 	{
 		Object[] cells = getSelectionCells();
-		List<Object> removed = new ArrayList<Object>();
-		
-		for (int i = 0; i < cells.length; i++)
-		{
-			if (!model.contains(cells[i]))
-			{
-				removed.add(cells[i]);
+		List<Object> removed = new ArrayList<>();
+
+		for (Object cell : cells) {
+			if (!model.contains(cell)) {
+				removed.add(cell);
 			}
 		}
 		
@@ -942,19 +907,14 @@ public class mxGraph extends mxEventSource
 			boolean invalidate, boolean ignoreDirty)
 	{
 		mxRectangle bounds = null;
-		Iterator<mxUndoableChange> it = changes.iterator();
 
-		while (it.hasNext())
-		{
-			mxRectangle rect = processChange(it.next(), invalidate,
-					ignoreDirty);
+		for (mxUndoableChange change : changes) {
+			mxRectangle rect = processChange(change, invalidate, ignoreDirty);
 
-			if (bounds == null)
-			{
+			if (bounds == null) {
 				bounds = rect;
 			}
-			else
-			{
+			else {
 				bounds.add(rect);
 			}
 		}
@@ -1269,9 +1229,8 @@ public class mxGraph extends mxEventSource
 			model.beginUpdate();
 			try
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
-					model.setStyle(cells[i], style);
+				for (Object cell: cells) {
+					model.setStyle(cell, style);
 				}
 			}
 			finally
@@ -1482,14 +1441,11 @@ public class mxGraph extends mxEventSource
 	{
 		if (key != null)
 		{
-			Iterator<mxImageBundle> it = imageBundles.iterator();
 
-			while (it.hasNext())
-			{
-				String value = it.next().getImage(key);
+			for (mxImageBundle imageBundle: imageBundles) {
+				String value = imageBundle.getImage(key);
 
-				if (value != null)
-				{
+				if (value != null) {
 					return value;
 				}
 			}
@@ -1564,65 +1520,48 @@ public class mxGraph extends mxEventSource
 			// Finds the required coordinate for the alignment
 			if (param == null)
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
-					mxGeometry geo = getCellGeometry(cells[i]);
+				for (Object cell : cells) {
+					mxGeometry geo = getCellGeometry(cell);
 
-					if (geo != null && !model.isEdge(cells[i]))
-					{
-						if (param == null)
-						{
+					if (geo != null && !model.isEdge(cell)) {
+						if (param == null) {
 							if (align == null
-									|| align.equals(mxConstants.ALIGN_LEFT))
-							{
+									|| align.equals(mxConstants.ALIGN_LEFT)) {
 								param = geo.getX();
 							}
-							else if (align.equals(mxConstants.ALIGN_CENTER))
-							{
+							else if (align.equals(mxConstants.ALIGN_CENTER)) {
 								param = geo.getX() + geo.getWidth() / 2;
 								break;
 							}
-							else if (align.equals(mxConstants.ALIGN_RIGHT))
-							{
+							else if (align.equals(mxConstants.ALIGN_RIGHT)) {
 								param = geo.getX() + geo.getWidth();
 							}
-							else if (align.equals(mxConstants.ALIGN_TOP))
-							{
+							else if (align.equals(mxConstants.ALIGN_TOP)) {
 								param = geo.getY();
 							}
-							else if (align.equals(mxConstants.ALIGN_MIDDLE))
-							{
+							else if (align.equals(mxConstants.ALIGN_MIDDLE)) {
 								param = geo.getY() + geo.getHeight() / 2;
 								break;
 							}
-							else if (align.equals(mxConstants.ALIGN_BOTTOM))
-							{
+							else if (align.equals(mxConstants.ALIGN_BOTTOM)) {
 								param = geo.getY() + geo.getHeight();
 							}
 						}
-						else
-						{
-							double tmp = Double
-									.parseDouble(String.valueOf(param));
+						else {
+							double tmp = Double.parseDouble(String.valueOf(param));
 
 							if (align == null
-									|| align.equals(mxConstants.ALIGN_LEFT))
-							{
+									|| align.equals(mxConstants.ALIGN_LEFT)) {
 								param = Math.min(tmp, geo.getX());
 							}
-							else if (align.equals(mxConstants.ALIGN_RIGHT))
-							{
-								param = Math.max(tmp,
-										geo.getX() + geo.getWidth());
+							else if (align.equals(mxConstants.ALIGN_RIGHT)) {
+								param = Math.max(tmp, geo.getX() + geo.getWidth());
 							}
-							else if (align.equals(mxConstants.ALIGN_TOP))
-							{
+							else if (align.equals(mxConstants.ALIGN_TOP)) {
 								param = Math.min(tmp, geo.getY());
 							}
-							else if (align.equals(mxConstants.ALIGN_BOTTOM))
-							{
-								param = Math.max(tmp,
-										geo.getY() + geo.getHeight());
+							else if (align.equals(mxConstants.ALIGN_BOTTOM)) {
+								param = Math.max(tmp, geo.getY() + geo.getHeight());
 							}
 						}
 					}
@@ -1635,51 +1574,41 @@ public class mxGraph extends mxEventSource
 			{
 				double tmp = Double.parseDouble(String.valueOf(param));
 
-				for (int i = 0; i < cells.length; i++)
-				{
-					mxGeometry geo = getCellGeometry(cells[i]);
+				for (Object cell : cells) {
+					mxGeometry geo = getCellGeometry(cell);
 
-					if (geo != null && !model.isEdge(cells[i]))
-					{
+					if (geo != null && !model.isEdge(cell)) {
 						geo = (mxGeometry) geo.clone();
 
 						if (align == null
-								|| align.equals(mxConstants.ALIGN_LEFT))
-						{
+								|| align.equals(mxConstants.ALIGN_LEFT)) {
 							geo.setX(tmp);
 						}
-						else if (align.equals(mxConstants.ALIGN_CENTER))
-						{
+						else if (align.equals(mxConstants.ALIGN_CENTER)) {
 							geo.setX(tmp - geo.getWidth() / 2);
 						}
-						else if (align.equals(mxConstants.ALIGN_RIGHT))
-						{
+						else if (align.equals(mxConstants.ALIGN_RIGHT)) {
 							geo.setX(tmp - geo.getWidth());
 						}
-						else if (align.equals(mxConstants.ALIGN_TOP))
-						{
+						else if (align.equals(mxConstants.ALIGN_TOP)) {
 							geo.setY(tmp);
 						}
-						else if (align.equals(mxConstants.ALIGN_MIDDLE))
-						{
+						else if (align.equals(mxConstants.ALIGN_MIDDLE)) {
 							geo.setY(tmp - geo.getHeight() / 2);
 						}
-						else if (align.equals(mxConstants.ALIGN_BOTTOM))
-						{
+						else if (align.equals(mxConstants.ALIGN_BOTTOM)) {
 							geo.setY(tmp - geo.getHeight());
 						}
 
-						model.setGeometry(cells[i], geo);
+						model.setGeometry(cell, geo);
 
-						if (isResetEdgesOnMove())
-						{
-							resetEdges(new Object[] { cells[i] });
+						if (isResetEdgesOnMove()) {
+							resetEdges(new Object[] { cell });
 						}
 					}
 				}
 
-				fireEvent(new mxEventObject(mxEvent.ALIGN_CELLS, "cells", cells,
-						"align", align));
+				fireEvent(new mxEventObject(mxEvent.ALIGN_CELLS, "cells", cells, "align", align));
 			}
 			finally
 			{
@@ -1930,7 +1859,7 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] getCellsForGroup(Object[] cells)
 	{
-		List<Object> result = new ArrayList<Object>(cells.length);
+		List<Object> result = new ArrayList<>(cells.length);
 
 		if (cells.length > 0)
 		{
@@ -2020,39 +1949,34 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] ungroupCells(Object[] cells)
 	{
-		List<Object> result = new ArrayList<Object>();
+		List<Object> result = new ArrayList<>();
 
 		if (cells == null)
 		{
 			cells = getSelectionCells();
 
 			// Finds the cells with children
-			List<Object> tmp = new ArrayList<Object>(cells.length);
+			List<Object> tmp = new ArrayList<>(cells.length);
 
-			for (int i = 0; i < cells.length; i++)
-			{
-				if (model.getChildCount(cells[i]) > 0)
-				{
-					tmp.add(cells[i]);
+			for (Object cell: cells) {
+				if (model.getChildCount(cell) > 0) {
+					tmp.add(cell);
 				}
 			}
 
 			cells = tmp.toArray();
 		}
 
-		if (cells != null && cells.length > 0)
+		if (cells.length > 0)
 		{
 			model.beginUpdate();
 			try
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
-					Object[] children = mxGraphModel.getChildren(model,
-							cells[i]);
+				for (Object cell: cells) {
+					Object[] children = mxGraphModel.getChildren(model, cell);
 
-					if (children != null && children.length > 0)
-					{
-						Object parent = model.getParent(cells[i]);
+					if (children != null && children.length > 0) {
+						Object parent = model.getParent(cell);
 						int index = model.getChildCount(parent);
 
 						cellsAdded(children, parent, index, null, null, true);
@@ -2061,8 +1985,7 @@ public class mxGraph extends mxEventSource
 				}
 
 				cellsRemoved(addAllEdges(cells));
-				fireEvent(new mxEventObject(mxEvent.UNGROUP_CELLS, "cells",
-						cells));
+				fireEvent(new mxEventObject(mxEvent.UNGROUP_CELLS, "cells", cells));
 			}
 			finally
 			{
@@ -2246,7 +2169,7 @@ public class mxGraph extends mxEventSource
 
 		if (cells != null)
 		{
-			Collection<Object> tmp = new LinkedHashSet<Object>(cells.length);
+			Collection<Object> tmp = new LinkedHashSet<>(cells.length);
 			tmp.addAll(Arrays.asList(cells));
 
 			if (!tmp.isEmpty())
@@ -2839,33 +2762,25 @@ public class mxGraph extends mxEventSource
 			model.beginUpdate();
 			try
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
+				for (Object cell: cells) {
 					// Disconnects edges which are not in cells
-					Collection<Object> cellSet = new HashSet<Object>();
-					cellSet.addAll(Arrays.asList(cells));
-					Object[] edges = getConnections(cells[i]);
+					Collection<Object> cellSet = new HashSet<>(Arrays.asList(cells));
+					Object[] edges = getConnections(cell);
 
-					for (int j = 0; j < edges.length; j++)
-					{
-						if (!cellSet.contains(edges[j]))
-						{
-							mxGeometry geo = model.getGeometry(edges[j]);
+					for (Object edge: edges) {
+						if (!cellSet.contains(edge)) {
+							mxGeometry geo = model.getGeometry(edge);
 
-							if (geo != null)
-							{
-								mxCellState state = view.getState(edges[j]);
+							if (geo != null) {
+								mxCellState state = view.getState(edge);
 
-								if (state != null)
-								{
+								if (state != null) {
 									// Checks which side of the edge is being disconnected
 									Object tmp = state.getVisibleTerminal(true);
 									boolean source = false;
 
-									while (tmp != null)
-									{
-										if (cells[i] == tmp)
-										{
+									while (tmp != null) {
+										if (cell == tmp) {
 											source = true;
 											break;
 										}
@@ -2879,17 +2794,17 @@ public class mxGraph extends mxEventSource
 									mxPoint pt = state.getAbsolutePoint(n);
 
 									geo.setTerminalPoint(new mxPoint(
-											pt.getX() / scale - tr.getX(),
-											pt.getY() / scale - tr.getY()),
-											source);
-									model.setTerminal(edges[j], null, source);
-									model.setGeometry(edges[j], geo);
+																 pt.getX() / scale - tr.getX(),
+																 pt.getY() / scale - tr.getY()),
+														 source);
+									model.setTerminal(edge, null, source);
+									model.setGeometry(edge, geo);
 								}
 							}
 						}
 					}
 
-					model.remove(cells[i]);
+					model.remove(cell);
 				}
 
 				fireEvent(new mxEventObject(mxEvent.CELLS_REMOVED, "cells",
@@ -3036,9 +2951,8 @@ public class mxGraph extends mxEventSource
 			model.beginUpdate();
 			try
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
-					model.setVisible(cells[i], show);
+				for (Object cell: cells) {
+					model.setVisible(cell, show);
 				}
 			}
 			finally
@@ -3153,23 +3067,19 @@ public class mxGraph extends mxEventSource
 			model.beginUpdate();
 			try
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
-					if ((!checkFoldable || isCellFoldable(cells[i], collapse))
-							&& collapse != isCellCollapsed(cells[i]))
-					{
-						model.setCollapsed(cells[i], collapse);
-						swapBounds(cells[i], collapse);
+				for (Object cell: cells) {
+					if ((!checkFoldable || isCellFoldable(cell, collapse))
+							&& collapse != isCellCollapsed(cell)) {
+						model.setCollapsed(cell, collapse);
+						swapBounds(cell, collapse);
 
-						if (isExtendParent(cells[i]))
-						{
-							extendParent(cells[i]);
+						if (isExtendParent(cell)) {
+							extendParent(cell);
 						}
 
-						if (recurse)
-						{
+						if (recurse) {
 							Object[] children = mxGraphModel.getChildren(model,
-									cells[i]);
+																		 cell);
 							cellsFolded(children, collapse, recurse);
 						}
 					}
@@ -3268,7 +3178,7 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] addAllEdges(Object[] cells)
 	{
-		List<Object> allCells = new ArrayList<Object>(cells.length);
+		List<Object> allCells = new ArrayList<>(cells.length);
 		allCells.addAll(Arrays.asList(cells));
 		allCells.addAll(Arrays.asList(getAllEdges(cells)));
 
@@ -3280,21 +3190,19 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] getAllEdges(Object[] cells)
 	{
-		List<Object> edges = new ArrayList<Object>();
+		List<Object> edges = new ArrayList<>();
 
 		if (cells != null)
 		{
-			for (int i = 0; i < cells.length; i++)
-			{
-				int edgeCount = model.getEdgeCount(cells[i]);
+			for (Object cell: cells) {
+				int edgeCount = model.getEdgeCount(cell);
 
-				for (int j = 0; j < edgeCount; j++)
-				{
-					edges.add(model.getEdgeAt(cells[i], j));
+				for (int j = 0; j < edgeCount; j++) {
+					edges.add(model.getEdgeAt(cell, j));
 				}
 
 				// Recurses
-				Object[] children = mxGraphModel.getChildren(model, cells[i]);
+				Object[] children = mxGraphModel.getChildren(model, cell);
 				edges.addAll(Arrays.asList(getAllEdges(children)));
 			}
 		}
@@ -3800,13 +3708,11 @@ public class mxGraph extends mxEventSource
 					disconnectGraph(cells);
 				}
 
-				for (int i = 0; i < cells.length; i++)
-				{
-					translateCell(cells[i], dx, dy);
+				for (Object cell: cells) {
+					translateCell(cell, dx, dy);
 
-					if (constrain)
-					{
-						constrainChild(cells[i]);
+					if (constrain) {
+						constrainChild(cell);
 					}
 				}
 
@@ -3988,36 +3894,30 @@ public class mxGraph extends mxEventSource
 		if (cells != null)
 		{
 			// Prepares a hashtable for faster cell lookups
-			HashSet<Object> set = new HashSet<Object>(Arrays.asList(cells));
+			HashSet<Object> set = new HashSet<>(Arrays.asList(cells));
 
 			model.beginUpdate();
 			try
 			{
-				for (int i = 0; i < cells.length; i++)
-				{
-					Object[] edges = mxGraphModel.getEdges(model, cells[i]);
+				for (Object cell: cells) {
+					Object[] edges = mxGraphModel.getEdges(model, cell);
 
-					if (edges != null)
-					{
-						for (int j = 0; j < edges.length; j++)
-						{
-							mxCellState state = view.getState(edges[j]);
-							Object source = (state != null)
-									? state.getVisibleTerminal(true)
-									: view.getVisibleTerminal(edges[j], true);
-							Object target = (state != null)
-									? state.getVisibleTerminal(false)
-									: view.getVisibleTerminal(edges[j], false);
+					for (Object edge: edges) {
+						mxCellState state = view.getState(edge);
+						Object source = (state != null)
+								? state.getVisibleTerminal(true)
+								: view.getVisibleTerminal(edge, true);
+						Object target = (state != null)
+								? state.getVisibleTerminal(false)
+								: view.getVisibleTerminal(edge, false);
 
-							// Checks if one of the terminals is not in the given array
-							if (!set.contains(source) || !set.contains(target))
-							{
-								resetEdge(edges[j]);
-							}
+						// Checks if one of the terminals is not in the given array
+						if (!set.contains(source) || !set.contains(target)) {
+							resetEdge(edge);
 						}
 					}
 
-					resetEdges(mxGraphModel.getChildren(model, cells[i]));
+					resetEdges(mxGraphModel.getChildren(model, cell));
 				}
 			}
 			finally
@@ -4127,7 +4027,7 @@ public class mxGraph extends mxEventSource
 				Object[] cells = new Object[] { edge };
 
 				// FIXME, constraint can't be null, we've checked that above
-				if (constraint == null || constraint.point == null)
+				if (constraint.point == null)
 				{
 					setCellStyles((source) ? mxConstants.STYLE_EXIT_X
 							: mxConstants.STYLE_ENTRY_X, null, cells);
@@ -4138,8 +4038,7 @@ public class mxGraph extends mxEventSource
 									: mxConstants.STYLE_ENTRY_PERIMETER,
 							null, cells);
 				}
-				else if (constraint.point != null)
-				{
+				else {
 					setCellStyles(
 							(source) ? mxConstants.STYLE_EXIT_X
 									: mxConstants.STYLE_ENTRY_X,
@@ -4199,22 +4098,21 @@ public class mxGraph extends mxEventSource
 			// Bounds need to be rotated by 90 degrees for further computation
 			if (direction != null)
 			{
-				if (direction.equals(mxConstants.DIRECTION_NORTH))
-				{
-					r1 += 270;
-				}
-				else if (direction.equals(mxConstants.DIRECTION_WEST))
-				{
-					r1 += 180;
-				}
-				else if (direction.equals(mxConstants.DIRECTION_SOUTH))
-				{
-					r1 += 90;
+				switch (direction) {
+					case mxConstants.DIRECTION_NORTH:
+						r1 += 270;
+						break;
+					case mxConstants.DIRECTION_WEST:
+						r1 += 180;
+						break;
+					case mxConstants.DIRECTION_SOUTH:
+						r1 += 90;
+						break;
 				}
 
 				// Bounds need to be rotated by 90 degrees for further computation
-				if (direction == mxConstants.DIRECTION_NORTH
-						|| direction == mxConstants.DIRECTION_SOUTH)
+				if (direction.equals(mxConstants.DIRECTION_NORTH)
+						|| direction.equals(mxConstants.DIRECTION_SOUTH))
 				{
 					bounds.rotate90();
 				}
@@ -4222,8 +4120,7 @@ public class mxGraph extends mxEventSource
 
 			point = new mxPoint(
 					bounds.getX() + constraint.point.getX() * bounds.getWidth(),
-					bounds.getY()
-							+ constraint.point.getY() * bounds.getHeight());
+					bounds.getY() + constraint.point.getY() * bounds.getHeight());
 
 			// Rotation for direction before projection on perimeter
 			double r2 = mxUtils.getDouble(vertex.getStyle(),
@@ -4262,9 +4159,9 @@ public class mxGraph extends mxEventSource
 				if (this.getModel().isVertex(vertex.cell))
 				{
 					boolean flipH = mxUtils.getString(vertex.getStyle(),
-							mxConstants.STYLE_FLIPH).equals(1);
+							mxConstants.STYLE_FLIPH).equals("1");
 					boolean flipV = mxUtils.getString(vertex.getStyle(),
-							mxConstants.STYLE_FLIPV).equals(1);
+							mxConstants.STYLE_FLIPV).equals("1");
 
 					if (flipH)
 					{
@@ -4416,83 +4313,69 @@ public class mxGraph extends mxEventSource
 				mxPoint tr = view.getTranslate();
 
 				// Prepares a hashtable for faster cell lookups
-				Set<Object> hash = new HashSet<Object>();
 
-				for (int i = 0; i < cells.length; i++)
-				{
-					hash.add(cells[i]);
-				}
+				Set<Object> hash = new HashSet<>(Arrays.asList(cells));
 
-				for (int i = 0; i < cells.length; i++)
-				{
-					if (model.isEdge(cells[i]))
-					{
-						mxGeometry geo = model.getGeometry(cells[i]);
+				for (Object cell: cells) {
+					if (model.isEdge(cell)) {
+						mxGeometry geo = model.getGeometry(cell);
 
-						if (geo != null)
-						{
-							mxCellState state = view.getState(cells[i]);
+						if (geo != null) {
+							mxCellState state = view.getState(cell);
 							mxCellState pstate = view
-									.getState(model.getParent(cells[i]));
+									.getState(model.getParent(cell));
 
-							if (state != null && pstate != null)
-							{
+							if (state != null && pstate != null) {
 								geo = (mxGeometry) geo.clone();
 
 								double dx = -pstate.getOrigin().getX();
 								double dy = -pstate.getOrigin().getY();
 
-								Object src = model.getTerminal(cells[i], true);
+								Object src = model.getTerminal(cell, true);
 
 								if (src != null && isCellDisconnectable(
-										cells[i], src, true))
-								{
-									while (src != null && !hash.contains(src))
-									{
+										cell, src, true)) {
+									while (src != null && !hash.contains(src)) {
 										src = model.getParent(src);
 									}
 
-									if (src == null)
-									{
+									if (src == null) {
 										mxPoint pt = state.getAbsolutePoint(0);
 										geo.setTerminalPoint(new mxPoint(
-												pt.getX() / scale - tr.getX()
-														+ dx,
-												pt.getY() / scale - tr.getY()
-														+ dy),
-												true);
-										model.setTerminal(cells[i], null, true);
+																	 pt.getX() / scale - tr.getX()
+																			 + dx,
+																	 pt.getY() / scale - tr.getY()
+																			 + dy),
+															 true);
+										model.setTerminal(cell, null, true);
 									}
 								}
 
-								Object trg = model.getTerminal(cells[i], false);
+								Object trg = model.getTerminal(cell, false);
 
 								if (trg != null && isCellDisconnectable(
-										cells[i], trg, false))
-								{
-									while (trg != null && !hash.contains(trg))
-									{
+										cell, trg, false)) {
+									while (trg != null && !hash.contains(trg)) {
 										trg = model.getParent(trg);
 									}
 
-									if (trg == null)
-									{
+									if (trg == null) {
 										int n = state.getAbsolutePointCount()
 												- 1;
 										mxPoint pt = state.getAbsolutePoint(n);
 										geo.setTerminalPoint(new mxPoint(
-												pt.getX() / scale - tr.getX()
-														+ dx,
-												pt.getY() / scale - tr.getY()
-														+ dy),
-												false);
-										model.setTerminal(cells[i], null,
-												false);
+																	 pt.getX() / scale - tr.getX()
+																			 + dx,
+																	 pt.getY() / scale - tr.getY()
+																			 + dy),
+															 false);
+										model.setTerminal(cell, null,
+														  false);
 									}
 								}
 							}
 
-							model.setGeometry(cells[i], geo);
+							model.setGeometry(cell, geo);
 						}
 					}
 				}
@@ -4732,18 +4615,14 @@ public class mxGraph extends mxEventSource
 
 		if (cells != null)
 		{
-			for (int i = 0; i < cells.length; i++)
-			{
-				if (getModel().isVertex(cells[i]))
-				{
-					mxGeometry geo = getCellGeometry(cells[i]);
+			for (Object cell: cells) {
+				if (getModel().isVertex(cell)) {
+					mxGeometry geo = getCellGeometry(cell);
 
-					if (result == null)
-					{
+					if (result == null) {
 						result = new mxRectangle(geo);
 					}
-					else
-					{
+					else {
 						result.add(geo);
 					}
 				}
@@ -4798,19 +4677,15 @@ public class mxGraph extends mxEventSource
 
 		if (cells != null && cells.length > 0)
 		{
-			for (int i = 0; i < cells.length; i++)
-			{
-				mxRectangle tmp = getCellBounds(cells[i], includeEdges,
-						includeDescendants, boundingBox);
+			for (Object cell: cells) {
+				mxRectangle tmp = getCellBounds(cell, includeEdges,
+												includeDescendants, boundingBox);
 
-				if (tmp != null)
-				{
-					if (result == null)
-					{
+				if (tmp != null) {
+					if (result == null) {
 						result = new mxRectangle(tmp);
 					}
-					else
-					{
+					else {
 						result.add(tmp);
 					}
 				}
@@ -4832,22 +4707,19 @@ public class mxGraph extends mxEventSource
 		// Recursively includes connected edges
 		if (includeEdges)
 		{
-			Set<Object> allCells = new HashSet<Object>();
+			Set<Object> allCells = new HashSet<>();
 			allCells.add(cell);
 
-			Set<Object> edges = new HashSet<Object>(
+			Set<Object> edges = new HashSet<>(
 					Arrays.asList(getEdges(cell)));
 
 			while (!edges.isEmpty() && !allCells.containsAll(edges))
 			{
 				allCells.addAll(edges);
 
-				Set<Object> tmp = new HashSet<Object>();
-				Iterator<Object> it = edges.iterator();
+				Set<Object> tmp = new HashSet<>();
 
-				while (it.hasNext())
-				{
-					Object edge = it.next();
+				for (Object edge: edges) {
 					tmp.addAll(Arrays.asList(getEdges(edge)));
 				}
 
@@ -4866,22 +4738,18 @@ public class mxGraph extends mxEventSource
 		// Recursively includes the bounds of the children
 		if (includeDescendants)
 		{
-			for (int i = 0; i < cells.length; i++)
-			{
-				int childCount = model.getChildCount(cells[i]);
+			for (Object o: cells) {
+				int childCount = model.getChildCount(o);
 
-				for (int j = 0; j < childCount; j++)
-				{
+				for (int j = 0; j < childCount; j++) {
 					mxRectangle tmp = getCellBounds(
-							model.getChildAt(cells[i], j), includeEdges, true,
+							model.getChildAt(o, j), includeEdges, true,
 							boundingBox);
 
-					if (result != null)
-					{
+					if (result != null) {
 						result.add(tmp);
 					}
-					else
-					{
+					else {
 						result = tmp;
 					}
 				}
@@ -5106,7 +4974,7 @@ public class mxGraph extends mxEventSource
 
 		if (source != null && target != null)
 		{
-			StringBuffer error = new StringBuffer();
+			StringBuilder error = new StringBuilder();
 
 			// Checks if the cells are already connected
 			// and adds an error message if required			
@@ -5119,7 +4987,7 @@ public class mxGraph extends mxEventSource
 				if (tmp.length > 1 || (tmp.length == 1 && tmp[0] != edge))
 				{
 					error.append(mxResources.get("alreadyConnected",
-							"Already Connected") + "\n");
+												 "Already Connected")).append("\n");
 				}
 			}
 
@@ -5134,13 +5002,11 @@ public class mxGraph extends mxEventSource
 			// Checks the change against each multiplicity rule
 			if (multiplicities != null)
 			{
-				for (int i = 0; i < multiplicities.length; i++)
-				{
-					String err = multiplicities[i].check(this, edge, source,
-							target, sourceOut, targetIn);
+				for (mxMultiplicity multiplicity: multiplicities) {
+					String err = multiplicity.check(this, edge, source,
+													target, sourceOut, targetIn);
 
-					if (err != null)
-					{
+					if (err != null) {
 						error.append(err);
 					}
 				}
@@ -5184,33 +5050,29 @@ public class mxGraph extends mxEventSource
 	{
 		int outCount = mxGraphModel.getDirectedEdgeCount(model, cell, true);
 		int inCount = mxGraphModel.getDirectedEdgeCount(model, cell, false);
-		StringBuffer error = new StringBuffer();
+		StringBuilder error = new StringBuilder();
 		Object value = model.getValue(cell);
 
 		if (multiplicities != null)
 		{
-			for (int i = 0; i < multiplicities.length; i++)
-			{
-				mxMultiplicity rule = multiplicities[i];
+			for (mxMultiplicity rule: multiplicities) {
 				int max = rule.getMaxValue();
 
 				if (rule.source
 						&& mxUtils.isNode(value, rule.type, rule.attr,
-								rule.value)
+										  rule.value)
 						&& ((max == 0 && outCount > 0)
-								|| (rule.min == 1 && outCount == 0)
-								|| (max == 1 && outCount > 1)))
-				{
-					error.append(rule.countError + '\n');
+						|| (rule.min == 1 && outCount == 0)
+						|| (max == 1 && outCount > 1))) {
+					error.append(rule.countError).append('\n');
 				}
 				else if (!rule.source
 						&& mxUtils.isNode(value, rule.type, rule.attr,
-								rule.value)
+										  rule.value)
 						&& ((max == 0 && inCount > 0)
-								|| (rule.min == 1 && inCount == 0)
-								|| (max == 1 && inCount > 1)))
-				{
-					error.append(rule.countError + '\n');
+						|| (rule.min == 1 && inCount == 0)
+						|| (max == 1 && inCount > 1))) {
+					error.append(rule.countError).append('\n');
 				}
 			}
 		}
@@ -5598,13 +5460,7 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] getMovableCells(Object[] cells)
 	{
-		return mxGraphModel.filterCells(cells, new Filter()
-		{
-			public boolean filter(Object cell)
-			{
-				return isCellMovable(cell);
-			}
-		});
+		return mxGraphModel.filterCells(cells, this::isCellMovable);
 	}
 
 	/**
@@ -5736,13 +5592,7 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] getDeletableCells(Object[] cells)
 	{
-		return mxGraphModel.filterCells(cells, new Filter()
-		{
-			public boolean filter(Object cell)
-			{
-				return isCellDeletable(cell);
-			}
-		});
+		return mxGraphModel.filterCells(cells, this::isCellDeletable);
 	}
 
 	/**
@@ -5787,13 +5637,7 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] getCloneableCells(Object[] cells)
 	{
-		return mxGraphModel.filterCells(cells, new Filter()
-		{
-			public boolean filter(Object cell)
-			{
-				return isCellCloneable(cell);
-			}
-		});
+		return mxGraphModel.filterCells(cells, this::isCellCloneable);
 	}
 
 	/**
@@ -5890,16 +5734,13 @@ public class mxGraph extends mxEventSource
 		if (!isLabelsClipped())
 		{
 			mxCellState state = view.getState(cell);
-			Map<String, Object> style = (state != null) ? state.getStyle()
-					: getCellStyle(cell);
+			Map<String, Object> style = (state != null) ? state.getStyle() : getCellStyle(cell);
 
-			return (style != null)
-					? mxUtils.getString(style, mxConstants.STYLE_OVERFLOW, "")
-							.equals("hidden")
-					: false;
+			return (style != null) &&
+					mxUtils.getString(style, mxConstants.STYLE_OVERFLOW, "").equals("hidden");
 		}
-
-		return isLabelsClipped();
+		else
+			return true;
 	}
 
 	/**
@@ -6654,13 +6495,7 @@ public class mxGraph extends mxEventSource
 	 */
 	public Object[] getFoldableCells(Object[] cells, final boolean collapse)
 	{
-		return mxGraphModel.filterCells(cells, new Filter()
-		{
-			public boolean filter(Object cell)
-			{
-				return isCellFoldable(cell, collapse);
-			}
-		});
+		return mxGraphModel.filterCells(cells, cell -> isCellFoldable(cell, collapse));
 	}
 
 	/**
@@ -6827,10 +6662,8 @@ public class mxGraph extends mxEventSource
 	{
 		if (!isSwimlaneNesting())
 		{
-			for (int i = 0; i < cells.length; i++)
-			{
-				if (isSwimlane(cells[i]))
-				{
+			for (Object o: cells) {
+				if (isSwimlane(o)) {
 					return null;
 				}
 			}
@@ -6868,7 +6701,7 @@ public class mxGraph extends mxEventSource
 
 		return (model.getParent(cell) != model.getRoot()
 				&& !mxUtils.contains(cells, cell)) ? cell : null;
-	};
+	}
 
 	//
 	// Cell retrieval
@@ -6952,14 +6785,12 @@ public class mxGraph extends mxEventSource
 	{
 		Object[] cells = mxGraphModel.getChildCells(model, parent, vertices,
 				edges);
-		List<Object> result = new ArrayList<Object>(cells.length);
+		List<Object> result = new ArrayList<>(cells.length);
 
 		// Filters out the non-visible child cells
-		for (int i = 0; i < cells.length; i++)
-		{
-			if (isCellVisible(cells[i]))
-			{
-				result.add(cells[i]);
+		for (Object cell: cells) {
+			if (isCellVisible(cell)) {
+				result.add(cell);
 			}
 		}
 
@@ -7129,7 +6960,7 @@ public class mxGraph extends mxEventSource
 			boolean outgoing, boolean includeLoops, boolean recurse)
 	{
 		boolean isCollapsed = isCellCollapsed(cell);
-		List<Object> edges = new ArrayList<Object>();
+		List<Object> edges = new ArrayList<>();
 		int childCount = model.getChildCount(cell);
 
 		for (int i = 0; i < childCount; i++)
@@ -7138,19 +6969,14 @@ public class mxGraph extends mxEventSource
 
 			if (isCollapsed || !isCellVisible(child))
 			{
-				edges.addAll(Arrays.asList(mxGraphModel.getEdges(model, child,
-						incoming, outgoing, includeLoops)));
+				edges.addAll(Arrays.asList(mxGraphModel.getEdges(model, child, incoming, outgoing, includeLoops)));
 			}
 		}
 
-		edges.addAll(Arrays.asList(mxGraphModel.getEdges(model, cell, incoming,
-				outgoing, includeLoops)));
-		List<Object> result = new ArrayList<Object>(edges.size());
-		Iterator<Object> it = edges.iterator();
+		edges.addAll(Arrays.asList(mxGraphModel.getEdges(model, cell, incoming, outgoing, includeLoops)));
+		List<Object> result = new ArrayList<>(edges.size());
 
-		while (it.hasNext())
-		{
-			Object edge = it.next();
+		for (Object edge: edges) {
 			mxCellState state = view.getState(edge);
 			Object source = (state != null) ? state.getVisibleTerminal(true)
 					: view.getVisibleTerminal(edge, true);
@@ -7159,12 +6985,10 @@ public class mxGraph extends mxEventSource
 
 			if ((includeLoops && source == target)
 					|| ((source != target) && ((incoming && target == cell
-							&& (parent == null || isValidAncestor(source,
-									parent, recurse)))
-							|| (outgoing && source == cell
-									&& (parent == null || isValidAncestor(
-											target, parent, recurse))))))
-			{
+					&& (parent == null || isValidAncestor(source, parent, recurse)))
+					|| (outgoing && source == cell
+					&& (parent == null || isValidAncestor(
+					target, parent, recurse)))))) {
 				result.add(edge);
 			}
 		}
@@ -7218,25 +7042,23 @@ public class mxGraph extends mxEventSource
 	public Object[] getOpposites(Object[] edges, Object terminal,
 			boolean sources, boolean targets)
 	{
-		Collection<Object> terminals = new LinkedHashSet<Object>();
+		Collection<Object> terminals = new LinkedHashSet<>();
 
 		if (edges != null)
 		{
-			for (int i = 0; i < edges.length; i++)
-			{
-				mxCellState state = view.getState(edges[i]);
+			for (Object edge: edges) {
+				mxCellState state = view.getState(edge);
 				Object source = (state != null) ? state.getVisibleTerminal(true)
-						: view.getVisibleTerminal(edges[i], true);
+						: view.getVisibleTerminal(edge, true);
 				Object target = (state != null)
 						? state.getVisibleTerminal(false)
-						: view.getVisibleTerminal(edges[i], false);
+						: view.getVisibleTerminal(edge, false);
 
 				// Checks if the terminal is the source of
 				// the edge and if the target should be
 				// stored in the result
 				if (targets && source == terminal && target != null
-						&& target != terminal)
-				{
+						&& target != terminal) {
 					terminals.add(target);
 				}
 
@@ -7244,8 +7066,7 @@ public class mxGraph extends mxEventSource
 				// the edge and if the source should be
 				// stored in the result
 				else if (sources && target == terminal && source != null
-						&& source != terminal)
-				{
+						&& source != terminal) {
 					terminals.add(source);
 				}
 			}
@@ -7282,22 +7103,20 @@ public class mxGraph extends mxEventSource
 			boolean directed)
 	{
 		Object[] edges = getEdges(source);
-		List<Object> result = new ArrayList<Object>(edges.length);
+		List<Object> result = new ArrayList<>(edges.length);
 
 		// Checks if the edge is connected to the correct
 		// cell and adds any match to the result
-		for (int i = 0; i < edges.length; i++)
-		{
-			mxCellState state = view.getState(edges[i]);
+		for (Object edge: edges) {
+			mxCellState state = view.getState(edge);
 			Object src = (state != null) ? state.getVisibleTerminal(true)
-					: view.getVisibleTerminal(edges[i], true);
+					: view.getVisibleTerminal(edge, true);
 			Object trg = (state != null) ? state.getVisibleTerminal(false)
-					: view.getVisibleTerminal(edges[i], false);
+					: view.getVisibleTerminal(edge, false);
 
 			if ((src == source && trg == target)
-					|| (!directed && src == target && trg == source))
-			{
-				result.add(edges[i]);
+					|| (!directed && src == target && trg == source)) {
+				result.add(edge);
 			}
 		}
 
@@ -7327,7 +7146,7 @@ public class mxGraph extends mxEventSource
 		}
 
 		int childCount = model.getChildCount(parent);
-		List<Object> result = new ArrayList<Object>(childCount);
+		List<Object> result = new ArrayList<>(childCount);
 
 		if (rightHalfpane || bottomHalfpane)
 		{
@@ -7403,7 +7222,7 @@ public class mxGraph extends mxEventSource
 	public List<Object> findTreeRoots(Object parent, boolean isolate,
 			boolean invert)
 	{
-		List<Object> roots = new ArrayList<Object>();
+		List<Object> roots = new ArrayList<>();
 
 		if (parent != null)
 		{
@@ -7422,16 +7241,13 @@ public class mxGraph extends mxEventSource
 					int fanOut = 0;
 					int fanIn = 0;
 
-					for (int j = 0; j < conns.length; j++)
-					{
-						Object src = view.getVisibleTerminal(conns[j], true);
+					for (Object conn: conns) {
+						Object src = view.getVisibleTerminal(conn, true);
 
-						if (src == cell)
-						{
+						if (src == cell) {
 							fanOut++;
 						}
-						else
-						{
+						else {
 							fanIn++;
 						}
 					}
@@ -7510,7 +7326,7 @@ public class mxGraph extends mxEventSource
 		{
 			if (visited == null)
 			{
-				visited = new HashSet<Object>();
+				visited = new HashSet<>();
 			}
 
 			if (!visited.contains(vertex))
@@ -7795,27 +7611,19 @@ public class mxGraph extends mxEventSource
 	 * @param parent Optional cell that acts as the root of the recursion.
 	 * Default is <code>defaultParent</code>.
 	 */
-	public void selectCells(final boolean vertices, final boolean edges,
-			Object parent)
+	public void selectCells(final boolean vertices, final boolean edges, Object parent)
 	{
 		if (parent == null)
 		{
 			parent = getDefaultParent();
 		}
 
-		Collection<Object> cells = mxGraphModel.filterDescendants(getModel(),
-				new mxGraphModel.Filter()
-				{
-
-					public boolean filter(Object cell)
-					{
-						return view.getState(cell) != null
-								&& model.getChildCount(cell) == 0
-								&& ((model.isVertex(cell) && vertices)
-										|| (model.isEdge(cell) && edges));
-					}
-
-				});
+		Collection<Object> cells =
+				mxGraphModel.filterDescendants(getModel(),
+											   cell -> view.getState(cell) != null
+													   && model.getChildCount(cell) == 0
+													   && ((model.isVertex(cell) && vertices)
+													   || (model.isEdge(cell) && edges)));
 		setSelectionCells(cells);
 	}
 
@@ -7841,10 +7649,7 @@ public class mxGraph extends mxEventSource
 
 		Object[] children = mxGraphModel.getChildren(model, parent);
 
-		if (children != null)
-		{
-			setSelectionCells(children);
-		}
+		setSelectionCells(children);
 	}
 
 	//
@@ -7982,7 +7787,7 @@ public class mxGraph extends mxEventSource
 
 				if (elem.getNodeName().startsWith("v:"))
 				{
-					elem.setAttribute("href", link.toString());
+					elem.setAttribute("href", link);
 
 					if (title != null)
 					{
@@ -7993,7 +7798,7 @@ public class mxGraph extends mxEventSource
 						.getLength() > 0)
 				{
 					Element xlink = elem.getOwnerDocument().createElement("a");
-					xlink.setAttribute("xlink:href", link.toString());
+					xlink.setAttribute("xlink:href", link);
 
 					elem.getParentNode().replaceChild(xlink, elem);
 					xlink.appendChild(elem);
@@ -8008,7 +7813,7 @@ public class mxGraph extends mxEventSource
 				else
 				{
 					Element a = elem.getOwnerDocument().createElement("a");
-					a.setAttribute("href", link.toString());
+					a.setAttribute("href", link);
 					a.setAttribute("style", "text-decoration:none;");
 
 					elem.getParentNode().replaceChild(a, elem);
@@ -8095,16 +7900,13 @@ public class mxGraph extends mxEventSource
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(getClass().getSimpleName());
-		builder.append(" [");
-		builder.append("model=");
-		builder.append(model);
-		builder.append(", view=");
-		builder.append(view);
-		builder.append("]");
 
-		return builder.toString();
+		String builder = getClass().getSimpleName() +
+				" [" +
+				"model=" + model +
+				", view=" + view +
+				"]";
+		return builder;
 	}
 
 	/**

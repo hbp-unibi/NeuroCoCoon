@@ -3,6 +3,8 @@ package de.unibi.hbp.ncc.lang;
 import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,9 +38,10 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       byId.add(this);
    }
 
+   // for (temporary) serialization by mxGraph operations
    int getId () { return id; }
 
-   static Namespace<?> forId (int id) { return byId.get(id); }
+   public static Namespace<?> forId (int id) { return byId.get(id); }
 
    // TODO should name validation (and normalization?) been done here?
    void add (T member) {
@@ -70,6 +73,8 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       return members.values().iterator();
    }
 
+   public Collection<T> getAllMembers () { return Collections.unmodifiableCollection(members.values()); }
+
    public ListModel<T> getListModel () {
       if (listModel == null)
          listModel = new NamespaceModel();
@@ -98,7 +103,6 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    String getPythonDiscriminator () {
       return pythonDiscriminator;
    }
-
 
    private class NamespaceModel extends AbstractListModel<T> {
       private List<T> elements;

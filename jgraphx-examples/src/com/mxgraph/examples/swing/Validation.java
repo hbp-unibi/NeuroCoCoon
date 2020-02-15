@@ -17,6 +17,7 @@ import org.w3c.dom.Element;
 
 import javax.swing.JFrame;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Validation extends JFrame
 {
@@ -63,18 +64,22 @@ public class Validation extends JFrame
 		mxMultiplicity[] multiplicities = new mxMultiplicity[3];
 
 		// Source nodes needs 1..2 connected Targets
-		multiplicities[0] = new mxMultiplicity(true, "Source", null, null, 1,
-				"2", Arrays.asList(new String[] { "Target" }),
+		multiplicities[0] = new mxMultiplicity(
+				true, "Source", null, null, 1,
+				"2", Collections.singletonList("Target"),
 				"Source Must Have 1 or 2 Targets",
 				"Source Must Connect to Target", true);
 
 		// Source node does not want any incoming connections
-		multiplicities[1] = new mxMultiplicity(false, "Source", null, null, 0,
-				"0", null, "Source Must Have No Incoming Edge", null, true); // Type does not matter
+		multiplicities[1] = new mxMultiplicity(
+				false, "Source", null, null, 0,
+				"0", null, "Source Must Have No Incoming Edge",
+				null, true); // Type does not matter
 
 		// Target needs exactly one incoming connection from Source
-		multiplicities[2] = new mxMultiplicity(false, "Target", null, null, 1,
-				"1", Arrays.asList(new String[] { "Source" }),
+		multiplicities[2] = new mxMultiplicity(
+				false, "Target", null, null, 1,
+				"1", Collections.singletonList("Source"),
 				"Target Must Have 1 Source", "Target Must Connect From Source",
 				true);
 
@@ -92,13 +97,7 @@ public class Validation extends JFrame
 
 		// Installs automatic validation (use editor.validation = true
 		// if you are using an mxEditor instance)
-		graph.getModel().addListener(mxEvent.CHANGE, new mxIEventListener()
-		{
-			public void invoke(Object sender, mxEventObject evt)
-			{
-				graphComponent.validateGraph();
-			}
-		});
+		graph.getModel().addListener(mxEvent.CHANGE, (sender, evt) -> graphComponent.validateGraph());
 
 		// Initial validation
 		graphComponent.validateGraph();

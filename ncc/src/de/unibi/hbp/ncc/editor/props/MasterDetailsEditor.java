@@ -15,7 +15,8 @@ import java.awt.FlowLayout;
 import java.util.function.Function;
 
 public class MasterDetailsEditor<E extends NamedEntity<E>> {
-   private final JList<E> masterList;
+   private final JList<E> masterList;  // TODO use 2 column table with predefined-indicator and editable name
+   // TODO how to notify the details editor on rename
    private final DetailsEditor detailsEditor;
    private final JComponent component;
 

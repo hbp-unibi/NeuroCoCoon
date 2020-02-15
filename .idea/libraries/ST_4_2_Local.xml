@@ -1,7 +1,8 @@
 <component name="libraryTable">
-  <library name="ST-4.2">
+  <library name="ST-4.2 Local">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/StringTemplate4/ST-4.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/StringTemplate4/antlr-runtime-4.8.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

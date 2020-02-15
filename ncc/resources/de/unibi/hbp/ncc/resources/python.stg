@@ -1,0 +1,119 @@
+define_population(pop) ::= <<
+<pop.pythonName> = sim.Population(<pop.neuronCount>, sim.IF_cond_exp, neuron_params)
+
+>>
+program(prog, pops) ::= <<
+import numpy.random
+from pyNN.utility import get_simulator
+from pyNN.utility.plotting import Figure, Panel
+
+_usr_cnst_full = 0.015
+_usr_cnst_half = 0.0075
+_usr_cnst_inh_twice = -0.03
+
+neuron_params = {
+    'e_rev_E': 0.0,
+    'e_rev_I': -100.0,
+    'tau_syn_E': 2.0,
+    'tau_syn_I': 2.0,
+    'v_rest': -70.0,
+    'v_reset': -80.0,
+    'v_thresh': -65.0,
+    'tau_refrac': 2.0,
+    'tau_m': 10,
+    'cm': 0.2
+}
+
+runtime = 300
+
+sim, options = get_simulator(("--image-viewer", "Executable for displaying PNG images of plots", {"default": '-'}))
+
+sim.setup(timestep=<prog.timeStep>)
+<pops:define_population()>
+_usr_ana_pop_1 = sim.Population(1, sim.IF_cond_exp, neuron_params)
+_usr_ana_pop_1 = sim.Population(1, sim.IF_cond_exp, neuron_params)
+_usr_ana_source_x = sim.Population(1, sim.SpikeSourceArray(spike_times=[50, 150]))
+_usr_ana_source_y = sim.Population(1, sim.SpikeSourceArray(spike_times=[100, 150]))
+_usr_ana_output = sim.Population(1, sim.IF_cond_exp, neuron_params)
+
+one_to_one = sim.OneToOneConnector()
+all_to_all = sim.AllToAllConnector()
+
+sim.Projection(_usr_ana_source_x, _usr_ana_pop_1, one_to_one, sim.StaticSynapse(weight=_usr_cnst_full))
+sim.Projection(_usr_ana_source_y, _usr_ana_pop_2, one_to_one, sim.StaticSynapse(weight=_usr_cnst_half))
+sim.Projection(_usr_ana_source_x, _usr_ana_pop_2, one_to_one, sim.StaticSynapse(weight=_usr_cnst_half))
+sim.Projection(_usr_ana_source_y, _usr_ana_pop_1, one_to_one, sim.StaticSynapse(weight=_usr_cnst_full))
+sim.Projection(_usr_ana_pop_1, _usr_ana_output, one_to_one, sim.StaticSynapse(weight=_usr_cnst_full))
+sim.Projection(_usr_ana_pop_2, _usr_ana_output, one_to_one, sim.StaticSynapse(weight=_usr_cnst_inh_twice))
+
+_usr_ana_source_x.record('spikes')
+_usr_ana_source_y.record('spikes')
+_usr_ana_output.record('spikes')
+_usr_ana_pop_1.record('v')
+_usr_ana_pop_2.record('v')
+
+sim.run(runtime)
+
+from matplotlib.axes import Axes
+
+def fix_legends(pynn_fig):
+   for panel in pynn_fig.fig.get_children():
+      if isinstance(panel, Axes):
+         gids = [ child.get_gid() for child in panel.get_children() if child.get_gid() ]
+         if gids:
+            panel.legend(gids[0].split(', '))
+
+
+fig = Figure(
+    Panel(
+        _usr_ana_source_x.get_data().segments[0].spiketrains,
+        xlabel="Time (ms)", xticks=True,
+        gid='source_x',
+        line_properties= [{'color': 'b'}, ],
+    ),
+    Panel(
+        _usr_ana_source_y.get_data().segments[0].spiketrains,
+        xlabel="Time (ms)", xticks=True,
+        gid='source_y',
+        line_properties= [{'color': 'b'}, ],
+    ),
+    Panel(
+        _usr_ana_output.get_data().segments[0].spiketrains,
+        xlabel="Time (ms)", xticks=True,
+        gid='output',
+        line_properties= [{'color': 'b'}, ],
+    ),
+  title="XOR -- behavior",
+  annotations="Simulated with %s" % options.simulator.upper()
+)
+fix_legends(fig)
+fig.save("XOR_behavior.png")
+fig.fig.clear()
+
+fig = Figure(
+    Panel(
+        _usr_ana_pop_1.get_data().segments[0].filter(name='v')[0],
+        xlabel="Time (ms)", xticks=True,
+        data_labels=['pop_1'],
+        line_properties= [{'color': 'b'}, ],
+    ),
+    Panel(
+        _usr_ana_pop_2.get_data().segments[0].filter(name='v')[0],
+        xlabel="Time (ms)", xticks=True,
+        data_labels=['pop_2'],
+        line_properties= [{'color': 'b'}, ],
+    ),
+  title="XOR -- hidden",
+  annotations="Simulated with %s" % options.simulator.upper()
+)
+fix_legends(fig)
+fig.save("XOR_hidden.png")
+fig.fig.clear()
+
+
+if options.image_viewer != '-':
+  import subprocess
+  subprocess.run([options.image_viewer, "XOR_behavior.png", "XOR_hidden.png"])
+
+sim.end()
+>>

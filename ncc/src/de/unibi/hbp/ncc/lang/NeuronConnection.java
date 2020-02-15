@@ -2,12 +2,14 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.serialize.SerializedNeuronConnection;
 
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class NeuronConnection extends LanguageEntity {
+public class NeuronConnection extends LanguageEntity implements Serializable {
    private Namespace<SynapseType> synapseTypeNamespace;
    private EditableNameProp<SynapseType> synapseType;
 
@@ -78,4 +80,10 @@ public class NeuronConnection extends LanguageEntity {
       return new NeuronConnection(this);
    }
 
+   public SynapseType getSynapseType () { return synapseType.getValue(); }
+
+   @Override
+   public String getCellStyle () {
+      return synapseType.getValue().getEdgeStyle();
+   }
 }

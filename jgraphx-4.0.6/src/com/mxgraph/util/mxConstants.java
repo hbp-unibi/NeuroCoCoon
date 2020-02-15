@@ -3,6 +3,8 @@
  */
 package com.mxgraph.util;
 
+import java.awt.Font;
+
 /**
  * Contains all global constants.
  */
@@ -68,7 +70,7 @@ public class mxConstants
 	 * Defines the default font family. Default is "Dialog". (To be replaced
 	 * with Font.DIALOG after EOL of Java 1.5.)
 	 */
-	public static String DEFAULT_FONTFAMILY = "Dialog";
+	public static String DEFAULT_FONTFAMILY = Font.DIALOG;
 
 	/**
 	 * Defines the default font size (in px). Default is 11.

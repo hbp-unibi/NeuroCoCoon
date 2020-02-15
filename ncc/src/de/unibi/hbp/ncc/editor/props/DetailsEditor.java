@@ -2,58 +2,117 @@ package de.unibi.hbp.ncc.editor.props;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
+import javafx.scene.input.KeyCode;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.JTextComponent;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
 public class DetailsEditor {
-
    private PropsTableModel tableModel;
+   private JTable table;
    private JComponent component;
 
    public DetailsEditor () {
       tableModel = new PropsTableModel();
       TableColumnModel tableColumnModel = new DefaultTableColumnModel();
-      TableColumn labelColumn = new TableColumn(0, 150);
+      TableColumn markerColumn = new TableColumn(0, 30);
+      // no header text
+      markerColumn.setMaxWidth(30);
+      tableColumnModel.addColumn(markerColumn);
+      TableColumn labelColumn = new TableColumn(1, 150);
       labelColumn.setHeaderValue("Property");
       labelColumn.setCellRenderer(new PropNameCellRenderer(tableModel));
       tableColumnModel.addColumn(labelColumn);
-      TableColumn valueColumn = new TableColumn(1);
+      TableColumn valueColumn = new TableColumn(2);
       valueColumn.setHeaderValue("Value");
       valueColumn.setCellRenderer(new PropValueCellRenderer());
       valueColumn.setCellEditor(new PropValueCellEditor(tableModel));
       tableColumnModel.addColumn(valueColumn);
-      JTable table = new JTable(tableModel, tableColumnModel);
+      table = new JTable(tableModel, tableColumnModel);
+      // replace action for ENTER, since next row would be selected automatically
+      ActionMap actions = table.getActionMap();
+      actions.put("smartNavNext", new SmartNavigationAction("smartNavNext", +1));
+      actions.put("smartNavPrev", new SmartNavigationAction("smartNavPrev", -1));
+      InputMap whenAncestor = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "smartNavNext");
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), "smartNavPrev");
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "smartNavNext");
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "smartNavPrev");
       table.setGridColor(Color.LIGHT_GRAY);
       table.setShowGrid(true);
       table.setFillsViewportHeight(true);
       component = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
    }
 
-   public void setSubject (mxGraphComponent graphComponent, mxCell cell, LanguageEntity subject) {
-      tableModel.setSubject(graphComponent, cell, subject);
+   private class SmartNavigationAction extends AbstractAction {
+      private int rowDelta;
+
+      public SmartNavigationAction (String name, int rowDelta) {
+         super(name);
+         this.rowDelta = rowDelta;
+      }
+
+      public void actionPerformed(ActionEvent e) {
+         int row, col;
+         if (table.isEditing()) {
+            row = table.getEditingRow();
+            col = table.getEditingColumn();
+            if (!table.getCellEditor().stopCellEditing())  // store user input, if it is valid
+               return;
+            row += rowDelta;
+            if (row < 0 || row >= tableModel.getRowCount())
+               return;
+            table.changeSelection(row, col, false, false);
+         }
+         else {
+            row = table.getSelectedRow();
+            col = table.getSelectedColumn();
+         }
+         if (table.editCellAt(row, col)) {
+            Component editor = table.getEditorComponent();
+            editor.requestFocusInWindow();
+            if (editor instanceof JTextComponent)
+               ((JTextComponent) editor).selectAll();
+         }
+      }
+   }
+
+   public void setSubject (mxGraphComponent graphComponent, LanguageEntity subject) {
+      tableModel.setSubject(graphComponent, subject);
    }
 
    public void setSubject (LanguageEntity subject) {  // for entities without a visual representation
-      tableModel.setSubject(null, null, subject);
+      tableModel.setSubject(null, subject);
    }
 
    public JComponent getComponent () { return component; }
@@ -63,12 +122,18 @@ public class DetailsEditor {
 
       PropNameCellRenderer (PropsTableModel tableModel) { this.tableModel = tableModel; }
 
+      private static Font normalCellFont, italicsCellFont;
+
       @Override
       public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus,
                                                       int row, int column) {
          Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-         component.setForeground(column == 0 && tableModel.isIndirectProp(row) ? Color.BLUE : Color.BLACK);
-         // component.setFont();
+         if (normalCellFont == null) {
+            normalCellFont = component.getFont();
+            italicsCellFont = new Font(normalCellFont.getName(), Font.ITALIC, normalCellFont.getSize());
+         }
+         component.setFont(column == 1 && tableModel.isIndirectProp(row) ? italicsCellFont : normalCellFont);
+         // TODO use component.setFont(); with italics instead of blue
          return component;
       }
    }
@@ -111,7 +176,6 @@ public class DetailsEditor {
 
    static class PropsTableModel extends AbstractTableModel {
       private mxGraphComponent graphComponent;
-      private mxCell cell;
       private LanguageEntity subject;
       List<ReadOnlyProp<?>> readOnlyProps;
       List<EditableProp<?>> editableProps;
@@ -122,10 +186,8 @@ public class DetailsEditor {
          editableProps = Collections.emptyList();
       }
 
-      void setSubject (mxGraphComponent graphComponent, mxCell cell, LanguageEntity subject) {
-         assert (graphComponent == null) == (cell == null) : "graph and cell are needed together";
+      void setSubject (mxGraphComponent graphComponent, LanguageEntity subject) {
          this.graphComponent = graphComponent;
-         this.cell = cell;
          if (!Objects.equals(this.subject, subject))
             updateSubject(subject);
       }
@@ -133,7 +195,7 @@ public class DetailsEditor {
       private void updateSubject (LanguageEntity subject) {
          this.subject = subject;
          if (subject != null) {
-            readOnlyProps = subject.getReadOnlyProps();
+            readOnlyProps = subject.getDirectAndIndirectReadOnlyProps();
             editableProps = subject.getDirectAndIndirectEditableProps();
          }
          else {
@@ -144,20 +206,10 @@ public class DetailsEditor {
          fireTableDataChanged();
       }
 
-      boolean isIndirectProp (int rowIndex) {
-         return !subject.equals(getAnyPropForRow(rowIndex).getParentEntity());
-      }
+      boolean isIndirectProp (int rowIndex) { return isIndirectProp(getAnyPropForRow(rowIndex)); }
 
-      void notifyCell (EditableProp.Impact impact) {
-         if (graphComponent == null)
-            return;
-         if (impact == EditableProp.Impact.CELL_LABEL)
-            graphComponent.labelChanged(cell, subject, null);
-         else if (impact == EditableProp.Impact.CELL_APPEARANCE)
-            graphComponent.refresh();  // FIXME this is too coarse grained
-         // TODO handle other impact levels
-      }
-
+      boolean isIndirectProp (ReadOnlyProp<?> prop) { return !subject.equals(prop.getParentEntity()); }
+      
       @Override
       public int getRowCount () {
          return readOnlyProps.size() + editableProps.size();
@@ -165,7 +217,7 @@ public class DetailsEditor {
 
       @Override
       public int getColumnCount () {
-         return 2;
+         return 3;
       }
 
       private ReadOnlyProp<?> getAnyPropForRow (int rowIndex) {
@@ -180,9 +232,27 @@ public class DetailsEditor {
          return editableProps.get(rowIndex - readOnlyProps.size());
       }
 
+      private String getMarker (boolean isReadOnly, boolean isIndirect, boolean isPredefined) {
+         StringBuilder sb = new StringBuilder(2);
+         if (isIndirect) {
+            sb.append('\u279d');
+            if (isReadOnly || isPredefined)
+               sb.append('\u2008');
+         }
+         if (isReadOnly) sb.append('\u20e0');
+         else if (isPredefined) sb.append('\u29bf');
+         return sb.toString();
+      }
+
       @Override
       public Object getValueAt (int rowIndex, int columnIndex) {
-         if (columnIndex == 0)
+         if (columnIndex == 0){
+            ReadOnlyProp<?> prop = getAnyPropForRow(rowIndex);
+            return getMarker(!(prop instanceof EditableProp<?>),
+                             isIndirectProp(prop),
+                             prop.getParentEntity().isPredefined());
+         }
+         if (columnIndex == 1)
             return getAnyPropForRow(rowIndex).getPropName(true);
          else
             return getAnyPropForRow(rowIndex).getValue();
@@ -190,14 +260,30 @@ public class DetailsEditor {
 
       @Override
       public void setValueAt (Object value, int rowIndex, int columnIndex) {
-         assert columnIndex == 1 : "only value column can be edited";
+         assert columnIndex == 2 : "only value column can be edited";
          if (value != null) {
             EditableProp<?> prop = getPropForRow(rowIndex);
             prop.setRawValue(value);
             fireTableCellUpdated(rowIndex, columnIndex);
             EnumSet<EditableProp.Impact> impact = prop.getChangeImpact();
-            if (impact.contains(EditableProp.Impact.CELL_LABEL))
-               notifyCell(EditableProp.Impact.CELL_LABEL);
+            LanguageEntity parent = prop.getParentEntity();
+            mxCell cell = parent.getOwningCell();
+            if (cell != null && impact.contains(EditableProp.Impact.CELL_LABEL)) {
+               graphComponent.labelChanged(cell, subject, null);
+            }
+            if (cell != null && impact.contains(EditableProp.Impact.CELL_STYLE)) {
+               String style = parent.getCellStyle();
+               if (style != null)
+                  graphComponent.getGraph().setCellStyle(style, new Object[] { cell });
+            }
+            if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_STYLE)) {
+               String style = parent.getCellStyle();
+               if (style != null) {
+                  mxGraph graph = graphComponent.getGraph();
+                  List<mxCell> dependentCells = parent.getDependentCells(graph.getModel());
+                  graph.setCellStyle(style, dependentCells.toArray());
+               }
+            }
             // FIXME handle in between cases
             if (impact.contains(EditableProp.Impact.OTHER_PROPS_VISIBILITY))
                updateSubject(subject);  // force set of visible table rows to change
@@ -206,7 +292,7 @@ public class DetailsEditor {
 
       @Override
       public boolean isCellEditable (int rowIndex, int columnIndex) {
-         return columnIndex == 1 && rowIndex >= readOnlyProps.size() &&
+         return columnIndex == 2 && rowIndex >= readOnlyProps.size() &&
                !getAnyPropForRow(rowIndex).getParentEntity().isPredefined();
       }
 

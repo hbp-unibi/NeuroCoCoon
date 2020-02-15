@@ -26,8 +26,11 @@ import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronPopulation;
 import de.unibi.hbp.ncc.lang.NeuronType;
+import de.unibi.hbp.ncc.lang.PoissonSource;
 import de.unibi.hbp.ncc.lang.Program;
+import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
+import de.unibi.hbp.ncc.lang.StandardPopulation;
 import de.unibi.hbp.ncc.lang.SynapseType;
 import org.w3c.dom.Document;
 
@@ -68,6 +71,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		programGraphComponent = component;
 	}
 
+	public Program getProgram () { return programGraphComponent.getProgramGraph().getProgram(); }
+
 	@Override
 	public void initialize () {
 		super.initialize();
@@ -81,378 +86,39 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		EditorPalette modulesPalette = insertPalette(mxResources.get("modules"));
 		// EditorPalette symbolsPalette = insertPalette(mxResources.get("symbols"));
 
+		detailsEditor.setSubject(getProgram());
 		graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> {
 			mxGraphSelectionModel model = (mxGraphSelectionModel) sender;
 			if (model.isEmpty())
-				detailsEditor.setSubject(graphComponent, null, null);
+				detailsEditor.setSubject(getProgram());
 			else {
 				Collection<?> added = (Collection<?>) evt.getProperty("removed");  // yes "added" and "removed" are swapped, see notice in mxGraphSelectionModel
 				if (added != null && !added.isEmpty()) {
 					Object tmp = added.iterator().next();
 					// System.err.println("selected: " + tmp);
 					if (tmp instanceof mxCell) {
-						mxCell cell = (mxCell) tmp;
-						Object value = cell.getValue();
+						Object value = ((mxCell) tmp).getValue();
 						if (value instanceof LanguageEntity)
-							detailsEditor.setSubject(graphComponent, cell, (LanguageEntity) value);
+							detailsEditor.setSubject(graphComponent, (LanguageEntity) value);
 					}
 				}
 			}
 		});
 
 		// Adds some template cells for dropping into the graph
-		/*
-		basicPalette
-				.addTemplate(
-						"Container",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/swimlane.png")),
-						"swimlane", 280, 280, "Container");
-		basicPalette
-				.addTemplate(
-						"Icon",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/rounded.png")),
-						"icon;image=/de/unibi/hbp/ncc/images/wrench.png",
-						70, 70, "Icon");
-		basicPalette
-				.addTemplate(
-						"Label",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/rounded.png")),
-						"label;image=/de/unibi/hbp/ncc/images/gear.png",
-						130, 50, "Label");
-		basicPalette
-				.addTemplate(
-						"Rectangle",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/rectangle.png")),
-						null, 160, 120, "");
-		basicPalette
-				.addTemplate(
-						"Rounded Rectangle",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/rounded.png")),
-						"rounded=1", 160, 120, "");
-		basicPalette
-				.addTemplate(
-						"Double Rectangle",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/doublerectangle.png")),
-						"rectangle;shape=doubleRectangle", 160, 120, "");
-		basicPalette
-				.addTemplate(
-						"Ellipse",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/ellipse.png")),
-						"ellipse", 160, 160, "");
-		basicPalette
-				.addTemplate(
-						"Double Ellipse",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/doubleellipse.png")),
-						"ellipse;shape=doubleEllipse", 160, 160, "");
-		 */
-		basicPalette.addTemplate("Population",
-								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
-								 "rectangle;fillColor=#ddddff;strokeColor=#bbbbdd",
-								 60, 80, NeuronPopulation.CREATOR);
+
 		basicPalette.addTemplate("Spikes",
-								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
-								 "triangle;fillColor=#ddffdd;strokeColor=#bbddbb",
-								 60, 80, NeuronPopulation.CREATOR);
+								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/spikesource.png")),
+								 "spikesource",
+								 100, 100, RegularSpikeSource.CREATOR);
 		basicPalette.addTemplate("Poisson",
-								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/triangle.png")),
-								 "rhombus;fillColor=#ddff88;strokeColor=#bbdd77",
-								 60, 80, NeuronPopulation.CREATOR);
-		/*
-		basicPalette.addEdgeTemplate("Connection",
-									 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/straight.png")),
-									 "straight", 120, 120, NeuronConnection.CREATOR);
-		 */
-
-		/*
-		basicPalette
-				.addTemplate(
-						"Rhombus",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/rhombus.png")),
-						"rhombus", 160, 160, "");
-		basicPalette
-				.addTemplate(
-						"Horizontal Line",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/hline.png")),
-						"line", 160, 10, "");
-		basicPalette
-				.addTemplate(
-						"Hexagon",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/hexagon.png")),
-						"shape=hexagon", 160, 120, "");
-		basicPalette
-				.addTemplate(
-						"Cylinder",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/cylinder.png")),
-						"shape=cylinder", 120, 160, "");
-		basicPalette
-				.addTemplate(
-						"Actor",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/actor.png")),
-						"shape=actor", 120, 160, "");
-		basicPalette
-				.addTemplate(
-						"Cloud",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/cloud.png")),
-						"ellipse;shape=cloud", 160, 120, "");
-
-		basicPalette
-				.addEdgeTemplate(
-						"Straight",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/straight.png")),
-						"straight", 120, 120, "");
-		basicPalette
-				.addEdgeTemplate(
-						"Horizontal Connector",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/connect.png")),
-						null, 100, 100, "");
-		basicPalette
-				.addEdgeTemplate(
-						"Vertical Connector",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/vertical.png")),
-						"vertical", 100, 100, "");
-		basicPalette
-				.addEdgeTemplate(
-						"Entity Relation",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/entity.png")),
-						"entity", 100, 100, "");
-		basicPalette
-				.addEdgeTemplate(
-						"Arrow",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/arrow.png")),
-						"arrow", 120, 120, "");
-
-		modulesPalette
-				.addTemplate(
-						"Bell",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/bell.png")),
-						"image;image=/de/unibi/hbp/ncc/images/bell.png",
-						50, 50, "Bell");
-		modulesPalette
-				.addTemplate(
-						"Box",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/box.png")),
-						"image;image=/de/unibi/hbp/ncc/images/box.png",
-						50, 50, "Box");
-		modulesPalette
-				.addTemplate(
-						"Cube",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/cube_green.png")),
-						"image;image=/de/unibi/hbp/ncc/images/cube_green.png",
-						50, 50, "Cube");
-		modulesPalette
-				.addTemplate(
-						"User",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/dude3.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/dude3.png",
-						50, 50, "User");
-		modulesPalette
-				.addTemplate(
-						"Earth",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/earth.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/earth.png",
-						50, 50, "Earth");
-		modulesPalette
-				.addTemplate(
-						"Gear",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/gear.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/gear.png",
-						50, 50, "Gear");
-		modulesPalette
-				.addTemplate(
-						"Home",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/house.png")),
-						"image;image=/de/unibi/hbp/ncc/images/house.png",
-						50, 50, "Home");
-		modulesPalette
-				.addTemplate(
-						"Package",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/package.png")),
-						"image;image=/de/unibi/hbp/ncc/images/package.png",
-						50, 50, "Package");
-		modulesPalette
-				.addTemplate(
-						"Printer",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/printer.png")),
-						"image;image=/de/unibi/hbp/ncc/images/printer.png",
-						50, 50, "Printer");
-		modulesPalette
-				.addTemplate(
-						"Server",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/server.png")),
-						"image;image=/de/unibi/hbp/ncc/images/server.png",
-						50, 50, "Server");
-		modulesPalette
-				.addTemplate(
-						"Workplace",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/workplace.png")),
-						"image;image=/de/unibi/hbp/ncc/images/workplace.png",
-						50, 50, "Workplace");
-		modulesPalette
-				.addTemplate(
-						"Wrench",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/wrench.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/wrench.png",
-						50, 50, "Wrench");
-
-		symbolsPalette
-				.addTemplate(
-						"Cancel",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/cancel_end.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/cancel_end.png",
-						80, 80, "Cancel");
-		symbolsPalette
-				.addTemplate(
-						"Error",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/error.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/error.png",
-						80, 80, "Error");
-		symbolsPalette
-				.addTemplate(
-						"Event",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/event.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/event.png",
-						80, 80, "Event");
-		symbolsPalette
-				.addTemplate(
-						"Fork",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/fork.png")),
-						"rhombusImage;image=/de/unibi/hbp/ncc/images/fork.png",
-						80, 80, "Fork");
-		symbolsPalette
-				.addTemplate(
-						"Inclusive",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/inclusive.png")),
-						"rhombusImage;image=/de/unibi/hbp/ncc/images/inclusive.png",
-						80, 80, "Inclusive");
-		symbolsPalette
-				.addTemplate(
-						"Link",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/link.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/link.png",
-						80, 80, "Link");
-		symbolsPalette
-				.addTemplate(
-						"Merge",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/merge.png")),
-						"rhombusImage;image=/de/unibi/hbp/ncc/images/merge.png",
-						80, 80, "Merge");
-		symbolsPalette
-				.addTemplate(
-						"Message",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/message.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/message.png",
-						80, 80, "Message");
-		symbolsPalette
-				.addTemplate(
-						"Multiple",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/multiple.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/multiple.png",
-						80, 80, "Multiple");
-		symbolsPalette
-				.addTemplate(
-						"Rule",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/rule.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/rule.png",
-						80, 80, "Rule");
-		symbolsPalette
-				.addTemplate(
-						"Terminate",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/terminate.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/terminate.png",
-						80, 80, "Terminate");
-		symbolsPalette
-				.addTemplate(
-						"Timer",
-						new ImageIcon(
-								NeuroCoCoonEditor.class
-										.getResource("images/timer.png")),
-						"roundImage;image=/de/unibi/hbp/ncc/images/timer.png",
-						80, 80, "Timer");
-		 */
+								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/poissonsource.png")),
+								 "poissonsource",
+								 100, 80, PoissonSource.CREATOR);
+		basicPalette.addTemplate("Population",
+								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/population.png")),
+								 "population",
+								 100, 60, StandardPopulation.CREATOR);
 	}
 
 	@Override
@@ -548,6 +214,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		 */
 		public ProgramGraph (Program program)
 		{
+			program.setGraphModel(this.getModel());
 			this.program = program;
 			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
 		}

@@ -112,7 +112,7 @@ public class mxMultiplicity
 	public String check(mxGraph graph, Object edge, Object source,
 			Object target, int sourceOut, int targetIn)
 	{
-		StringBuffer error = new StringBuffer();
+		StringBuilder error = new StringBuilder();
 
 		if ((this.source && checkTerminal(graph, source, edge))
 				|| (!this.source && checkTerminal(graph, target, edge)))
@@ -124,7 +124,7 @@ public class mxMultiplicity
 				if (m == 0 || (this.source && sourceOut >= m)
 						|| (!this.source && targetIn >= m))
 				{
-					error.append(countError + "\n");
+					error.append(countError).append("\n");
 				}
 			}
 
@@ -134,7 +134,7 @@ public class mxMultiplicity
 
 				if (!isValid)
 				{
-					error.append(typeError + "\n");
+					error.append(typeError).append("\n");
 				}
 			}
 		}
@@ -152,19 +152,13 @@ public class mxMultiplicity
 		Object sourceValue = model.getValue(source);
 		Object targetValue = model.getValue(target);
 		boolean isValid = !validNeighborsAllowed;
-		Iterator<String> it = validNeighbors.iterator();
 
-		while (it.hasNext())
-		{
-			String tmp = it.next();
-
-			if (this.source && checkType(graph, targetValue, tmp))
-			{
+		for (String tmp: validNeighbors) {
+			if (this.source && checkType(graph, targetValue, tmp)) {
 				isValid = validNeighborsAllowed;
 				break;
 			}
-			else if (!this.source && checkType(graph, sourceValue, tmp))
-			{
+			else if (!this.source && checkType(graph, sourceValue, tmp)) {
 				isValid = validNeighborsAllowed;
 				break;
 			}
@@ -179,7 +173,6 @@ public class mxMultiplicity
 	public boolean checkTerminal(mxGraph graph, Object terminal, Object edge)
 	{
 		Object userObject = graph.getModel().getValue(terminal);
-
 		return checkType(graph, userObject, type, attr, value);
 	}
 
@@ -195,7 +188,7 @@ public class mxMultiplicity
 	 * Checks the type of the given value.
 	 */
 	public boolean checkType(mxGraph graph, Object value, String type,
-			String attr, String attrValue)
+							 String attr, String attrValue)
 	{
 		if (value != null)
 		{

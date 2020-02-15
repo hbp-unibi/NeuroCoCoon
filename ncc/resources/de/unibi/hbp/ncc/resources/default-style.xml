@@ -6,7 +6,7 @@
 		<add as="strokeWidth" value="2"/>
 		<add as="fontSize" value="12"/>
 		<add as="fontColor" value="#000000"/>
-		<add as="fontFamily" value="Verdana"/>
+		<add as="fontFamily" value="SansSerif"/>
 	</add>
 	<add as="defaultEdge" extend="defaultEdge">
 		<add as="labelBackgroundColor" value="white"/>
@@ -15,7 +15,42 @@
 		<add as="strokeColor" value="#666666"/>
 		<add as="fontSize" value="11"/>
 		<add as="fontColor" value="#444444"/>
-		<add as="fontFamily" value="Verdana"/>
+		<add as="fontFamily" value="SansSerif"/>
+	</add>
+	<add as="population" extend="defaultVertex">
+		<add as="shape" value="rectangle"/>
+		<add as="fillColor" value="#ddddff"/>
+		<add as="strokeColor" value="#bbbbdd"/>
+	</add>
+	<add as="spikesource" extend="defaultVertex">
+		<add as="shape" value="triangle"/>
+		<add as="fillColor" value="#ddffdd"/>
+		<add as="strokeColor" value="#bbddbb"/>
+		<add as="align" value="left"/>
+	</add>
+	<add as="poissonsource" extend="defaultVertex">
+		<add as="shape" value="rhombus"/>
+		<add as="fillColor" value="#ddff88"/>
+		<add as="strokeColor" value="#bbdd77"/>
+	</add>
+	<add as="straight" extend="defaultEdge">
+		<add as="shape" value="connector"/>
+		<add as="endArrow" value="classic"/>
+		<add as="edgeStyle" value="none"/>
+	</add>
+	<add as="alltoall" extends="straight">
+		<add as="strokeWidth" value="4"/>
+	</add>
+	<add as="onetoone" extends="straight">
+		<add as="strokeWidth" value="2"/>
+	</add>
+	<add as="probability" extends="straight">
+		<add as="strokeWidth" value="2"/>
+		<add as="dashed" value="1"/>
+	</add>
+	<add as="weightzero" extends="straight">
+		<add as="strokeWidth" value="2"/>
+		<add as="strokeColor" value="#ff3333"/>
 	</add>
 	<add as="label">
 		<add as="shape" value="label"/>
@@ -50,11 +85,6 @@
 	</add>
 	<add as="vertical">
 		<add as="elbow" value="vertical"/>
-	</add>
-	<add as="straight">
-		<add as="shape" value="connector"/>
-		<add as="endArrow" value="classic"/>
-		<add as="edgeStyle" value="none"/>
 	</add>
 	<add as="arrow">
 		<add as="shape" value="arrow"/>

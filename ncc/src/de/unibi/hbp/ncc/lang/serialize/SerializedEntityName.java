@@ -1,4 +1,6 @@
-package de.unibi.hbp.ncc.lang;
+package de.unibi.hbp.ncc.lang.serialize;
+
+import de.unibi.hbp.ncc.lang.Namespace;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -7,7 +9,7 @@ public class SerializedEntityName implements Serializable {
    private int namespaceId;
    private String name;
 
-   SerializedEntityName (int namespaceId, String name) {
+   public SerializedEntityName (int namespaceId, String name) {
       this.namespaceId = namespaceId;
       this.name = name;
    }

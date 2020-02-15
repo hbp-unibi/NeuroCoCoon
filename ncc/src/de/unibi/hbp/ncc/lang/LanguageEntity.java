@@ -1,11 +1,13 @@
 package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
 import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class LanguageEntity {
@@ -15,16 +17,21 @@ public abstract class LanguageEntity {
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       return list;
    }
-
    protected List<EditableProp<?>> addIndirectEditableProps (List<EditableProp<?>> list) { return list; }
 
    protected List<ReadOnlyProp<?>> addReadOnlyProps (List<ReadOnlyProp<?>> list) {
       return list;
    }
+   protected List<ReadOnlyProp<?>> addIndirectReadOnlyProps (List<ReadOnlyProp<?>> list) { return list; }
 
    public List<ReadOnlyProp<?>> getReadOnlyProps () {
       return addReadOnlyProps(new ArrayList<>());
    }
+   public List<ReadOnlyProp<?>> getIndirectReadOnlyProps () { return addIndirectReadOnlyProps(new ArrayList<>()); }
+   public List<ReadOnlyProp<?>> getDirectAndIndirectReadOnlyProps () {
+      return addIndirectReadOnlyProps(addReadOnlyProps(new ArrayList<>()));
+   }
+
    public List<EditableProp<?>> getEditableProps () {
       return addEditableProps(new ArrayList<>());
    }
@@ -38,6 +45,18 @@ public abstract class LanguageEntity {
 
    public mxCell getOwningCell () { return owningCell; }
    public void setOwningCell (mxCell owningCell) { this.owningCell = owningCell; }
+   // override in subclasses, where cell style depends on (direct or indirect) property values
+   public String getCellStyle () { return null; }
+
+   // override this in subclasses, indirectly referenced from (multiple) cell-associated entities
+   public List<mxCell> getDependentCells (mxIGraphModel graphModel) {
+      return Collections.emptyList();
+   }
+
+   public List<LanguageEntity> getDependentEntities () {
+      // TODO implement this
+      return null;
+   }
 
    private List<LanguageEntity> addReferencedEntities (List<LanguageEntity> list, List<? extends ReadOnlyProp<?>> props) {
       for (ReadOnlyProp<?> prop: props) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007-2012, JGraph Ltd
  */
 package de.unibi.hbp.ncc.editor;
@@ -14,7 +14,6 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import de.unibi.hbp.ncc.lang.EntityCreator;
-import de.unibi.hbp.ncc.lang.LanguageEntity;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -32,12 +31,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.function.Supplier;
 
 public class EditorPalette extends JPanel
 {
@@ -50,49 +47,19 @@ public class EditorPalette extends JPanel
 
 	protected Color gradientColor = new Color(208, 208, 208);
 
-	@SuppressWarnings("serial")
 	public EditorPalette()
 	{
 		setBackground(new Color(248, 248, 248));
 		setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
 
 		// Clears the current selection when the background is clicked
-		addMouseListener(new MouseListener()
+		addMouseListener(new MouseAdapter()
 		{
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-			 */
+			@Override
 			public void mousePressed(MouseEvent e)
 			{
 				clearSelection();
 			}
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-			 */
-			public void mouseClicked(MouseEvent e) { }
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-			 */
-			public void mouseEntered(MouseEvent e) { }
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-			 */
-			public void mouseExited(MouseEvent e) { }
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-			 */
-			public void mouseReleased(MouseEvent e) { }
-
 		});
 
 		// Shows a nice icon for drag and drop but doesn't import anything
@@ -163,11 +130,14 @@ public class EditorPalette extends JPanel
 				selectedEntry, "transferable", t, "previous", previous));
 	}
 
+	private static final int TILE_SIZE = 64;
+	private static final int MAX_ICON_SIZE = TILE_SIZE * 3 / 4;
+
 	public void setPreferredWidth(int width)
 	{
-		int cols = Math.max(1, width / 55);
+		int cols = Math.max(1, width / TILE_SIZE);
 		setPreferredSize(new Dimension(width,
-				(getComponentCount() * 55 / cols) + 30));
+				(getComponentCount() * TILE_SIZE / cols) + 30));
 		revalidate();
 	}
 
@@ -203,17 +173,16 @@ public class EditorPalette extends JPanel
 		// Scales the image if it's too large for the library
 		if (icon != null)
 		{
-			if (icon.getIconWidth() > 32 || icon.getIconHeight() > 32)
+			if (icon.getIconWidth() > MAX_ICON_SIZE || icon.getIconHeight() > MAX_ICON_SIZE)
 			{
-				icon = new ImageIcon(icon.getImage().getScaledInstance(32, 32,
-						0));
+				icon = new ImageIcon(icon.getImage().getScaledInstance(MAX_ICON_SIZE, MAX_ICON_SIZE, 0));
 			}
 		}
 
 		final JLabel entry = new JLabel(icon);
-		entry.setPreferredSize(new Dimension(50, 50));
+		entry.setPreferredSize(new Dimension(TILE_SIZE - 4, TILE_SIZE - 4));
 		entry.setBackground(EditorPalette.this.getBackground().brighter());
-		entry.setFont(new Font(entry.getFont().getFamily(), 0, 10));
+		entry.setFont(new Font(entry.getFont().getFamily(), Font.PLAIN, 10));
 
 		entry.setVerticalTextPosition(JLabel.BOTTOM);
 		entry.setHorizontalTextPosition(JLabel.CENTER);
@@ -222,68 +191,21 @@ public class EditorPalette extends JPanel
 		entry.setToolTipText(name);
 		entry.setText(name);
 
-		entry.addMouseListener(new MouseListener()
+		entry.addMouseListener(new MouseAdapter()
 		{
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-			 */
+			@Override
 			public void mousePressed(MouseEvent e)
 			{
 				setSelectionEntry(entry, t);
 			}
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-			 */
-			public void mouseClicked(MouseEvent e)
-			{
-			}
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-			 */
-			public void mouseEntered(MouseEvent e)
-			{
-			}
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-			 */
-			public void mouseExited(MouseEvent e)
-			{
-			}
-
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-			 */
-			public void mouseReleased(MouseEvent e)
-			{
-			}
-
 		});
 
 		// Install the handler for dragging nodes into a graph
-		DragGestureListener dragGestureListener = new DragGestureListener()
-		{
-
-			public void dragGestureRecognized(DragGestureEvent e)
-			{
-				e
-						.startDrag(null, mxSwingConstants.EMPTY_IMAGE, new Point(),
-								t, null);
-			}
-
-		};
+		DragGestureListener dragGestureListener = e ->
+				e.startDrag(null, mxSwingConstants.EMPTY_IMAGE, new Point(), t, null);
 
 		DragSource dragSource = new DragSource();
-		dragSource.createDefaultDragGestureRecognizer(entry,
-				DnDConstants.ACTION_COPY, dragGestureListener);
+		dragSource.createDefaultDragGestureRecognizer(entry, DnDConstants.ACTION_COPY, dragGestureListener);
 
 		add(entry);
 	}

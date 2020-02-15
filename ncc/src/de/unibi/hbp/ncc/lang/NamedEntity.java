@@ -2,6 +2,7 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.StringProp;
+import de.unibi.hbp.ncc.lang.serialize.SerializedEntityName;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -11,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEntity
-      implements DisplayNamed, Serializable, Comparable<NamedEntity<?>> {
-   private EditableProp<String> nameProp;
+      implements DisplayNamed, PythonNamed, Serializable, Comparable<NamedEntity<?>> {
+   private StringProp nameProp;
    private Namespace<E> namespace;
 
    protected Object writeReplace() throws ObjectStreamException {
@@ -132,7 +133,17 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
    private static final String PYTHON_USER_NAME_PREFIX = "_usr_";  // we disallow leading underscores
 
    public String getPythonName () {
-      return PYTHON_USER_NAME_PREFIX + namespace.getPythonDiscriminator() + "_" + normalizedName(getName());
+      return buildPythonName(namespace.getPythonDiscriminator(), getName());
+   }
 
+   static String buildPythonName (String discriminator, String name) {
+      assert !discriminator.isEmpty() && !discriminator.startsWith("_") && !discriminator.endsWith("_");
+      assert isValidName(name);
+      return PYTHON_USER_NAME_PREFIX + discriminator + "_" + normalizedName(name);
+   }
+
+   static String buildTopLevelPythonName (String name) {
+      assert isValidName(name);
+      return normalizedName(name);
    }
 }

@@ -6,12 +6,14 @@ import java.util.EnumSet;
 
 public interface EditableProp<T> extends ReadOnlyProp<T> {
 
-   enum Impact { OWN_VALUE, OTHER_PROPS_VALUES, OTHER_PROPS_VISIBILITY, CELL_LABEL, CELL_APPEARANCE, CELL_SIZE }
+   enum Impact { OWN_VALUE, OTHER_PROPS_VALUES, OTHER_PROPS_VISIBILITY,
+      CELL_LABEL, CELL_STYLE, CELL_SIZE,
+      DEPENDENT_CELLS_STYLE }
 
    boolean isValid (T proposedValue);
    void setValue (T value);
    default void setRawValue (Object rawValue) {
-      // System.err.println("setRawValue: " + rawValue + " --> " + getValueClass().getName());
+      System.err.println("setRawValue: " + rawValue + " --> " + getValueClass().getName());
       setValue(getValueClass().cast(rawValue));
    }
    EnumSet<Impact> getChangeImpact ();

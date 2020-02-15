@@ -4,7 +4,7 @@ public class Scope {
    private Namespace<NeuronPopulation> neuronPopulations;
    private Namespace<NeuronType> neuronTypes;
    private Namespace<SynapseType> synapseTypes;
-   // TODO add DoubleConstant and IntegerConstant as named entities
+   // TODO add DoubleConstant and IntegerConstant as named entities?
 
    public Scope () {
       neuronPopulations = new Namespace<>(this, NeuronPopulation.class, "Population", "pop");

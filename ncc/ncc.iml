@@ -11,7 +11,8 @@
     <orderEntry type="module" module-name="jgraphx-4.0.6" />
     <orderEntry type="library" name="cheerpj-dom" level="project" />
     <orderEntry type="library" name="loader" level="application" />
-    <orderEntry type="library" name="ST-4.2" level="project" />
+    <orderEntry type="library" name="ST-4.2 Local" level="project" />
     <orderEntry type="library" name="com.eclipsesource.minimal-json:minimal-json:0.9.5" level="project" />
+    <orderEntry type="library" name="org.antlr:ST4:4.3" level="project" />
   </component>
 </module>

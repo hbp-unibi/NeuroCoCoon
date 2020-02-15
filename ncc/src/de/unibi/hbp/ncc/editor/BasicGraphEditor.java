@@ -482,10 +482,6 @@ public class BasicGraphEditor extends JPanel
 		return newAction;
 	}
 
-	/**
-	 * 
-	 * @param msg
-	 */
 	public void status(String msg)
 	{
 		statusBar.setText(msg);
