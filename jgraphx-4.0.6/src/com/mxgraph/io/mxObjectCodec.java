@@ -3,25 +3,24 @@
  */
 package com.mxgraph.io;
 
+import com.mxgraph.util.mxUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import com.mxgraph.util.mxUtils;
 
 /**
  * Generic codec for Java objects. See below for a detailed description of
@@ -31,15 +30,9 @@ import com.mxgraph.util.mxUtils;
  * encoded into 1 for true and 0 for false.
  */
 @SuppressWarnings("unchecked")
-public class mxObjectCodec
-{
+public class mxObjectCodec {
 
 	private static final Logger log = Logger.getLogger(mxObjectCodec.class.getName());
-
-	/**
-	 * Immutable empty set.
-	 */
-	private static Set<String> EMPTY_SET = new HashSet<String>();
 
 	/**
 	 * Holds the template object associated with this codec.
@@ -75,7 +68,7 @@ public class mxObjectCodec
 	/**
 	 * Caches fields for faster access.
 	 */
-	protected Map<Class, Map<String, Field>> fields;
+	protected Map<Class<?>, Map<String, Field>> fields;
 
 	/**
 	 * Constructs a new codec for the specified template object.
@@ -93,56 +86,35 @@ public class mxObjectCodec
 	 * attributes. The argument is created as follows:
 	 * 
 	 * @param template Prototypical instance of the object to be encoded/decoded.
-	 * @param exclude Optional array of fieldnames to be ignored.
-	 * @param idrefs Optional array of fieldnames to be converted to/from references.
-	 * @param mapping Optional mapping from field- to attributenames.
+	 * @param exclude Optional array of field names to be ignored.
+	 * @param idrefs Optional array of field names to be converted to/from references.
+	 * @param mapping Optional mapping from field names to attribute names.
 	 */
-	public mxObjectCodec(Object template, String[] exclude, String[] idrefs,
-			Map<String, String> mapping)
-	{
+	public mxObjectCodec (Object template, String[] exclude, String[] idrefs, Map<String, String> mapping) {
 		this.template = template;
 
-		if (exclude != null)
-		{
-			this.exclude = new HashSet<String>();
-
-			for (int i = 0; i < exclude.length; i++)
-			{
-				this.exclude.add(exclude[i]);
-			}
+		if (exclude != null) {
+			this.exclude = new HashSet<>();
+			Collections.addAll(this.exclude, exclude);
 		}
 		else
-		{
-			this.exclude = EMPTY_SET;
-		}
+			this.exclude = Collections.emptySet();
 
-		if (idrefs != null)
-		{
-			this.idrefs = new HashSet<String>();
-
-			for (int i = 0; i < idrefs.length; i++)
-			{
-				this.idrefs.add(idrefs[i]);
-			}
+		if (idrefs != null) {
+			this.idrefs = new HashSet<>();
+			Collections.addAll(this.idrefs, idrefs);
 		}
 		else
-		{
-			this.idrefs = EMPTY_SET;
-		}
+			this.idrefs = Collections.emptySet();
 
 		if (mapping == null)
-		{
-			mapping = new Hashtable<String, String>();
-		}
+			mapping = new Hashtable<>();
 
 		this.mapping = mapping;
 
-		reverse = new Hashtable<String, String>();
-		Iterator<Map.Entry<String, String>> it = mapping.entrySet().iterator();
+		reverse = new Hashtable<>();
 
-		while (it.hasNext())
-		{
-			Map.Entry<String, String> e = it.next();
+		for (Map.Entry<String, String> e: mapping.entrySet()) {
 			reverse.put(e.getValue(), e.getKey());
 		}
 	}
@@ -165,7 +137,7 @@ public class mxObjectCodec
 	 * });
 	 * </code>
 	 */
-	public String getName()
+	public String getName ()
 	{
 		return mxCodecRegistry.getName(getTemplate());
 	}
@@ -175,7 +147,7 @@ public class mxObjectCodec
 	 * 
 	 * @return Returns the template object.
 	 */
-	public Object getTemplate()
+	public Object getTemplate ()
 	{
 		return template;
 	}
@@ -187,20 +159,15 @@ public class mxObjectCodec
 	 * @param node XML node that the object is going to represent.
 	 * @return Returns a new template instance.
 	 */
-	protected Object cloneTemplate(Node node)
+	protected Object cloneTemplate (Node node)
 	{
 		Object obj = null;
 
-		try
-		{
+		try {
 			if (template.getClass().isEnum())
-			{
 				obj = template.getClass().getEnumConstants()[0];
-			}
 			else
-			{
 				obj = template.getClass().newInstance();
-			}
 
 			// Special case: Check if the collection
 			// should be a map. This is if the first
@@ -209,29 +176,19 @@ public class mxObjectCodec
 			// as attributes in this case. This is
 			// required because in JavaScript, the
 			// map and array object are the same.
-			if (obj instanceof Collection)
-			{
+			if (obj instanceof Collection) {
 				node = node.getFirstChild();
 
 				// Skips text nodes
-				while (node != null && !(node instanceof Element))
-				{
+				while (node != null && !(node instanceof Element)) {
 					node = node.getNextSibling();
 				}
 
-				if (node != null && node instanceof Element
-						&& ((Element) node).hasAttribute("as"))
-				{
-					obj = new Hashtable<Object, Object>();
-				}
+				if (node != null && ((Element) node).hasAttribute("as"))
+					obj = new Hashtable<>();
 			}
 		}
-		catch (InstantiationException e)
-		{
-			log.log(Level.FINEST, "Failed to clone the template", e);
-		}
-		catch (IllegalAccessException e)
-		{
+		catch (InstantiationException | IllegalAccessException e) {
 			log.log(Level.FINEST, "Failed to clone the template", e);
 		}
 
@@ -251,9 +208,7 @@ public class mxObjectCodec
 	 * being decoded.
 	 * @return Returns true if the given attribute should be ignored.
 	 */
-	public boolean isExcluded(Object obj, String attr, Object value,
-			boolean write)
-	{
+	public boolean isExcluded (Object obj, String attr, Object value, boolean write) {
 		return exclude.contains(attr);
 	}
 
@@ -271,9 +226,7 @@ public class mxObjectCodec
 	 * @return Returns true if the given attribute should be handled as a
 	 * reference.
 	 */
-	public boolean isReference(Object obj, String attr, Object value,
-			boolean isWrite)
-	{
+	public boolean isReference (Object obj, String attr, Object value, boolean isWrite) {
 		return idrefs.contains(attr);
 	}
 
@@ -317,8 +270,7 @@ public class mxObjectCodec
 	 * @param obj Object to be encoded.
 	 * @return Returns the resulting XML node that represents the given object. 
 	 */
-	public Node encode(mxCodec enc, Object obj)
-	{
+	public Node encode (mxCodec enc, Object obj) {
 		Node node = enc.document.createElement(getName());
 
 		obj = beforeEncode(enc, obj, node);
@@ -336,8 +288,7 @@ public class mxObjectCodec
 	 * @param obj Object to be encoded.
 	 * @param node XML node that contains the encoded object.
 	 */
-	protected void encodeObject(mxCodec enc, Object obj, Node node)
-	{
+	protected void encodeObject (mxCodec enc, Object obj, Node node) {
 		mxCodec.setAttribute(node, "id", enc.getId(obj));
 		encodeFields(enc, obj, node);
 		encodeElements(enc, obj, node);
@@ -350,25 +301,19 @@ public class mxObjectCodec
 	 * @param obj Object whose fields should be encoded.
 	 * @param node XML node that contains the encoded object.
 	 */
-	protected void encodeFields(mxCodec enc, Object obj, Node node)
-	{
+	protected void encodeFields (mxCodec enc, Object obj, Node node) {
 		// LATER: Use PropertyDescriptors in Introspector.getBeanInfo(clazz)
 		// see http://forum.jgraph.com/questions/1424
 		Class<?> type = obj.getClass();
 
-		while (type != null)
-		{
+		while (type != null) {
 			Field[] fields = type.getDeclaredFields();
 
-			for (int i = 0; i < fields.length; i++)
-			{
-				Field f = fields[i];
-
-				if ((f.getModifiers() & Modifier.TRANSIENT) != Modifier.TRANSIENT)
-				{
-					String fieldname = f.getName();
-					Object value = getFieldValue(obj, fieldname);
-					encodeValue(enc, obj, fieldname, value, node);
+			for (Field f: fields) {
+				if ((f.getModifiers() & Modifier.TRANSIENT) != Modifier.TRANSIENT) {
+					String fieldName = f.getName();
+					Object value = getFieldValue(obj, fieldName);
+					encodeValue(enc, obj, fieldName, value, node);
 				}
 			}
 
@@ -383,37 +328,22 @@ public class mxObjectCodec
 	 * @param obj Object whose child objects should be encoded.
 	 * @param node XML node that contains the encoded object.
 	 */
-	protected void encodeElements(mxCodec enc, Object obj, Node node)
-	{
-		if (obj.getClass().isArray())
-		{
+	protected void encodeElements (mxCodec enc, Object obj, Node node) {
+		if (obj.getClass().isArray()) {
 			Object[] tmp = (Object[]) obj;
 
-			for (int i = 0; i < tmp.length; i++)
-			{
-				encodeValue(enc, obj, null, tmp[i], node);
-			}
+			for (Object o: tmp)
+				encodeValue(enc, obj, null, o, node);
 		}
-		else if (obj instanceof Map)
-		{
-			Iterator<Map.Entry> it = ((Map) obj).entrySet().iterator();
+		else if (obj instanceof Map<?, ?>) {
 
-			while (it.hasNext())
-			{
-				Map.Entry e = it.next();
-				encodeValue(enc, obj, String.valueOf(e.getKey()), e.getValue(),
-						node);
-			}
+			for (Map.Entry<?, ?> e: ((Map<?, ?>) obj).entrySet())
+				encodeValue(enc, obj, String.valueOf(e.getKey()), e.getValue(), node);
 		}
-		else if (obj instanceof Collection)
-		{
-			Iterator<?> it = ((Collection<?>) obj).iterator();
+		else if (obj instanceof Collection) {
 
-			while (it.hasNext())
-			{
-				Object value = it.next();
+			for (Object value: (Collection<?>) obj)
 				encodeValue(enc, obj, null, value, node);
-			}
 		}
 	}
 
@@ -429,17 +359,12 @@ public class mxObjectCodec
 	 * @param value Value of the property to be encoded.
 	 * @param node XML node that contains the encoded object.
 	 */
-	protected void encodeValue(mxCodec enc, Object obj, String fieldname,
-			Object value, Node node)
-	{
-		if (value != null && !isExcluded(obj, fieldname, value, true))
-		{
-			if (isReference(obj, fieldname, value, true))
-			{
+	protected void encodeValue (mxCodec enc, Object obj, String fieldname, Object value, Node node) {
+		if (value != null && !isExcluded(obj, fieldname, value, true)) {
+			if (isReference(obj, fieldname, value, true)) {
 				Object tmp = enc.getId(value);
 
-				if (tmp == null)
-				{
+				if (tmp == null) {
 					log.log(Level.FINEST, "mxObjectCodec.encode: No ID for "
 							+ getName() + "." + fieldname + "=" + value);
 					return; // exit
@@ -451,10 +376,8 @@ public class mxObjectCodec
 			Object defaultValue = getFieldValue(template, fieldname);
 
 			if (fieldname == null || enc.isEncodeDefaults()
-					|| defaultValue == null || !defaultValue.equals(value))
-			{
-				writeAttribute(enc, obj, getAttributeName(fieldname), value,
-						node);
+					|| defaultValue == null || !defaultValue.equals(value)) {
+				writeAttribute(enc, obj, getAttributeName(fieldname), value, node);
 			}
 		}
 	}
@@ -465,8 +388,7 @@ public class mxObjectCodec
 	 * @param value Object that should be checked.
 	 * @return Returns true if the given object is a primitive value.
 	 */
-	protected boolean isPrimitiveValue(Object value)
-	{
+	protected boolean isPrimitiveValue (Object value) {
 		return value instanceof String || value instanceof Boolean
 				|| value instanceof Character || value instanceof Byte
 				|| value instanceof Short || value instanceof Integer
@@ -478,64 +400,44 @@ public class mxObjectCodec
 	 * Writes the given value into node using writePrimitiveAttribute
 	 * or writeComplexAttribute depending on the type of the value.
 	 */
-	protected void writeAttribute(mxCodec enc, Object obj, String attr,
-			Object value, Node node)
-	{
+	protected void writeAttribute (mxCodec enc, Object obj, String attr, Object value, Node node) {
 		value = convertValueToXml(value);
 
 		if (isPrimitiveValue(value))
-		{
 			writePrimitiveAttribute(enc, obj, attr, value, node);
-		}
 		else
-		{
 			writeComplexAttribute(enc, obj, attr, value, node);
-		}
 	}
 
 	/**
 	 * Writes the given value as an attribute of the given node.
 	 */
-	protected void writePrimitiveAttribute(mxCodec enc, Object obj,
-			String attr, Object value, Node node)
-	{
-		if (attr == null || obj instanceof Map)
-		{
+	protected void writePrimitiveAttribute(mxCodec enc, Object obj, String attr, Object value, Node node) {
+		if (attr == null || obj instanceof Map) {
 			Node child = enc.document.createElement("add");
 
 			if (attr != null)
-			{
 				mxCodec.setAttribute(child, "as", attr);
-			}
 
 			mxCodec.setAttribute(child, "value", value);
 			node.appendChild(child);
 		}
 		else
-		{
 			mxCodec.setAttribute(node, attr, value);
-		}
 	}
 
 	/**
 	 * Writes the given value as a child node of the given node.
 	 */
-	protected void writeComplexAttribute(mxCodec enc, Object obj, String attr,
-			Object value, Node node)
-	{
+	protected void writeComplexAttribute (mxCodec enc, Object obj, String attr, Object value, Node node) {
 		Node child = enc.encode(value);
 
-		if (child != null)
-		{
+		if (child != null) {
 			if (attr != null)
-			{
 				mxCodec.setAttribute(child, "as", attr);
-			}
-
 			node.appendChild(child);
 		}
-		else
-		{
+		else {
 			log.log(Level.FINEST, "mxObjectCodec.encode: No node for " + getName()
 					+ "." + attr + ": " + value);
 		}
@@ -544,12 +446,9 @@ public class mxObjectCodec
 	/**
 	 * Converts true to "1" and false to "0". All other values are ignored.
 	 */
-	protected Object convertValueToXml(Object value)
-	{
+	protected Object convertValueToXml (Object value) {
 		if (value instanceof Boolean)
-		{
-			value = ((Boolean) value).booleanValue() ? "1" : "0";
-		}
+			value = (Boolean) value ? "1" : "0";
 
 		return value;
 	}
@@ -557,47 +456,38 @@ public class mxObjectCodec
 	/**
 	 * Converts XML attribute values to object of the given type.
 	 */
-	protected Object convertValueFromXml(Class<?> type, Object value)
-	{
+	protected Object convertValueFromXml (Class<?> type, Object value) {
 		if (value instanceof String)
 		{
 			String tmp = (String) value;
 
-			if (type.equals(boolean.class) || type == Boolean.class)
-			{
-				if (tmp.equals("1") || tmp.equals("0"))
-				{
-					tmp = (tmp.equals("1")) ? "true" : "false";
-				}
-
-				value = Boolean.valueOf(tmp);
+			if (type.equals(boolean.class) || type == Boolean.class) {
+				if ("1".equals(tmp))
+					value = Boolean.TRUE;
+				else if ("0".equals(tmp))
+					value = Boolean.FALSE;
+				else
+					value = Boolean.valueOf(tmp);
 			}
-			else if (type.equals(char.class) || type == Character.class)
-			{
-				value = Character.valueOf(tmp.charAt(0));
+			else if (type.equals(char.class) || type == Character.class) {
+				value = tmp.charAt(0);
 			}
-			else if (type.equals(byte.class) || type == Byte.class)
-			{
+			else if (type.equals(byte.class) || type == Byte.class) {
 				value = Byte.valueOf(tmp);
 			}
-			else if (type.equals(short.class) || type == Short.class)
-			{
+			else if (type.equals(short.class) || type == Short.class) {
 				value = Short.valueOf(tmp);
 			}
-			else if (type.equals(int.class) || type == Integer.class)
-			{
+			else if (type.equals(int.class) || type == Integer.class) {
 				value = Integer.valueOf(tmp);
 			}
-			else if (type.equals(long.class) || type == Long.class)
-			{
+			else if (type.equals(long.class) || type == Long.class) {
 				value = Long.valueOf(tmp);
 			}
-			else if (type.equals(float.class) || type == Float.class)
-			{
+			else if (type.equals(float.class) || type == Float.class) {
 				value = Float.valueOf(tmp);
 			}
-			else if (type.equals(double.class) || type == Double.class)
-			{
+			else if (type.equals(double.class) || type == Double.class) {
 				value = Double.valueOf(tmp);
 			}
 		}
@@ -609,156 +499,113 @@ public class mxObjectCodec
 	 * Returns the XML node attribute name for the given Java field name. That
 	 * is, it returns the mapping of the field name.
 	 */
-	protected String getAttributeName(String fieldname)
-	{
-		if (fieldname != null)
-		{
-			Object mapped = mapping.get(fieldname);
+	protected String getAttributeName (String fieldName) {
+		if (fieldName != null) {
+			Object mapped = mapping.get(fieldName);
 
 			if (mapped != null)
-			{
-				fieldname = mapped.toString();
-			}
+				fieldName = mapped.toString();
 		}
 
-		return fieldname;
+		return fieldName;
 	}
 
 	/**
 	 * Returns the Java field name for the given XML attribute name. That is, it
 	 * returns the reverse mapping of the attribute name.
 	 * 
-	 * @param attributename
+	 * @param attributeName
 	 *            The attribute name to be mapped.
 	 * @return String that represents the mapped field name.
 	 */
-	protected String getFieldName(String attributename)
-	{
-		if (attributename != null)
-		{
-			Object mapped = reverse.get(attributename);
+	protected String getFieldName (String attributeName) {
+		if (attributeName != null) {
+			Object mapped = reverse.get(attributeName);
 
 			if (mapped != null)
-			{
-				attributename = mapped.toString();
-			}
+				attributeName = mapped.toString();
 		}
 
-		return attributename;
+		return attributeName;
 	}
 
 	/**
 	 * Returns the field with the specified name.
 	 */
-	protected Field getField(Object obj, String fieldname)
-	{
+	protected Field getField (Object obj, String fieldName) {
 		Class<?> type = obj.getClass();
 
 		// Creates the fields cache
 		if (fields == null)
-		{
-			fields = new HashMap<Class, Map<String, Field>>();
-		}
+			fields = new HashMap<>();
 
 		// Creates the fields cache entry for the given type
-		Map<String, Field> map = fields.get(type);
-
-		if (map == null)
-		{
-			map = new HashMap<String, Field>();
-			fields.put(type, map);
-		}
+		Map<String, Field> map = fields.computeIfAbsent(type, k -> new HashMap<>());
 
 		// Tries to get cached field
-		Field field = map.get(fieldname);
+		Field field = map.get(fieldName);
 
 		if (field != null)
-		{
 			return field;
-		}
 
-		while (type != null)
-		{
-			try
-			{
-				field = type.getDeclaredField(fieldname);
+		while (type != null) {
+			try {
+				field = type.getDeclaredField(fieldName);
 
-				if (field != null)
-				{
+				if (field != null) {
 					// Adds field to fields cache
-					map.put(fieldname, field);
-
+					map.put(fieldName, field);
 					return field;
 				}
 			}
-			catch (Exception e)
-			{
-				log.log(Level.FINEST, "Failed to get field " + fieldname + " in class " + type, e);
+			catch (Exception e) {
+				log.log(Level.FINEST, "Failed to get field " + fieldName + " in class " + type, e);
 			}
 
 			type = type.getSuperclass();
 		}
 
-		log.log(Level.FINEST, "Field " + fieldname + " not found in " + obj);
+		log.log(Level.FINEST, "Field " + fieldName + " not found in " + obj);
 		return null;
 	}
 
 	/**
 	 * Returns the accessor (getter, setter) for the specified field.
 	 */
-	protected Method getAccessor(Object obj, Field field, boolean isGetter)
-	{
+	protected Method getAccessor (Object obj, Field field, boolean isGetter) {
 		String name = field.getName();
 		name = name.substring(0, 1).toUpperCase() + name.substring(1);
 
 		if (!isGetter)
-		{
 			name = "set" + name;
-		}
 		else if (boolean.class.isAssignableFrom(field.getType()))
-		{
 			name = "is" + name;
-		}
 		else
-		{
 			name = "get" + name;
-		}
 
 		Method method = (accessors != null) ? accessors.get(name) : null;
 
-		if (method == null)
-		{
-			try
-			{
+		if (method == null) {
+			try {
 				if (isGetter)
-				{
 					method = getMethod(obj, name, null);
-				}
 				else
-				{
-					method = getMethod(obj, name,
-							new Class[] { field.getType() });
-				}
+					method = getMethod(obj, name, new Class[] { field.getType() });
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				log.log(Level.FINEST, "Failed to get method " + name + " from " + obj, e);
 			}
 
 			// Adds accessor to cache
-			if (method != null)
-			{
+			if (method != null) {
 				if (accessors == null)
-				{
-					accessors = new Hashtable<String, Method>();
-				}
+					accessors = new Hashtable<>();
 
 				accessors.put(name, method);
 			}
 		}
 
-		if (method == null)
-		{
+		if (method == null) {
 			// this should be considered an error in the scope of this method, but the
 			// calling code already depends on this method failing softly to filter
 			// non-serializable properties, so it gets called for static fields
@@ -775,24 +622,18 @@ public class mxObjectCodec
 	/**
 	 * Returns the method with the specified signature.
 	 */
-	protected Method getMethod(Object obj, String methodname, Class[] params)
-	{
+	protected Method getMethod(Object obj, String methodName, Class<?>[] params) {
 		Class<?> type = obj.getClass();
 
-		while (type != null)
-		{
-			try
-			{
-				Method method = type.getDeclaredMethod(methodname, params);
+		while (type != null) {
+			try {
+				Method method = type.getDeclaredMethod(methodName, params);
 
 				if (method != null)
-				{
 					return method;
-				}
 			}
-			catch (Exception e)
-			{
-				log.log(Level.FINEST, "Failed to get method " + methodname + " in class " + type, e);
+			catch (Exception e) {
+				log.log(Level.FINEST, "Failed to get method " + methodName + " in class " + type, e);
 			}
 
 			type = type.getSuperclass();
@@ -804,35 +645,25 @@ public class mxObjectCodec
 	 * Returns the value of the field with the specified name in the specified
 	 * object instance.
 	 */
-	protected Object getFieldValue(Object obj, String fieldname)
-	{
+	protected Object getFieldValue (Object obj, String fieldName) {
 		Object value = null;
 
-		if (obj != null && fieldname != null)
-		{
-			Field field = getField(obj, fieldname);
+		if (obj != null && fieldName != null) {
+			Field field = getField(obj, fieldName);
 
-			try
-			{
-				if (field != null)
-				{
+			try {
+				if (field != null) {
 					if (Modifier.isPublic(field.getModifiers()))
-					{
 						value = field.get(obj);
-					}
 					else
-					{
 						value = getFieldValueWithAccessor(obj, field);
-					}
 				}
 			}
-			catch (IllegalAccessException e1)
-			{
+			catch (IllegalAccessException e1) {
 				value = getFieldValueWithAccessor(obj, field);
 			}
-			catch (Exception e)
-			{
-				log.log(Level.FINEST, "Failed to get value from field " + fieldname + " in " + obj, e);
+			catch (Exception e) {
+				log.log(Level.FINEST, "Failed to get value from field " + fieldName + " in " + obj, e);
 			}
 		}
 
@@ -842,23 +673,17 @@ public class mxObjectCodec
 	/**
 	 * Returns the value of the field using the accessor for the field if one exists.
 	 */
-	protected Object getFieldValueWithAccessor(Object obj, Field field)
-	{
+	protected Object getFieldValueWithAccessor (Object obj, Field field) {
 		Object value = null;
 
-		if (field != null)
-		{
-			try
-			{
+		if (field != null) {
+			try {
 				Method method = getAccessor(obj, field, true);
 
 				if (method != null)
-				{
 					value = method.invoke(obj, (Object[]) null);
-				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				log.log(Level.FINEST, "Failed to get value from field " + field + " in " + obj, e);
 			}
 		}
@@ -870,73 +695,56 @@ public class mxObjectCodec
 	 * Sets the value of the field with the specified name
 	 * in the specified object instance.
 	 */
-	protected void setFieldValue(Object obj, String fieldname, Object value)
-	{
+	protected void setFieldValue (Object obj, String fieldName, Object value) {
 		Field field = null;
 
-		try
-		{
-			field = getField(obj, fieldname);
+		try {
+			field = getField(obj, fieldName);
 
-			if (field != null)
-			{
-				if (field.getType() == Boolean.class)
-				{
-					value = (value.equals("1") || String.valueOf(value)
-							.equalsIgnoreCase("true")) ? Boolean.TRUE
+			if (field != null) {
+				if (field.getType() == Boolean.class) {
+					value = ("1".equals(value) || String.valueOf(value).equalsIgnoreCase("true"))
+							? Boolean.TRUE
 							: Boolean.FALSE;
 				}
 
 				if (Modifier.isPublic(field.getModifiers()))
-				{
 					field.set(obj, value);
-				}
 				else
-				{
 					setFieldValueWithAccessor(obj, field, value);
-				}
 			}
 		}
-		catch (IllegalAccessException e1)
-		{
+		catch (IllegalAccessException e1) {
 			setFieldValueWithAccessor(obj, field, value);
 		}
-		catch (Exception e)
-		{
-			log.log(Level.FINEST, "Failed to set value \"" + value + "\" to field " + fieldname + " in " + obj, e);
+		catch (Exception e) {
+			log.log(Level.FINEST, "Failed to set value \"" + value + "\" to field " + fieldName + " in " + obj, e);
 		}
 	}
 
 	/**
 	 * Sets the value of the given field using the accessor if one exists.
 	 */
-	protected void setFieldValueWithAccessor(Object obj, Field field,
-			Object value)
+	protected void setFieldValueWithAccessor (Object obj, Field field, Object value)
 	{
-		if (field != null)
-		{
-			try
-			{
+		if (field != null) {
+			try {
 				Method method = getAccessor(obj, field, false);
 
-				if (method != null)
-				{
+				if (method != null) {
 					Class<?> type = method.getParameterTypes()[0];
 					value = convertValueFromXml(type, value);
 
 					// Converts collection to a typed array before setting
-					if (type.isArray() && value instanceof Collection)
-					{
+					if (type.isArray() && value instanceof Collection) {
 						Collection<?> coll = (Collection<?>) value;
-						value = coll.toArray((Object[]) Array.newInstance(
-								type.getComponentType(), coll.size()));
+						value = coll.toArray((Object[]) Array.newInstance(type.getComponentType(), coll.size()));
 					}
 
-					method.invoke(obj, new Object[] { value });
+					method.invoke(obj, value);
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				log.log(Level.FINEST, "setFieldValue: " + e + " on "
 						+ obj.getClass().getSimpleName() + "."
 						+ field.getName() + " ("
@@ -974,7 +782,7 @@ public class mxObjectCodec
 	 * @param node XML node that represents the default encoding.
 	 * @return Returns the resulting node of the encoding.
 	 */
-	public Node afterEncode(mxCodec enc, Object obj, Node node)
+	public Node afterEncode (mxCodec enc, Object obj, Node node)
 	{
 		return node;
 	}
@@ -987,7 +795,7 @@ public class mxObjectCodec
 	 * @param node XML node to be decoded.
 	 * @return Returns the resulting object that represents the given XML node.
 	 */
-	public Object decode(mxCodec dec, Node node)
+	public Object decode (mxCodec dec, Node node)
 	{
 		return decode(dec, node, null);
 	}
@@ -1024,28 +832,21 @@ public class mxObjectCodec
 	 * @return Returns the resulting object that represents the given XML node
 	 * or the object given to the method as the into parameter.
 	 */
-	public Object decode(mxCodec dec, Node node, Object into)
-	{
+	public Object decode (mxCodec dec, Node node, Object into) {
 		Object obj = null;
 
-		if (node instanceof Element)
-		{
+		if (node instanceof Element) {
 			String id = ((Element) node).getAttribute("id");
 			obj = dec.objects.get(id);
 
-			if (obj == null)
-			{
+			if (obj == null) {
 				obj = into;
 
 				if (obj == null)
-				{
 					obj = cloneTemplate(node);
-				}
 
 				if (id != null && id.length() > 0)
-				{
 					dec.putObject(id, obj);
-				}
 			}
 
 			node = beforeDecode(dec, node, obj);
@@ -1059,10 +860,8 @@ public class mxObjectCodec
 	/**
 	 * Calls decodeAttributes and decodeChildren for the given node.
 	 */
-	protected void decodeNode(mxCodec dec, Node node, Object obj)
-	{
-		if (node != null)
-		{
+	protected void decodeNode (mxCodec dec, Node node, Object obj) {
+		if (node != null) {
 			decodeAttributes(dec, node, obj);
 			decodeChildren(dec, node, obj);
 		}
@@ -1071,14 +870,11 @@ public class mxObjectCodec
 	/**
 	 * Decodes all attributes of the given node using decodeAttribute.
 	 */
-	protected void decodeAttributes(mxCodec dec, Node node, Object obj)
-	{
+	protected void decodeAttributes (mxCodec dec, Node node, Object obj) {
 		NamedNodeMap attrs = node.getAttributes();
 
-		if (attrs != null)
-		{
-			for (int i = 0; i < attrs.getLength(); i++)
-			{
+		if (attrs != null) {
+			for (int i = 0; i < attrs.getLength(); i++) {
 				Node attr = attrs.item(i);
 				decodeAttribute(dec, attr, obj);
 			}
@@ -1088,21 +884,17 @@ public class mxObjectCodec
 	/**
 	 * Reads the given attribute into the specified object.
 	 */
-	protected void decodeAttribute(mxCodec dec, Node attr, Object obj)
-	{
+	protected void decodeAttribute (mxCodec dec, Node attr, Object obj) {
 		String name = attr.getNodeName();
 
-		if (!name.equalsIgnoreCase("as") && !name.equalsIgnoreCase("id"))
-		{
+		if (!name.equalsIgnoreCase("as") && !name.equalsIgnoreCase("id")) {
 			Object value = attr.getNodeValue();
 			String fieldname = getFieldName(name);
 
-			if (isReference(obj, fieldname, value, false))
-			{
+			if (isReference(obj, fieldname, value, false)) {
 				Object tmp = dec.getObject(String.valueOf(value));
 
-				if (tmp == null)
-				{
+				if (tmp == null) {
 					log.log(Level.FINEST, "mxObjectCodec.decode: No object for "
 							+ getName() + "." + fieldname + "=" + value);
 					return; // exit
@@ -1112,26 +904,19 @@ public class mxObjectCodec
 			}
 
 			if (!isExcluded(obj, fieldname, value, false))
-			{
 				setFieldValue(obj, fieldname, value);
-			}
 		}
 	}
 
 	/**
 	 * Decodec all children of the given node using decodeChild.
 	 */
-	protected void decodeChildren(mxCodec dec, Node node, Object obj)
-	{
+	protected void decodeChildren (mxCodec dec, Node node, Object obj) {
 		Node child = node.getFirstChild();
 
-		while (child != null)
-		{
-			if (child.getNodeType() == Node.ELEMENT_NODE
-					&& !processInclude(dec, child, obj))
-			{
+		while (child != null) {
+			if (child.getNodeType() == Node.ELEMENT_NODE && !processInclude(dec, child, obj))
 				decodeChild(dec, child, obj);
-			}
 
 			child = child.getNextSibling();
 		}
@@ -1140,32 +925,26 @@ public class mxObjectCodec
 	/**
 	 * Reads the specified child into the given object.
 	 */
-	protected void decodeChild(mxCodec dec, Node child, Object obj)
-	{
-		String fieldname = getFieldName(((Element) child).getAttribute("as"));
+	protected void decodeChild (mxCodec dec, Node child, Object obj) {
+		String fieldName = getFieldName(((Element) child).getAttribute("as"));
 
-		if (fieldname == null || !isExcluded(obj, fieldname, child, false))
-		{
-			Object template = getFieldTemplate(obj, fieldname, child);
+		if (fieldName == null || !isExcluded(obj, fieldName, child, false)) {
+			Object template = getFieldTemplate(obj, fieldName, child);
 			Object value = null;
 
-			if (child.getNodeName().equals("add"))
-			{
+			if (child.getNodeName().equals("add")) {
 				value = ((Element) child).getAttribute("value");
 
 				if (value == null)
-				{
 					value = child.getTextContent();
-				}
 			}
-			else
-			{
+			else {
 				value = dec.decode(child, template);
 				// log.log(Level.FINEST, "Decoded " + child.getNodeName() + "."
-				// + fieldname + "=" + value);
+				// + fieldName + "=" + value);
 			}
 
-			addObjectValue(obj, fieldname, value, template);
+			addObjectValue(obj, fieldName, value, template);
 		}
 	}
 
@@ -1177,51 +956,37 @@ public class mxObjectCodec
 	 * required to override this to return the correct collection instance
 	 * based on the encoded child.
 	 */
-	protected Object getFieldTemplate(Object obj, String fieldname, Node child)
-	{
-		Object template = getFieldValue(obj, fieldname);
+	protected Object getFieldTemplate (Object obj, String fieldName, Node child) {
+		Object template = getFieldValue(obj, fieldName);
 
 		// Arrays are replaced completely
 		if (template != null && template.getClass().isArray())
-		{
 			template = null;
-		}
 		// Collections are cleared
 		else if (template instanceof Collection)
-		{
 			((Collection<?>) template).clear();
-		}
 
 		return template;
 	}
 
 	/**
 	 * Sets the decoded child node as a value of the given object. If the
-	 * object is a map, then the value is added with the given fieldname as a
-	 * key. If the fieldname is not empty, then setFieldValue is called or
+	 * object is a map, then the value is added with the given fieldName as a
+	 * key. If the fieldName is not empty, then setFieldValue is called or
 	 * else, if the object is a collection, the value is added to the
 	 * collection. For strongly typed languages it may be required to
 	 * override this with the correct code to add an entry to an object.
 	 */
-	protected void addObjectValue(Object obj, String fieldname, Object value,
-			Object template)
-	{
-		if (value != null && !value.equals(template))
-		{
-			if (fieldname != null && obj instanceof Map)
-			{
-				((Map) obj).put(fieldname, value);
-			}
-			else if (fieldname != null && fieldname.length() > 0)
-			{
-				setFieldValue(obj, fieldname, value);
-			}
+	protected void addObjectValue (Object obj, String fieldName, Object value, Object template) {
+		if (value != null && !value.equals(template)) {
+			if (fieldName != null && obj instanceof Map<?, ?>)
+				((Map<Object, Object>) obj).put(fieldName, value);
+			else if (fieldName != null && fieldName.length() > 0)
+				setFieldValue(obj, fieldName, value);
 			// Arrays are treated as collections and
 			// converted in setFieldValue
 			else if (obj instanceof Collection)
-			{
-				((Collection) obj).add(value);
-			}
+				((Collection<Object>) obj).add(value);
 		}
 	}
 
@@ -1235,28 +1000,20 @@ public class mxObjectCodec
 	 * @param into Optional object to pass-thru to the codec.
 	 * @return Returns true if the given node was processed as an include.
 	 */
-	public boolean processInclude(mxCodec dec, Node node, Object into)
-	{
-		if (node.getNodeType() == Node.ELEMENT_NODE
-				&& node.getNodeName().equalsIgnoreCase("include"))
-		{
+	public boolean processInclude(mxCodec dec, Node node, Object into) {
+		if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equalsIgnoreCase("include")) {
 			String name = ((Element) node).getAttribute("name");
 
-			if (name != null)
-			{
-				try
-				{
+			if (name != null) {
+				try {
 					Node xml = mxUtils.loadDocument(
 							mxObjectCodec.class.getResource(name).toString())
 							.getDocumentElement();
 
 					if (xml != null)
-					{
 						dec.decode(xml, into);
-					}
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					log.log(Level.FINEST, "Cannot process include: " + name, e);
 				}
 			}
@@ -1268,7 +1025,7 @@ public class mxObjectCodec
 	}
 
 	/**
-	 * Hook for subclassers to pre-process the node for the specified object
+	 * Hook for subclasses to pre-process the node for the specified object
 	 * and return the node to be used for further processing by
 	 * {@link #decode(mxCodec, Node)}. The object is created based on the
 	 * template in the calling method and is never null.
@@ -1282,13 +1039,13 @@ public class mxObjectCodec
 	 * @param obj Object to encode the node into.
 	 * @return Returns the node used for the default decoding.
 	 */
-	public Node beforeDecode(mxCodec dec, Node node, Object obj)
+	public Node beforeDecode (mxCodec dec, Node node, Object obj)
 	{
 		return node;
 	}
 
 	/**
-	 * Hook for subclassers to post-process the object after decoding. This
+	 * Hook for subclasses to post-process the object after decoding. This
 	 * implementation returns the given object without any changes. The return
 	 * value of this method is returned to the decoder from
 	 * {@link #decode(mxCodec, Node)}.
@@ -1298,7 +1055,7 @@ public class mxObjectCodec
 	 * @param obj Object that represents the default decoding.
 	 * @return Returns the result of the decoding process.
 	 */
-	public Object afterDecode(mxCodec dec, Node node, Object obj)
+	public Object afterDecode (mxCodec dec, Node node, Object obj)
 	{
 		return obj;
 	}

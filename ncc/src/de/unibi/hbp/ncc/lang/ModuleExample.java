@@ -1,10 +1,11 @@
 package de.unibi.hbp.ncc.lang;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ModuleExample extends NetworkModule {
    public ModuleExample (Namespace<NetworkModule> namespace, String name) {
-      super(namespace, name, Arrays.asList("in X", "in Y"), Arrays.asList("out X", "out Y"));
+      super(namespace, name);
    }
 
    public ModuleExample (String namePrefix) {
@@ -19,6 +20,16 @@ public class ModuleExample extends NetworkModule {
    public LanguageEntity duplicate () {
       throw new UnsupportedOperationException("TODO");
       // return null;
+   }
+
+   @Override
+   protected List<String> getInputPortNames () {
+      return Arrays.asList("in X", "in Y");
+   }
+
+   @Override
+   protected List<String> getOutputPortNames () {
+      return Arrays.asList("out X", "out Y");
    }
 
    public static final EntityCreator<ModuleExample> CREATOR = new Creator();

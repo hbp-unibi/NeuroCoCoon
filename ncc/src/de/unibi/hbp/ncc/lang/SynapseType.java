@@ -1,6 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
-import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.graph.AbstractCellsCollector;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
@@ -14,8 +14,8 @@ import java.util.Objects;
 public class SynapseType extends NamedEntity<SynapseType> {
 
    public enum ConnectorKind implements DisplayNamed {
-      ALL_TO_ALL("All:All", "alltoall"),
-      ONE_TO_ONE("One:One", "onetoone"),
+      ALL_TO_ALL("All:All", "allToAll"),
+      ONE_TO_ONE("One:One", "oneToOne"),
       FIXED_PROBABILITY("Probability", "probability");
 
       private String displayName, edgeStyle;
@@ -48,7 +48,7 @@ public class SynapseType extends NamedEntity<SynapseType> {
             return edgeStyle + ";endArrow=oval";
          else if (weight > 0)
             return edgeStyle;
-         else return "weightzero";
+         else return "weightZero";
       }
    }
 
@@ -80,6 +80,7 @@ public class SynapseType extends NamedEntity<SynapseType> {
             .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
       this.weight = new DoubleProp("Weight", this, weight)
             .setImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
+      // FIXME styles in dependent cells (edges) are NOT updated when the sign of the weight is changed (cell collector ok?)
       this.delay = new NonNegativeDoubleProp("Delay", this, delay).setUnit("ms");
       this.probability = new NonNegativeDoubleProp("Probability", this, probability) {
          @Override
@@ -126,10 +127,10 @@ public class SynapseType extends NamedEntity<SynapseType> {
    }
 
    @Override
-   public List<mxCell> getDependentCells (mxIGraphModel graphModel) {
-      return new AbstractCellsCollector() {
+   public List<mxICell> getDependentCells (mxIGraphModel graphModel) {
+      return new AbstractCellsCollector(false, true) {
          @Override
-         protected boolean matches (mxCell cell, LanguageEntity entity) {
+         protected boolean matches (mxICell cell, LanguageEntity entity) {
             return entity instanceof NeuronConnection &&
                   SynapseType.this.equals(((NeuronConnection) entity).getSynapseType());
          }

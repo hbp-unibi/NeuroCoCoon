@@ -3,17 +3,16 @@
  */
 package com.mxgraph.io;
 
-import java.util.Iterator;
-import java.util.Map;
-
+import com.mxgraph.model.mxCell;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.mxgraph.model.mxCell;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Codec for mxCells. This class is created and registered
- * dynamically at load time and used implicitely via mxCodec
+ * dynamically at load time and used implicitly via mxCodec
  * and the mxCodecRegistry.
  */
 public class mxCellCodec extends mxObjectCodec

@@ -24,14 +24,16 @@
 		<add as="fillColor" value="#ddddff"/>
 		<add as="strokeColor" value="#bbbbdd"/>
 	</add>
-	<add as="spikesource" extend="defaultVertex">
+	<add as="spikeSource" extend="defaultVertex">
 		<add as="shape" value="triangle"/>
+		<add as="perimeter" value="trianglePerimeter"/>
 		<add as="fillColor" value="#ddffdd"/>
 		<add as="strokeColor" value="#bbddbb"/>
 		<add as="align" value="left"/>
 	</add>
-	<add as="poissonsource" extend="defaultVertex">
+	<add as="poissonSource" extend="defaultVertex">
 		<add as="shape" value="rhombus"/>
+		<add as="perimeter" value="rhombusPerimeter"/>
 		<add as="fillColor" value="#ddff88"/>
 		<add as="strokeColor" value="#bbdd77"/>
 	</add>
@@ -45,26 +47,29 @@
 		<add as="strokeWidth" value="3"/>
 		<add as="verticalAlign" value="top"/>
 	</add>
-	<add as="portany" extend="defaultVertex">
+	<add as="moduleWide" extend="module">
+		<add as="verticalAlign" value="middle"/>
+	</add>
+	<add as="portAny" extend="defaultVertex">
 		<add as="shape" value="triangle"/>
 		<add as="perimeter" value="trianglePerimeter"/>
 		<add as="fillColor" value="#ff77ff"/>
 		<add as="strokeColor" value="#dd66dd"/>
 		<add as="strokeWidth" value="1"/>
 	</add>
-	<add as="portleft" extend="portany">
+	<add as="portLeft" extend="portAny">
 		<add as="direction" value="east"/>
 		<add as="labelPosition" value="right"/>
 	</add>
-	<add as="portright" extend="portany">
+	<add as="portRight" extend="portAny">
 		<add as="direction" value="east"/>
 		<add as="labelPosition" value="left"/>
 	</add>
-	<add as="porttop" extend="portany">
+	<add as="portTop" extend="portAny">
 		<add as="direction" value="south"/>
 		<add as="verticalLabelPosition" value="bottom"/>
 	</add>
-	<add as="portbottom" extend="portany">
+	<add as="portBottom" extend="portAny">
 		<add as="direction" value="south"/>
 		<add as="verticalLabelPosition" value="top"/>
 	</add>
@@ -73,17 +78,17 @@
 		<add as="endArrow" value="classic"/>
 		<add as="edgeStyle" value="none"/>
 	</add>
-	<add as="alltoall" extends="straight">
+	<add as="allToAll" extends="straight">
 		<add as="strokeWidth" value="4"/>
 	</add>
-	<add as="onetoone" extends="straight">
+	<add as="oneToOne" extends="straight">
 		<add as="strokeWidth" value="2"/>
 	</add>
 	<add as="probability" extends="straight">
 		<add as="strokeWidth" value="2"/>
 		<add as="dashed" value="1"/>
 	</add>
-	<add as="weightzero" extends="straight">
+	<add as="weightZero" extends="straight">
 		<add as="strokeWidth" value="2"/>
 		<add as="strokeColor" value="#ff3333"/>
 	</add>

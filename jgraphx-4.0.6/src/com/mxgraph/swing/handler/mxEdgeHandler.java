@@ -131,16 +131,14 @@ public class mxEdgeHandler extends mxCellHandler
 	 * Returns the error message or an empty string if the connection for the
 	 * given source target pair is not valid. Otherwise it returns null.
 	 */
-	public String validateConnection(Object source, Object target)
-	{
-		return graphComponent.getGraph().getEdgeValidationError(
-				state.getCell(), source, target);
+	public String validateConnection (Object source, Object target) {
+		return graphComponent.getGraph().getEdgeValidationError(state.getCell(), source, target);
 	}
 
 	/**
 	 * Returns true if the current index is 0.
 	 */
-	public boolean isSource(int index)
+	public boolean isSource (int index)
 	{
 		return index == 0;
 	}
@@ -148,7 +146,7 @@ public class mxEdgeHandler extends mxCellHandler
 	/**
 	 * Returns true if the current index is the last index.
 	 */
-	public boolean isTarget(int index)
+	public boolean isTarget( int index)
 	{
 		return index == getHandleCount() - 2;
 	}

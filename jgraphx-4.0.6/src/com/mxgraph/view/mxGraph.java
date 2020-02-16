@@ -4929,47 +4929,32 @@ public class mxGraph extends mxEventSource
 	 * @param source Cell that represents the source terminal.
 	 * @param target Cell that represents the target terminal.
 	 */
-	public String getEdgeValidationError(Object edge, Object source,
-			Object target)
-	{
-		if (edge != null && !isAllowDanglingEdges()
-				&& (source == null || target == null))
-		{
+	public String getEdgeValidationError (Object edge, Object source, Object target) {
+		if (edge != null && !isAllowDanglingEdges() && (source == null || target == null))
 			return "";
-		}
 
 		if (edge != null && model.getTerminal(edge, true) == null
 				&& model.getTerminal(edge, false) == null)
-		{
 			return null;
-		}
 
 		// Checks if we're dealing with a loop
 		if (!isAllowLoops() && source == target && source != null)
-		{
 			return "";
-		}
 
 		// Checks if the connection is generally allowed
 		if (!isValidConnection(source, target))
-		{
 			return "";
-		}
 
-		if (source != null && target != null)
-		{
+		if (source != null && target != null) {
 			StringBuilder error = new StringBuilder();
 
 			// Checks if the cells are already connected
 			// and adds an error message if required			
-			if (!multigraph)
-			{
-				Object[] tmp = mxGraphModel.getEdgesBetween(model, source,
-						target, true);
+			if (!multigraph) {
+				Object[] tmp = mxGraphModel.getEdgesBetween(model, source, target, true);
 
 				// Checks if the source and target are not connected by another edge
-				if (tmp.length > 1 || (tmp.length == 1 && tmp[0] != edge))
-				{
+				if (tmp.length > 1 || (tmp.length == 1 && tmp[0] != edge)) {
 					error.append(mxResources.get("alreadyConnected",
 												 "Already Connected")).append("\n");
 				}
@@ -4978,21 +4963,16 @@ public class mxGraph extends mxEventSource
 			// Gets the number of outgoing edges from the source
 			// and the number of incoming edges from the target
 			// without counting the edge being currently changed.
-			int sourceOut = mxGraphModel.getDirectedEdgeCount(model, source,
-					true, edge);
-			int targetIn = mxGraphModel.getDirectedEdgeCount(model, target,
-					false, edge);
+			int sourceOut = mxGraphModel.getDirectedEdgeCount(model, source, true, edge);
+			int targetIn = mxGraphModel.getDirectedEdgeCount(model, target, false, edge);
 
 			// Checks the change against each multiplicity rule
-			if (multiplicities != null)
-			{
+			if (multiplicities != null) {
 				for (mxMultiplicity multiplicity: multiplicities) {
-					String err = multiplicity.check(this, edge, source,
-													target, sourceOut, targetIn);
+					String err = multiplicity.check(this, edge, source, target, sourceOut, targetIn);
 
-					if (err != null) {
+					if (err != null)
 						error.append(err);
-					}
 				}
 			}
 
@@ -5000,14 +4980,12 @@ public class mxGraph extends mxEventSource
 			String err = validateEdge(edge, source, target);
 
 			if (err != null)
-			{
 				error.append(err);
-			}
 
 			return (error.length() > 0) ? error.toString() : null;
 		}
 
-		return (allowDanglingEdges) ? null : "";
+		return isAllowDanglingEdges() ? null : "";
 	}
 
 	/**
@@ -6399,8 +6377,7 @@ public class mxGraph extends mxEventSource
 	 * @return Returns true if the the connection between the given terminals
 	 * is valid.
 	 */
-	public boolean isValidConnection(Object source, Object target)
-	{
+	public boolean isValidConnection (Object source, Object target) {
 		return isValidSource(source) && isValidTarget(target)
 				&& (isAllowLoops() || source != target);
 	}
@@ -6762,11 +6739,9 @@ public class mxGraph extends mxEventSource
 	 * @param edges Specifies if child edges should be returned.
 	 * @return Returns the child vertices and edges.
 	 */
-	public Object[] getChildCells(Object parent, boolean vertices,
-			boolean edges)
+	public Object[] getChildCells(Object parent, boolean vertices, boolean edges)
 	{
-		Object[] cells = mxGraphModel.getChildCells(model, parent, vertices,
-				edges);
+		Object[] cells = mxGraphModel.getChildCells(model, parent, vertices, edges);
 		List<Object> result = new ArrayList<>(cells.length);
 
 		// Filters out the non-visible child cells

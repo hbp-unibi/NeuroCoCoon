@@ -68,8 +68,9 @@ public class EditorAboutFrame extends JDialog
 
 		// Adds optional subtitle
 		JLabel subtitleLabel = new JLabel(
-				"<html><body>For more information visit<br>" +
-						"<a href=\"http://www.humanbrainproject.eu\">http://www.humanbrainproject.eu</a></body></html>");
+				"<html>For more information visit<br>" +
+						"<a href=\"http://www.humanbrainproject.eu\">http://www.humanbrainproject.eu</a></html>");
+		// <html> tag is required to get further HTML tags interpreted , but <body> tag is optional
 		subtitleLabel.setBorder(BorderFactory.createEmptyBorder(4, 18, 0, 0));
 		subtitleLabel.setOpaque(false);
 		panel.add(subtitleLabel, BorderLayout.CENTER);

@@ -11,7 +11,8 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import java.util.Objects;
 
-public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditableProp<E> implements NameProp<E> {
+public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditableProp<E>
+      implements NameProp<E> {
    private Namespace<E> targetNamespace;
 
    public EditableNameProp (String propName, Class<E> valueClass, LanguageEntity owner,
@@ -39,5 +40,6 @@ public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditablePr
       comboBox.setEditable(false);
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
+      // FIXME combobox does NOT commit changes on itemChanged (but only on focus lost and maybe ENTER?)
    }
 }

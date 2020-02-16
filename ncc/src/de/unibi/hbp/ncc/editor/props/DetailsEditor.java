@@ -1,8 +1,6 @@
 package de.unibi.hbp.ncc.editor.props;
 
-import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -30,17 +28,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
 public class DetailsEditor {
-   private PropsTableModel tableModel;
-   private JTable table;
-   private JComponent component;
+   private final PropsTableModel tableModel;
+   private final JTable table;
+   private final JComponent component;
+
+   private static final String SMART_NAV_PREV = "smartNavPrev";
+   private static final String SMART_NAV_NEXT = "smartNavNext";
 
    public DetailsEditor () {
       tableModel = new PropsTableModel();
+      Notificator.getInstance().subscribe(tableModel);
       TableColumnModel tableColumnModel = new DefaultTableColumnModel();
       TableColumn markerColumn = new TableColumn(0, 30);
       // no header text
@@ -57,25 +58,26 @@ public class DetailsEditor {
       tableColumnModel.addColumn(valueColumn);
       table = new JTable(tableModel, tableColumnModel);
       // replace action for ENTER, since next row would be selected automatically
+      // FIXME TAB and SHIFT-TAB and SHIFT-ENTER work, but ENTER alone is somehow consumed?
       ActionMap actions = table.getActionMap();
-      actions.put("smartNavNext", new SmartNavigationAction("smartNavNext", +1));
-      actions.put("smartNavPrev", new SmartNavigationAction("smartNavPrev", -1));
+      actions.put(SMART_NAV_NEXT, new SmartNavigationAction(+1));
+      actions.put(SMART_NAV_PREV, new SmartNavigationAction(-1));
       InputMap whenAncestor = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "smartNavNext");
-      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), "smartNavPrev");
-      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "smartNavNext");
-      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "smartNavPrev");
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), SMART_NAV_NEXT);
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), SMART_NAV_PREV);
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), SMART_NAV_NEXT);
+      whenAncestor.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), SMART_NAV_PREV);
       table.setGridColor(Color.LIGHT_GRAY);
       table.setShowGrid(true);
       table.setFillsViewportHeight(true);
-      component = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+      component = new JScrollPane(table);  // both scrollbars as needed
    }
 
    private class SmartNavigationAction extends AbstractAction {
       private int rowDelta;
 
-      public SmartNavigationAction (String name, int rowDelta) {
-         super(name);
+      public SmartNavigationAction (int rowDelta) {
+         super();
          this.rowDelta = rowDelta;
       }
 
@@ -165,13 +167,14 @@ public class DetailsEditor {
 
       @Override
       public Component getTableCellEditorComponent (JTable table, Object value, boolean isSelected, int row, int column) {
-         EditableProp<?> prop = tableModel.getPropForRow(row);
+         EditableProp<?> prop = tableModel.getEditablePropForRow(row);
          editor = prop.getTableCellEditor(table);
          return editor.getTableCellEditorComponent(table, value, isSelected, row, column);
       }
    }
 
-   static class PropsTableModel extends AbstractTableModel {
+   static class PropsTableModel extends AbstractTableModel
+         implements PropPerRowModel, PropChangeListener {
       private mxGraphComponent graphComponent;
       private LanguageEntity subject;
       List<ReadOnlyProp<?>> readOnlyProps;
@@ -203,7 +206,30 @@ public class DetailsEditor {
          fireTableDataChanged();
       }
 
-      boolean isIndirectProp (int rowIndex) { return !subject.equals(getAnyPropForRow(rowIndex).getEnclosingEntity()); }
+      @Override
+      public void propertyChanged (EditableProp<?> changed, int position) {
+         if (position != PropChangeListener.UNKNOWN_POSITION)
+            fireTableCellUpdated(position, 2);
+         else {
+            int rowIndex = PropModelSearch.findPosition(this, changed);
+            if (rowIndex != PropChangeListener.UNKNOWN_POSITION)
+               fireTableCellUpdated(rowIndex, 2);
+         }
+      }
+
+      @Override
+      public void multiplePropertyValuesChanged (LanguageEntity affected) {
+         if (affected.equals(subject) || PropModelSearch.haveRowForEntity(this, affected))
+            fireTableDataChanged();
+      }
+
+      @Override
+      public void otherPropertiesVisibilityChanged (LanguageEntity affected) {
+         if (affected.equals(subject) || PropModelSearch.haveRowForEntity(this, affected))
+            updateSubject(subject);  // force reconstruction of table structure
+      }
+
+      boolean isIndirectProp (int rowIndex) { return !subject.equals(getPropForRow(rowIndex).getEnclosingEntity()); }
 
       @Override
       public int getRowCount () {
@@ -214,68 +240,45 @@ public class DetailsEditor {
       public int getColumnCount () {
          return 3;
       }
-
-      private ReadOnlyProp<?> getAnyPropForRow (int rowIndex) {
+      @Override
+      public ReadOnlyProp<?> getPropForRow (int rowIndex) {
          if (rowIndex < readOnlyProps.size())
             return readOnlyProps.get(rowIndex);
          else
             return editableProps.get(rowIndex - readOnlyProps.size());
       }
 
-      private EditableProp<?> getPropForRow (int rowIndex) {
+      private EditableProp<?> getEditablePropForRow (int rowIndex) {
          assert rowIndex >= readOnlyProps.size() : "value of read-only prop cannot be edited";
          return editableProps.get(rowIndex - readOnlyProps.size());
       }
 
       @Override
       public Object getValueAt (int rowIndex, int columnIndex) {
-         if (columnIndex == 0){
-            ReadOnlyProp<?> prop = getAnyPropForRow(rowIndex);
+         if (columnIndex == 0) {
+            ReadOnlyProp<?> prop = getPropForRow(rowIndex);
             return VisualMarkers.getPropertyMarkers(prop, subject);
          }
-         if (columnIndex == 1)
-            return getAnyPropForRow(rowIndex).getPropName(true);
+         else if (columnIndex == 1)
+            return getPropForRow(rowIndex).getPropName(true);
          else
-            return getAnyPropForRow(rowIndex).getValue();
+            return getPropForRow(rowIndex).getValue();
       }
 
       @Override
       public void setValueAt (Object value, int rowIndex, int columnIndex) {
          assert columnIndex == 2 : "only value column can be edited";
          if (value != null) {
-            EditableProp<?> prop = getPropForRow(rowIndex);
+            EditableProp<?> prop = getEditablePropForRow(rowIndex);
             prop.setRawValue(value);
-            fireTableCellUpdated(rowIndex, columnIndex);
-            EnumSet<EditableProp.Impact> impact = prop.getChangeImpact();
-            LanguageEntity parent = prop.getEnclosingEntity();
-            mxCell cell = parent.getOwningCell();
-            if (cell != null && impact.contains(EditableProp.Impact.CELL_LABEL)) {
-               graphComponent.labelChanged(cell, subject, null);
-            }
-            if (cell != null && impact.contains(EditableProp.Impact.CELL_STYLE)) {
-               String style = parent.getCellStyle();
-               if (style != null)
-                  graphComponent.getGraph().setCellStyle(style, new Object[] { cell });
-            }
-            if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_STYLE)) {
-               String style = parent.getCellStyle();
-               if (style != null) {
-                  mxGraph graph = graphComponent.getGraph();
-                  List<mxCell> dependentCells = parent.getDependentCells(graph.getModel());
-                  graph.setCellStyle(style, dependentCells.toArray());
-               }
-            }
-            // FIXME handle in between cases
-            if (impact.contains(EditableProp.Impact.OTHER_PROPS_VISIBILITY))
-               updateSubject(subject);  // force set of visible table rows to change
+            Notificator.getInstance().notify(this, prop, rowIndex);
          }
       }
 
       @Override
       public boolean isCellEditable (int rowIndex, int columnIndex) {
          return columnIndex == 2 && rowIndex >= readOnlyProps.size() &&
-               !getAnyPropForRow(rowIndex).getEnclosingEntity().isPredefined();
+               !getPropForRow(rowIndex).getEnclosingEntity().isPredefined();
       }
-
    }
 }

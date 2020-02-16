@@ -55,5 +55,6 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
       comboBox.setEditable(false);
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
+      // FIXME combobox does NOT commit changes on itemChanged (but only on focus lost and maybe ENTER?)
    }
 }

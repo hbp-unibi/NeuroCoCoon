@@ -17,9 +17,9 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    public SimpleEditableProp (String propName, Class<T> valueClass, LanguageEntity owner, T value) {
       this.propName = Objects.requireNonNull(propName);
       this.valueClass = Objects.requireNonNull(valueClass);
-      this.impact = DEFAULT_IMPACT;
+      // this.impact = DEFAULT_IMPACT;  // null means may still be set
       this.owner = Objects.requireNonNull(owner);
-      setValue(value);
+      setValueInternal(value);
    }
 
    public SimpleEditableProp<T> setUnit (String unit) {
@@ -37,7 +37,8 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
 
    public SimpleEditableProp<T> setImpact (Impact impact) {
       assert this.impact == null : "may only be set once at creation time";
-      this.impact = EnumSet.of(Objects.requireNonNull(impact));
+      assert impact != Impact.OWN_VALUE : "impact on own value is assumed by default anyway";
+      this.impact = EnumSet.of(Impact.OWN_VALUE, Objects.requireNonNull(impact));
       return this;
    }
 
@@ -48,6 +49,13 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
 
    @Override
    public void setValue (T value) {
+      if (!isValid(value))
+         throw new IllegalArgumentException("property " + getPropName() + " at " + owner + ": invalid value " + value);
+      this.value = value;
+   }
+
+   public final void setValueInternal (T value) {
+      // should never be overridden
       if (!isValid(value))
          throw new IllegalArgumentException("property " + getPropName() + " at " + owner + ": invalid value " + value);
       this.value = value;
@@ -74,6 +82,6 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    public Class<T> getValueClass () { return valueClass; }
 
    @Override
-   public EnumSet<Impact> getChangeImpact () { return impact; }
+   public EnumSet<Impact> getChangeImpact () { return impact != null ? impact : DEFAULT_IMPACT; }
 
 }

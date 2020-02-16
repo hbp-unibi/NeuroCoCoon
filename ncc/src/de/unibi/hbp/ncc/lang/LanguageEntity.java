@@ -1,6 +1,7 @@
 package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
@@ -49,7 +50,7 @@ public abstract class LanguageEntity {
    public String getCellStyle () { return null; }
 
    // override this in subclasses, indirectly referenced from (multiple) cell-associated entities
-   public List<mxCell> getDependentCells (mxIGraphModel graphModel) {
+   public List<mxICell> getDependentCells (mxIGraphModel graphModel) {
       return Collections.emptyList();
    }
 

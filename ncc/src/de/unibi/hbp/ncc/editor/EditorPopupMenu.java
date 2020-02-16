@@ -15,35 +15,25 @@ public class EditorPopupMenu extends JPopupMenu
 
 	public EditorPopupMenu(BasicGraphEditor editor)
 	{
-		boolean selected = !editor.getGraphComponent().getGraph()
-				.isSelectionEmpty();
+		boolean selected = !editor.getGraphComponent().getGraph().isSelectionEmpty();
 
 		add(editor.bind(mxResources.get("undo"), new HistoryAction(true),
 				"/de/unibi/hbp/ncc/images/undo.gif"));
 
 		addSeparator();
 
-		add(
-				editor.bind(mxResources.get("cut"), TransferHandler
-						.getCutAction(),
-						"/de/unibi/hbp/ncc/images/cut.gif"))
-				.setEnabled(selected);
-		add(
-				editor.bind(mxResources.get("copy"), TransferHandler
-						.getCopyAction(),
-						"/de/unibi/hbp/ncc/images/copy.gif"))
-				.setEnabled(selected);
-		add(editor.bind(mxResources.get("paste"), TransferHandler
-				.getPasteAction(),
+		add(editor.bind(mxResources.get("cut"), TransferHandler.getCutAction(),
+						"/de/unibi/hbp/ncc/images/cut.gif")).setEnabled(selected);
+		add(editor.bind(mxResources.get("copy"), TransferHandler.getCopyAction(),
+						"/de/unibi/hbp/ncc/images/copy.gif")).setEnabled(selected);
+		add(editor.bind(mxResources.get("paste"), TransferHandler.getPasteAction(),
 				"/de/unibi/hbp/ncc/images/paste.gif"));
 
 		addSeparator();
 
 		add(
-				editor.bind(mxResources.get("delete"), mxGraphActions
-						.getDeleteAction(),
-						"/de/unibi/hbp/ncc/images/delete.gif"))
-				.setEnabled(selected);
+				editor.bind(mxResources.get("delete"), mxGraphActions.getDeleteAction(),
+						"/de/unibi/hbp/ncc/images/delete.gif")).setEnabled(selected);
 
 		addSeparator();
 
@@ -60,21 +50,16 @@ public class EditorPopupMenu extends JPopupMenu
 
 		addSeparator();
 
-		add(
-				editor.bind(mxResources.get("edit"), mxGraphActions
-						.getEditAction())).setEnabled(selected);
+//		add(editor.bind(mxResources.get("edit"), mxGraphActions.getEditAction())).setEnabled(selected);
 
 		addSeparator();
 
-		add(editor.bind(mxResources.get("selectVertices"), mxGraphActions
-				.getSelectVerticesAction()));
-		add(editor.bind(mxResources.get("selectEdges"), mxGraphActions
-				.getSelectEdgesAction()));
+		add(editor.bind(mxResources.get("selectVertices"), mxGraphActions.getSelectVerticesAction()));
+		add(editor.bind(mxResources.get("selectEdges"), mxGraphActions.getSelectEdgesAction()));
 
 		addSeparator();
 
-		add(editor.bind(mxResources.get("selectAll"), mxGraphActions
-				.getSelectAllAction()));
+		add(editor.bind(mxResources.get("selectAll"), mxGraphActions.getSelectAllAction()));
 	}
 
 }

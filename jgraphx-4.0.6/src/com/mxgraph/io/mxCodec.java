@@ -3,19 +3,18 @@
  */
 package com.mxgraph.io;
 
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxCellPath;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxDomUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * XML codec for Java object graphs. In order to resolve forward references
@@ -64,9 +63,7 @@ public class mxCodec
 	public mxCodec(Document document)
 	{
 		if (document == null)
-		{
 			document = mxDomUtils.createDocument();
-		}
 
 		this.document = document;
 	}
@@ -134,26 +131,17 @@ public class mxCodec
 	 * @param id ID of the object to be returned.
 	 * @return Returns the object for the given ID.
 	 */
-	public Object getObject(String id)
-	{
+	public Object getObject (String id) {
 		Object obj = null;
 
-		if (id != null)
-		{
+		if (id != null) {
 			obj = objects.get(id);
-
-			if (obj == null)
-			{
+			if (obj == null) {
 				obj = lookup(id);
-
-				if (obj == null)
-				{
+				if (obj == null) {
 					Node node = getElementById(id);
-
 					if (node != null)
-					{
 						obj = decode(node);
-					}
 				}
 			}
 		}
@@ -162,7 +150,7 @@ public class mxCodec
 	}
 
 	/**
-	 * Hook for subclassers to implement a custom lookup mechanism for cell IDs.
+	 * Hook for subclasses to implement a custom lookup mechanism for cell IDs.
 	 * This implementation always returns null.
 	 * 
 	 * @param id ID of the object to be returned.
@@ -179,11 +167,9 @@ public class mxCodec
 	 * @param id ID of the element to be returned.
 	 * @return Returns the element for the given ID.
 	 */
-	public Node getElementById(String id)
-	{
-		if (elements == null)
-		{
-			elements = new Hashtable<String, Node>();
+	public Node getElementById (String id) {
+		if (elements == null) {
+			elements = new Hashtable<>();
 			addElement(document.getDocumentElement());
 		}
 		
@@ -193,22 +179,17 @@ public class mxCodec
 	/**
 	 * Adds the given element to <elements> if it has an ID.
 	 */
-	protected void addElement(Node node)
-	{
-		if (node instanceof Element)
-		{
+	protected void addElement (Node node) {
+		if (node instanceof Element) {
 			String id = ((Element) node).getAttribute("id");
 			
 			if (id != null && !elements.containsKey(id))
-			{
-				elements.put(id,  node);
-			}
+				elements.put(id, node);
 		}
 		
 		node = node.getFirstChild();
 		
-		while (node != null)
-		{
+		while (node != null) {
 			addElement(node);
 			node = node.getNextSibling();
 		}
@@ -224,27 +205,21 @@ public class mxCodec
 	 * @param obj Object to return the ID for.
 	 * @return Returns the ID for the given object.
 	 */
-	public String getId(Object obj)
-	{
+	public String getId (Object obj) {
 		String id = null;
 
-		if (obj != null)
-		{
+		if (obj != null) {
 			id = reference(obj);
 
-			if (id == null && obj instanceof mxICell)
-			{
+			if (id == null && obj instanceof mxICell) {
 				id = ((mxICell) obj).getId();
 
-				if (id == null)
-				{
+				if (id == null) {
 					// Uses an on-the-fly Id
 					id = mxCellPath.create((mxICell) obj);
 
 					if (id.length() == 0)
-					{
 						id = "root";
-					}
 				}
 			}
 		}
@@ -253,7 +228,7 @@ public class mxCodec
 	}
 
 	/**
-	 * Hook for subclassers to implement a custom method for retrieving IDs from
+	 * Hook for subclasses to implement a custom method for retrieving IDs from
 	 * objects. This implementation always returns null.
 	 * 
 	 * @param obj Object whose ID should be returned.
@@ -270,29 +245,20 @@ public class mxCodec
 	 * @param obj Object to be encoded.
 	 * @return Returns an XML node that represents the given object.
 	 */
-	public Node encode(Object obj)
-	{
+	public Node encode( Object obj) {
 		Node node = null;
 
-		if (obj != null)
-		{
+		if (obj != null) {
 			String name = mxCodecRegistry.getName(obj);
 			mxObjectCodec enc = mxCodecRegistry.getCodec(name);
 
 			if (enc != null)
-			{
 				node = enc.encode(this, obj);
-			}
-			else
-			{
+			else {
 				if (obj instanceof Node)
-				{
 					node = ((Node) obj).cloneNode(true);
-				}
 				else
-				{
 					log.log(Level.FINEST, "No codec for " + name);
-				}
 			}
 		}
 
@@ -305,7 +271,7 @@ public class mxCodec
 	 * @param node XML node to be decoded.
 	 * @return Returns an object that represents the given node.
 	 */
-	public Object decode(Node node)
+	public Object decode (Node node)
 	{
 		return decode(node, null);
 	}
@@ -322,28 +288,21 @@ public class mxCodec
 	 * @param into Optional object to be decodec into.
 	 * @return Returns an object that represents the given node.
 	 */
-	public Object decode(Node node, Object into)
-	{
+	public Object decode( Node node, Object into) {
 		Object obj = null;
 
-		if (node != null && node.getNodeType() == Node.ELEMENT_NODE)
-		{
+		if (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
 			mxObjectCodec codec = mxCodecRegistry.getCodec(node.getNodeName());
 
-			try
-			{
+			try {
 				if (codec != null)
-				{
 					obj = codec.decode(this, node, into);
-				}
-				else
-				{
+				else {
 					obj = node.cloneNode(true);
 					((Element) obj).removeAttribute("as");
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				log.log(Level.FINEST, "Cannot decode " + node.getNodeName(), e);
 			}
 		}
@@ -353,7 +312,7 @@ public class mxCodec
 
 	/**
 	 * Encoding of cell hierarchies is built-into the core, but is a
-	 * higher-level function that needs to be explicitely used by the
+	 * higher-level function that needs to be explicitly used by the
 	 * respective object encoders (eg. mxModelCodec, mxChildChangeCodec
 	 * and mxRootChangeCodec). This implementation writes the given cell
 	 * and its children as a (flat) sequence into the given node. The
@@ -366,18 +325,14 @@ public class mxCodec
 	 * @param includeChildren Boolean indicating if the method
 	 * should include all descendents.
 	 */
-	public void encodeCell(mxICell cell, Node node, boolean includeChildren)
-	{
+	public void encodeCell (mxICell cell, Node node, boolean includeChildren) {
 		node.appendChild(encode(cell));
 
-		if (includeChildren)
-		{
+		if (includeChildren) {
 			int childCount = cell.getChildCount();
 
 			for (int i = 0; i < childCount; i++)
-			{
-				encodeCell(cell.getChildAt(i), node, includeChildren);
-			}
+				encodeCell(cell.getChildAt(i), node, true);
 		}
 	}
 
@@ -393,47 +348,36 @@ public class mxCodec
 	 * parent and terminals, respectively.
 	 * @return Graph cell that represents the given node.
 	 */
-	public mxICell decodeCell(Node node, boolean restoreStructures)
-	{
+	public mxICell decodeCell (Node node, boolean restoreStructures) {
 		mxICell cell = null;
 
-		if (node != null && node.getNodeType() == Node.ELEMENT_NODE)
-		{
+		if (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
 			// Tries to find a codec for the given node name. If that does
 			// not return a codec then the node is the user object (an XML node
 			// that contains the mxCell, aka inversion).
-			mxObjectCodec decoder = mxCodecRegistry
-					.getCodec(node.getNodeName());
+			mxObjectCodec decoder = mxCodecRegistry.getCodec(node.getNodeName());
 
 			// Tries to find the codec for the cell inside the user object.
 			// This assumes all node names inside the user object are either
 			// not registered or they correspond to a class for cells.
-			if (!(decoder instanceof mxCellCodec))
-			{
+			if (!(decoder instanceof mxCellCodec)) {
 				Node child = node.getFirstChild();
 
-				while (child != null && !(decoder instanceof mxCellCodec))
-				{
+				while (child != null && !(decoder instanceof mxCellCodec)) {
 					decoder = mxCodecRegistry.getCodec(child.getNodeName());
 					child = child.getNextSibling();
 				}
 
-				String name = mxCell.class.getSimpleName();
-				decoder = mxCodecRegistry.getCodec(name);
-			}
-
-			if (!(decoder instanceof mxCellCodec))
-			{
-				String name = mxCell.class.getSimpleName();
-				decoder = mxCodecRegistry.getCodec(name);
+				if (!(decoder instanceof mxCellCodec)) {
+					String name = mxCell.class.getSimpleName();
+					decoder = mxCodecRegistry.getCodec(name);
+				}
 			}
 
 			cell = (mxICell) decoder.decode(this, node);
 
 			if (restoreStructures)
-			{
 				insertIntoGraph(cell);
-			}
 		}
 
 		return cell;
@@ -442,8 +386,7 @@ public class mxCodec
 	/**
 	 * Inserts the given cell into its parent and terminal cells.
 	 */
-	public void insertIntoGraph(mxICell cell)
-	{
+	public void insertIntoGraph (mxICell cell) {
 		mxICell parent = cell.getParent();
 		mxICell source = cell.getTerminal(true);
 		mxICell target = cell.getTerminal(false);
@@ -454,19 +397,13 @@ public class mxCodec
 		cell.setParent(null);
 		
 		if (parent != null)
-		{
 			parent.insert(cell);
-		}
 
 		if (source != null)
-		{
 			source.insertEdge(cell, true);
-		}
 
 		if (target != null)
-		{
 			target.insertEdge(cell, false);
-		}
 	}
 
 	/**
@@ -478,13 +415,9 @@ public class mxCodec
 	 * @param attribute Name of the attribute whose value should be set.
 	 * @param value New value of the attribute.
 	 */
-	public static void setAttribute(Node node, String attribute, Object value)
-	{
-		if (node.getNodeType() == Node.ELEMENT_NODE && attribute != null
-				&& value != null)
-		{
+	public static void setAttribute (Node node, String attribute, Object value) {
+		if (node.getNodeType() == Node.ELEMENT_NODE && attribute != null && value != null)
 			((Element) node).setAttribute(attribute, String.valueOf(value));
-		}
 	}
 
 }

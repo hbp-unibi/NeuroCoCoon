@@ -2042,8 +2042,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		boolean oldValue = invokesStopCellEditing;
 		invokesStopCellEditing = value;
 
-		firePropertyChange("invokesStopCellEditing", oldValue,
-				invokesStopCellEditing);
+		firePropertyChange("invokesStopCellEditing", oldValue, invokesStopCellEditing);
 	}
 
 	/**
@@ -2063,8 +2062,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		boolean oldValue = enterStopsCellEditing;
 		enterStopsCellEditing = value;
 
-		firePropertyChange("enterStopsCellEditing", oldValue,
-				enterStopsCellEditing);
+		firePropertyChange("enterStopsCellEditing", oldValue, enterStopsCellEditing);
 	}
 
 	/**

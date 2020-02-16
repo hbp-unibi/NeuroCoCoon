@@ -48,7 +48,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -92,21 +91,14 @@ public class BasicGraphEditor extends JPanel
 	protected mxRubberband rubberband;
 	protected mxKeyboardHandler keyboardHandler;
 
-	protected mxIEventListener undoHandler = new mxIEventListener()
-	{
+	protected mxIEventListener undoHandler = new mxIEventListener() {
 		public void invoke(Object source, mxEventObject evt)
 		{
 			undoManager.undoableEditHappened((mxUndoableEdit) evt.getProperty("edit"));
 		}
 	};
 
-	protected mxIEventListener changeTracker = new mxIEventListener()
-	{
-		public void invoke(Object source, mxEventObject evt)
-		{
-			setModified(true);
-		}
-	};
+	protected mxIEventListener changeTracker = (source, evt) -> setModified(true);
 
 	public BasicGraphEditor(String appTitle, mxGraphComponent component) {
 		// Stores and updates the frame title
@@ -131,13 +123,9 @@ public class BasicGraphEditor extends JPanel
 		graph.getView().addListener(mxEvent.UNDO, undoHandler);
 
 		// Keeps the selection in sync with the command history
-		mxIEventListener undoHandler = new mxIEventListener()
-		{
-			public void invoke(Object source, mxEventObject evt)
-			{
-				List<mxUndoableChange> changes = ((mxUndoableEdit) evt.getProperty("edit")).getChanges();
-				graph.setSelectionCells(graph.getSelectionCellsForChanges(changes));
-			}
+		mxIEventListener undoHandler = (source, evt) -> {
+			List<mxUndoableChange> changes = ((mxUndoableEdit) evt.getProperty("edit")).getChanges();
+			graph.setSelectionCells(graph.getSelectionCellsForChanges(changes));
 		};
 
 		undoManager.addListener(mxEvent.UNDO, undoHandler);
@@ -221,33 +209,6 @@ public class BasicGraphEditor extends JPanel
 		return statusBar;
 	}
 
-	protected void installRepaintListener()
-	{
-		graphComponent.getGraph().addListener(mxEvent.REPAINT,
-				new mxIEventListener()
-				{
-					public void invoke(Object source, mxEventObject evt)
-					{
-						String buffer = (graphComponent.getTripleBuffer() != null) ? ""
-								: " (unbuffered)";
-						mxRectangle dirty = (mxRectangle) evt
-								.getProperty("region");
-
-						if (dirty == null)
-						{
-							status("Repaint all" + buffer);
-						}
-						else
-						{
-							status("Repaint: x=" + (int) (dirty.getX()) + " y="
-									+ (int) (dirty.getY()) + " w="
-									+ (int) (dirty.getWidth()) + " h="
-									+ (int) (dirty.getHeight()) + buffer);
-						}
-					}
-				});
-	}
-
 	public EditorPalette insertPalette(String title)
 	{
 		final EditorPalette palette = new EditorPalette();
@@ -279,52 +240,69 @@ public class BasicGraphEditor extends JPanel
 		status(mxResources.get("scale") + ": " + (int) (100 * graphComponent.getGraph().getView().getScale()) + "%");
 	}
 
-	protected void showOutlinePopupMenu(MouseEvent e)
-	{
-		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
-		JCheckBoxMenuItem item = new JCheckBoxMenuItem(mxResources.get("magnifyPage"));
-		item.setSelected(graphOutline.isFitPage());
-		item.addActionListener(actionEvent -> {
-			graphOutline.setFitPage(!graphOutline.isFitPage());
-			graphOutline.repaint();
-		});
+	private abstract static class PopupMenuHandler extends MouseAdapter {
+		@Override
+		public void mousePressed(MouseEvent e)
+		{
+			// Handles context menu on the Mac where the trigger is on mousepressed
+			mouseReleased(e);
+		}
 
-		JCheckBoxMenuItem item2 = new JCheckBoxMenuItem(mxResources.get("showLabels"));
-		item2.setSelected(graphOutline.isDrawLabels());
+		@Override
+		public void mouseReleased(MouseEvent e)
+		{
+			if (e.isPopupTrigger())
+				showPopupMenu(e);
+		}
 
-		item2.addActionListener(actionEvent -> {
-			graphOutline.setDrawLabels(!graphOutline.isDrawLabels());
-			graphOutline.repaint();
-		});
-
-		JCheckBoxMenuItem item3 = new JCheckBoxMenuItem(mxResources.get("buffering"));
-		item3.setSelected(graphOutline.isTripleBuffered());
-		item3.addActionListener(actionEvent -> {
-			graphOutline.setTripleBuffered(!graphOutline.isTripleBuffered());
-			graphOutline.repaint();
-		});
-
-		JPopupMenu menu = new JPopupMenu();
-		menu.add(item);
-		menu.add(item2);
-		menu.add(item3);
-		menu.show(graphComponent, pt.x, pt.y);
-
-		e.consume();
+		protected abstract void showPopupMenu (MouseEvent e);
 	}
 
-	protected void showGraphPopupMenu(MouseEvent e)
-	{
-		Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
-		EditorPopupMenu menu = new EditorPopupMenu(BasicGraphEditor.this);
-		menu.show(graphComponent, pt.x, pt.y);
+	private class OutlinePopupMenuHandler extends PopupMenuHandler {
+		@Override
+		protected void showPopupMenu (MouseEvent e) {
+			Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
+			JCheckBoxMenuItem item = new JCheckBoxMenuItem(mxResources.get("magnifyPage"));
+			item.setSelected(graphOutline.isFitPage());
+			item.addActionListener(actionEvent -> {
+				graphOutline.setFitPage(!graphOutline.isFitPage());
+				graphOutline.repaint();
+			});
 
-		e.consume();
+			JCheckBoxMenuItem item2 = new JCheckBoxMenuItem(mxResources.get("showLabels"));
+			item2.setSelected(graphOutline.isDrawLabels());
+
+			item2.addActionListener(actionEvent -> {
+				graphOutline.setDrawLabels(!graphOutline.isDrawLabels());
+				graphOutline.repaint();
+			});
+
+			JCheckBoxMenuItem item3 = new JCheckBoxMenuItem(mxResources.get("buffering"));
+			item3.setSelected(graphOutline.isTripleBuffered());
+			item3.addActionListener(actionEvent -> {
+				graphOutline.setTripleBuffered(!graphOutline.isTripleBuffered());
+				graphOutline.repaint();
+			});
+
+			JPopupMenu menu = new JPopupMenu();
+			menu.add(item);
+			menu.add(item2);
+			menu.add(item3);
+			menu.show(graphComponent, pt.x, pt.y);
+
+			e.consume();
+		}
 	}
 
-	protected void mouseLocationChanged(MouseEvent e)
-	{
-		status(e.getX() + ", " + e.getY());
+	private class GraphPopupMenuHandler extends PopupMenuHandler {
+		@Override
+		protected void showPopupMenu (MouseEvent e) {
+			Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), graphComponent);
+			EditorPopupMenu menu = new EditorPopupMenu(BasicGraphEditor.this);
+			menu.show(graphComponent, pt.x, pt.y);
+
+			e.consume();
+		}
 	}
 
 	protected void installListeners()
@@ -339,66 +317,9 @@ public class BasicGraphEditor extends JPanel
 		graphOutline.addMouseWheelListener(wheelTracker);
 		graphComponent.addMouseWheelListener(wheelTracker);
 
-		// Installs the popup menu in the outline
-		graphOutline.addMouseListener(new MouseAdapter()
-		{
-
-			public void mousePressed(MouseEvent e)
-			{
-				// Handles context menu on the Mac where the trigger is on mousepressed
-				mouseReleased(e);
-			}
-
-			public void mouseReleased(MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-					showOutlinePopupMenu(e);
-			}
-
-		});
-
-		// Installs the popup menu in the graph component
-		graphComponent.getGraphControl().addMouseListener(new MouseAdapter()
-		{
-
-			public void mousePressed(MouseEvent e)
-			{
-				// Handles context menu on the Mac where the trigger is on mousepressed
-				mouseReleased(e);
-			}
-
-			public void mouseReleased(MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-					showGraphPopupMenu(e);
-			}
-
-		});
-
-		// Installs a mouse motion listener to display the mouse location
-		graphComponent.getGraphControl().addMouseMotionListener(
-				new MouseMotionListener()
-				{
-
-					/*
-					 * (non-Javadoc)
-					 * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
-					 */
-					public void mouseDragged(MouseEvent e)
-					{
-						mouseLocationChanged(e);
-					}
-
-					/*
-					 * (non-Javadoc)
-					 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-					 */
-					public void mouseMoved(MouseEvent e)
-					{
-						mouseDragged(e);
-					}
-
-				});
+		// Installs the popup menus in the outline and the graph
+		graphOutline.addMouseListener(new OutlinePopupMenuHandler());
+		graphComponent.getGraphControl().addMouseListener(new GraphPopupMenuHandler());
 	}
 
 	public void setCurrentFile(File file)
@@ -421,7 +342,7 @@ public class BasicGraphEditor extends JPanel
 	 * 
 	 * @param modified
 	 */
-	public void setModified(boolean modified)
+	public void setModified (boolean modified)
 	{
 		boolean oldValue = this.modified;
 		this.modified = modified;
@@ -467,13 +388,14 @@ public class BasicGraphEditor extends JPanel
 	@SuppressWarnings("serial")
 	public Action bind(String name, final Action action, String iconUrl)
 	{
-		AbstractAction newAction = new AbstractAction(name, (iconUrl != null) ? new ImageIcon(
-				BasicGraphEditor.class.getResource(iconUrl)) : null)
+		AbstractAction newAction = new AbstractAction(name, (iconUrl != null)
+				? new ImageIcon(BasicGraphEditor.class.getResource(iconUrl))
+				: null)
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				action.actionPerformed(new ActionEvent(getGraphComponent(), e
-						.getID(), e.getActionCommand()));
+				action.actionPerformed(new ActionEvent(getGraphComponent(),
+													   e.getID(), e.getActionCommand()));
 			}
 		};
 		

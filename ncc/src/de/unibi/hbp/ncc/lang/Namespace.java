@@ -159,6 +159,7 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       void removeElement (T element) {
          int pos = elements.indexOf(element);
          assert pos >= 0;
+         elements.remove(pos);
          fireIntervalRemoved(this, pos, pos);
       }
 

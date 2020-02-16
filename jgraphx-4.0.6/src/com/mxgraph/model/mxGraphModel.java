@@ -2301,8 +2301,7 @@ public class mxGraphModel extends mxEventSource implements mxIGraphModel,
 		public void execute()
 		{
 			geometry = previous;
-			previous = ((mxGraphModel) model).geometryForCellChanged(cell,
-					previous);
+			previous = ((mxGraphModel) model).geometryForCellChanged(cell, previous);
 		}
 
 	}

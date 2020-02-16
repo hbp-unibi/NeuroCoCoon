@@ -6,7 +6,6 @@ import de.unibi.hbp.ncc.lang.serialize.SerializedEntityName;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,10 +35,11 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
          }
 
          @Override
-         public EnumSet<Impact> getChangeImpact () {
-            return EnumSet.of(Impact.CELL_LABEL);
+         public void setValue (String value) {
+            renameTo(value);
          }
       };
+      this.nameProp.setImpact(EditableProp.Impact.CELL_LABEL);
       this.namespace.castAndAdd(this);
       // would be problematic, if T were not the concrete NamedEntity subclass itself
    }
@@ -67,6 +67,8 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
 
    protected Namespace<E> getNamespace () { return namespace; }
 
+   public EditableProp<String> getNameProp () { return nameProp; }
+
    public String getName () {
       return nameProp.getValue();
    }
@@ -83,10 +85,6 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       return name.replace(' ', '_');
    }
 
-   private void setName (String name) {
-      nameProp.setValue(name);
-   }
-
    public boolean canRenameTo (String name) {
       String newNormalizedName = normalizedName(name);
       return !namespace.contains(newNormalizedName) ||
@@ -97,11 +95,11 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
    public void renameTo (String name) {
       if (!canRenameTo(name))
          throw new LanguageException(this, "name " + name + " conflicts with an existing name");
-      if (getName().equals(name))
+      if (name.equals(getName()))
          return;  // a no-op
       namespace.remove(getName());
-      setName(name);
-      this.namespace.castAndAdd(this);
+      nameProp.setValueInternal(name);
+      namespace.castAndAdd(this);
    }
 
    @Override

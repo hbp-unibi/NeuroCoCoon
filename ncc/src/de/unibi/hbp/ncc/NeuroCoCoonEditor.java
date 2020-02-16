@@ -5,26 +5,28 @@ package de.unibi.hbp.ncc;
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphSelectionModel;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
+import de.unibi.hbp.ncc.editor.TooltipProvider;
 import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
+import de.unibi.hbp.ncc.editor.props.Notificator;
+import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.EntityCreator;
-import de.unibi.hbp.ncc.lang.GraphCellPostProcessor;
+import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.ModuleExample;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
@@ -43,9 +45,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor
 {
@@ -73,6 +73,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	public NeuroCoCoonEditor (String appTitle, ProgramGraphComponent component) {
 		super(appTitle, component);
 		programGraphComponent = component;
+		Notificator.getInstance().subscribe(component);
 	}
 
 	public Program getProgram () { return programGraphComponent.getProgramGraph().getProgram(); }
@@ -115,11 +116,11 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		basicPalette.addTemplate("Spikes",
 								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/spikesource.png")),
-								 "spikesource",
+								 "spikeSource",
 								 100, 100, RegularSpikeSource.CREATOR);
 		basicPalette.addTemplate("Poisson",
 								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/poissonsource.png")),
-								 "poissonsource",
+								 "poissonSource",
 								 100, 80, PoissonSource.CREATOR);
 		basicPalette.addTemplate("Population",
 								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/population.png")),
@@ -174,6 +175,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		public ProgramGraph getProgramGraph () { return programGraph; }
 
+		// TODO allow dragging of edges onto edges (and populations onto populations) to set the synapse type (or neuron type)
 		/* *
 		 * Overrides drop behaviour to set the cell style if the target
 		 * is not a valid drop target and the cells are of the same
@@ -228,6 +230,31 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			this.program = program;
 			setGridEnabled(false);
 //			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
+
+			addListener(mxEvent.CELLS_ADDED, (sender, evt ) -> {
+				Object[] cells = (Object[]) evt.getProperty("cells");
+				for (Object obj: cells) {
+					if (obj instanceof mxCell) {
+						mxCell cell = (mxCell) obj;
+						Object value = cell.getValue();
+						if (value instanceof GraphCellConfigurator)
+							((GraphCellConfigurator) value).configurePlaceholder(this, cell);
+					}
+				}
+			});
+
+			addListener(mxEvent.CELLS_RESIZED, (sender, evt ) -> {
+				Object[] cells = (Object[]) evt.getProperty("cells");
+				for (Object obj: cells) {
+					if (obj instanceof mxCell) {
+						mxCell cell = (mxCell) obj;
+						Object value = cell.getValue();
+						if (value instanceof GraphCellConfigurator)
+							((GraphCellConfigurator) value).resizeExisting(this, cell);
+					}
+				}
+			});
+
 		}
 
 		void setToolBar (EditorToolBar toolBar) { this.toolBar = toolBar; }
@@ -237,7 +264,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		@Override
 		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
 								boolean absolute, boolean constrain) {
-			List<mxCell> postProcessing = new ArrayList<>(cells.length);
 			for (Object obj: cells) {
 				if (obj instanceof mxCell) {
 					mxCell cell = (mxCell) obj;
@@ -245,9 +271,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					LanguageEntity duplicatedValue = null;
 					if (value instanceof EntityCreator) {
 						duplicatedValue = ((EntityCreator<?>) value).create();
-						if (duplicatedValue instanceof GraphCellPostProcessor) {
-							postProcessing.add(cell);
-						}
 					}
 					else if (value instanceof LanguageEntity)
 						duplicatedValue = ((LanguageEntity) value).duplicate();
@@ -259,139 +282,58 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 				}
 			}
 			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
-			if (!postProcessing.isEmpty()) {
-				getModel().beginUpdate();
-				try {
-					for (mxCell cell: postProcessing) {
-						((GraphCellPostProcessor) cell.getValue()).adjustAndAdoptGraphCell(this, parent, cell);
-					}
-				}
-				finally {
-					getModel().endUpdate();
-				}
-			}
 		}
 
 		// Ports are not used as terminals for edges, they are
 		// only used to compute the graphical connection point
+		@Override
 		public boolean isPort(Object cell)
 		{
 			mxGeometry geo = getCellGeometry(cell);
 			return (geo != null) && geo.isRelative();
 		}
 
-		/*
+		// can we get a red border when dragging to invalid target nodes?
+		// not easily, com.mxgraph.swing.handler.mxCellMarker.getCell override in mxConnectionHandler.java
+		// deliberately skips the red highlight, for validation errors with empty message strings
+		// would need to override getEdgeValidationError to return some message for !isValidConnection to change this
 		@Override
-		public Object[] cloneCells (Object[] cells, boolean allowInvalidEdges) {
-			Object[] clones =  super.cloneCells(cells, allowInvalidEdges);
-			for (Object clone: clones) {
-				if (clone instanceof mxCell) {
-					mxCell cell = (mxCell) clone;
-					Object value = cell.getValue();
-					if (value instanceof EntityCreator)
-						value = ((EntityCreator<?>) value).create();
-					else if (value instanceof NeuronPopulation)  // FIXME do this for all NamedEntities (or even LanguageEntities)
-						value = ((NeuronPopulation) value).duplicate();
-					cell.setValue(value);
-					// TODO do something similar with the (transitive) children of the cell?
-				}
+		public boolean isValidSource (Object cell) {
+			if (cell instanceof mxICell) {
+				Object value = ((mxICell) cell).getValue();
+				if (value instanceof Connectable)
+					return ((Connectable) value).isValidConnectionSource() && super.isValidSource(cell);
 			}
-			return clones;
+			return super.isValidSource(cell);
 		}
-*/
 
-		/**
-		 * Prints out some useful information about the cell in the tooltip.
-		 */
-		public String getToolTipForCell(Object cell)
-		{
-			// FIXME this is much tto detailed
-			StringBuilder tip = new StringBuilder("<html>");
-			mxGeometry geo = getModel().getGeometry(cell);
-			mxCellState state = getView().getState(cell);
-
-			// tip += "token=" + JavaScriptBridge.getHBPToken() + "<br>";
-
-			if (getModel().isEdge(cell))
-			{
-				tip.append("points={");
-
-				if (geo != null)
-				{
-					List<mxPoint> points = geo.getPoints();
-
-					if (points != null)
-					{
-						for (mxPoint point: points) {
-							tip.append("[x=").append(numberFormat.format(point.getX()))
-									.append(",y=").append(numberFormat.format(point.getY()))
-									.append("],");
-						}
-						tip.deleteCharAt(tip.length() - 1);
-					}
-				}
-
-				tip.append("}<br>")
-						.append("absPoints={");
-
-				if (state != null)
-				{
-
-					for (int i = 0; i < state.getAbsolutePointCount(); i++)
-					{
-						mxPoint point = state.getAbsolutePoint(i);
-						tip.append("[x=").append(numberFormat.format(point.getX()))
-								.append(",y=").append(numberFormat.format(point.getY()))
-								.append("],");
-					}
-					tip.deleteCharAt(tip.length() - 1);
-				}
-
-				tip.append("}");
+		@Override
+		public boolean isValidTarget (Object cell) {
+			if (cell instanceof mxICell) {
+				Object value = ((mxICell) cell).getValue();
+				if (value instanceof Connectable)
+					return ((Connectable) value).isValidConnectionTarget() && super.isValidSource(cell);
 			}
-			else
-			{
-				tip.append("geo=[");
+			return super.isValidSource(cell);  // only the isValidSource method implements the general (direction-agnostic) checks
+		}
 
-				if (geo != null)
-				{
-					tip.append("x=").append(numberFormat.format(geo.getX()))
-							.append(",y=").append(numberFormat.format(geo.getY()))
-							.append(",width=").append(numberFormat.format(geo.getWidth()))
-							.append(",height=").append(numberFormat.format(geo.getHeight()));
-				}
-
-				tip.append("]<br>")
-						.append("state=[");
-
-				if (state != null)
-				{
-					tip.append("x=").append(numberFormat.format(state.getX()))
-							.append(",y=").append(numberFormat.format(state.getY()))
-							.append(",width=").append(numberFormat.format(state.getWidth()))
-							.append(",height=").append(numberFormat.format(state.getHeight()));
-				}
-
-				tip.append("]");
+		@Override
+		public String getToolTipForCell (Object cell) {
+			if (cell instanceof mxICell) {
+				Object value = ((mxICell) cell).getValue();
+				if (value instanceof TooltipProvider)
+					return ((TooltipProvider) value).getTooltip();
 			}
-
-			mxPoint trans = getView().getTranslate();
-
-			tip.append("<br>scale=").append(numberFormat.format(getView().getScale()))
-					.append(", translate=[x=").append(numberFormat.format(trans.getX()))
-					.append(",y=").append(numberFormat.format(trans.getY())).append("]");
-			tip.append("</html>");
-
-			return tip.toString();
+			return null;
 		}
 
 		/**
-		 * Overrides the method to use the currently selected edge template for
+		 * Overrides the method to use the currently selected synapse type for
 		 * new edges.
 		 */
+		@Override
 		public Object createEdge(Object parent, String id, Object value,
-								 Object source, Object target, String style)
-		{
+								 Object source, Object target, String style) {
 
 			SynapseType synapseType = toolBar.getCurrentSynapseType();
 
@@ -403,16 +345,13 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main (String[] args) {
 		// FIXME use SwingUtilities.invokeLater?
-		try
-		{
+		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
-		catch (Exception e1)
-		{
-			e1.printStackTrace();
+		catch (Exception excp) {
+			excp.printStackTrace();
 		}
 
 		mxSwingConstants.SHADOW_COLOR = Color.LIGHT_GRAY;

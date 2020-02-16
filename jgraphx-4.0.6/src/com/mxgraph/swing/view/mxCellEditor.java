@@ -31,6 +31,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.EventObject;
@@ -105,12 +107,11 @@ public class mxCellEditor implements mxICellEditor
 
 	transient Object textEnterActionMapKey;
 
-	transient KeyStroke escapeKeystroke = KeyStroke.getKeyStroke("ESCAPE");
+	transient KeyStroke escapeKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 
-	transient KeyStroke enterKeystroke = KeyStroke.getKeyStroke("ENTER");
+	transient KeyStroke enterKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-	transient KeyStroke shiftEnterKeystroke = KeyStroke
-			.getKeyStroke("shift ENTER");
+	transient KeyStroke shiftEnterKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK);
 
 	protected AbstractAction cancelEditingAction = new AbstractAction()
 	{
@@ -122,7 +123,8 @@ public class mxCellEditor implements mxICellEditor
 
 	protected AbstractAction textSubmitAction = new AbstractAction()
 	{
-		public void actionPerformed(ActionEvent e)
+		@Override
+		public void actionPerformed (ActionEvent e)
 		{
 			stopEditing(false);
 		}
@@ -144,10 +146,10 @@ public class mxCellEditor implements mxICellEditor
 		editorPane.setContentType("text/html");
 
 		// Workaround for inserted linefeeds in HTML markup with
-		// lines that are longar than 80 chars
+		// lines that are longer than 80 chars
 		editorPane.setEditorKit(new NoLinefeedHtmlEditorKit());
 
-		// Creates the scollpane that contains the editor
+		// Creates the scrollpane that contains the editor
 		// FIXME: Cursor not visible when scrolling
 		scrollPane = new JScrollPane();
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());

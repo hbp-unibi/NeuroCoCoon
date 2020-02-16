@@ -438,9 +438,7 @@ public class EditorActions
 		/**
 		 * Saves XML+PNG format.
 		 */
-		protected void saveXmlPng(BasicGraphEditor editor, String filename,
-				Color bg) throws IOException
-		{
+		protected void saveXmlPng(BasicGraphEditor editor, String filename, Color bg) throws IOException {
 			mxGraphComponent graphComponent = editor.getGraphComponent();
 			mxGraph graph = graphComponent.getGraph();
 
@@ -451,10 +449,8 @@ public class EditorActions
 
 			// Creates the URL-encoded XML data
 			mxCodec codec = new mxCodec();
-			String xml = URLEncoder.encode(
-					mxXmlUtils.getXml(codec.encode(graph.getModel())), "UTF-8");
-			mxPngEncodeParam param = mxPngEncodeParam
-					.getDefaultEncodeParam(image);
+			String xml = URLEncoder.encode(mxXmlUtils.getXml(codec.encode(graph.getModel())), "UTF-8");
+			mxPngEncodeParam param = mxPngEncodeParam.getDefaultEncodeParam(image);
 			param.setCompressedText(new String[] { "mxGraphModel", xml });
 
 			// Saves as a PNG file
@@ -1580,10 +1576,6 @@ public class EditorActions
 
 		protected String labelPosition, alignment;
 
-		/**
-		 * 
-		 * @param key
-		 */
 		public SetLabelPositionAction(String labelPosition, String alignment)
 		{
 			this.labelPosition = labelPosition;
@@ -1631,10 +1623,6 @@ public class EditorActions
 
 		protected String value;
 
-		/**
-		 * 
-		 * @param key
-		 */
 		public SetStyleAction(String value)
 		{
 			this.value = value;
@@ -1736,10 +1724,6 @@ public class EditorActions
 
 		protected String align;
 
-		/**
-		 * 
-		 * @param key
-		 */
 		public AlignCellsAction(String align)
 		{
 			this.align = align;

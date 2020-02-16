@@ -144,8 +144,7 @@ public class mxEventSource
 	 */
 	public void fireEvent(mxEventObject evt, Object sender)
 	{
-		if (eventListeners != null && !eventListeners.isEmpty()
-				&& isEventsEnabled())
+		if (eventListeners != null && !eventListeners.isEmpty() && isEventsEnabled())
 		{
 			if (sender == null)
 			{
@@ -163,8 +162,7 @@ public class mxEventSource
 
 				if (listen == null || listen.equals(evt.getName()))
 				{
-					((mxIEventListener) eventListeners.get(i + 1)).invoke(
-							sender, evt);
+					((mxIEventListener) eventListeners.get(i + 1)).invoke(sender, evt);
 				}
 			}
 		}

@@ -93,9 +93,7 @@ public class EditorPalette extends JPanel
 			Rectangle rect = getVisibleRect();
 
 			if (g.getClipBounds() != null)
-			{
 				rect = rect.intersection(g.getClipBounds());
-			}
 
 			Graphics2D g2 = (Graphics2D) g;
 
@@ -114,14 +112,12 @@ public class EditorPalette extends JPanel
 		JLabel previous = selectedEntry;
 		selectedEntry = entry;
 
-		if (previous != null)
-		{
+		if (previous != null) {
 			previous.setBorder(null);
 			previous.setOpaque(false);
 		}
 
-		if (selectedEntry != null)
-		{
+		if (selectedEntry != null) {
 			selectedEntry.setBorder(ShadowBorder.getSharedInstance());
 			selectedEntry.setOpaque(true);
 		}
@@ -136,8 +132,7 @@ public class EditorPalette extends JPanel
 	public void setPreferredWidth(int width)
 	{
 		int cols = Math.max(1, width / TILE_SIZE);
-		setPreferredSize(new Dimension(width,
-				(getComponentCount() * TILE_SIZE / cols) + 30));
+		setPreferredSize(new Dimension(width, (getComponentCount() * TILE_SIZE / cols) + 30));
 		revalidate();
 	}
 
@@ -171,12 +166,9 @@ public class EditorPalette extends JPanel
 				new Object[] { cell }, bounds);
 
 		// Scales the image if it's too large for the library
-		if (icon != null)
-		{
+		if (icon != null) {
 			if (icon.getIconWidth() > MAX_ICON_SIZE || icon.getIconHeight() > MAX_ICON_SIZE)
-			{
 				icon = new ImageIcon(icon.getImage().getScaledInstance(MAX_ICON_SIZE, MAX_ICON_SIZE, 0));
-			}
 		}
 
 		final JLabel entry = new JLabel(icon);
@@ -191,11 +183,9 @@ public class EditorPalette extends JPanel
 		entry.setToolTipText(name);
 		entry.setText(name);
 
-		entry.addMouseListener(new MouseAdapter()
-		{
+		entry.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e)
-			{
+			public void mousePressed(MouseEvent e) {
 				setSelectionEntry(entry, t);
 			}
 		});
