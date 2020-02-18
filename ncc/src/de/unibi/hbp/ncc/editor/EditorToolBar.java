@@ -38,6 +38,8 @@ public class EditorToolBar extends JToolBar
 	private NmpiClient.Platform currentPlatform;
 	private SynapseType currentSynapseType;
 
+	private static final String IMAGE_PATH = "../images/";
+
 	public EditorToolBar(final BasicGraphEditor editor, int orientation)
 	{
 		super(orientation);
@@ -45,33 +47,24 @@ public class EditorToolBar extends JToolBar
 				BorderFactory.createEmptyBorder(3, 3, 3, 3), getBorder()));
 		setFloatable(false);
 
-		add(editor.bind("New", new NewAction(),
-				"/de/unibi/hbp/ncc/images/new.gif"));
-		add(editor.bind("Open", new OpenAction(),
-				"/de/unibi/hbp/ncc/images/open.gif"));
-		add(editor.bind("Save", new SaveAction(false),
-				"/de/unibi/hbp/ncc/images/save.gif"));
+		add(editor.bind("New", new NewAction(), IMAGE_PATH + "new.gif"));
+		add(editor.bind("Open", new OpenAction(), IMAGE_PATH + "open.gif"));
+		add(editor.bind("Save", new SaveAction(false), IMAGE_PATH + "save.gif"));
 
 		addSeparator();
 
-		add(editor.bind("Cut", TransferHandler.getCutAction(),
-				"/de/unibi/hbp/ncc/images/cut.gif"));
-		add(editor.bind("Copy", TransferHandler.getCopyAction(),
-				"/de/unibi/hbp/ncc/images/copy.gif"));
-		add(editor.bind("Paste", TransferHandler.getPasteAction(),
-				"/de/unibi/hbp/ncc/images/paste.gif"));
+		add(editor.bind("Cut", TransferHandler.getCutAction(), IMAGE_PATH + "cut.gif"));
+		add(editor.bind("Copy", TransferHandler.getCopyAction(), IMAGE_PATH + "copy.gif"));
+		add(editor.bind("Paste", TransferHandler.getPasteAction(), IMAGE_PATH + "paste.gif"));
 
 		addSeparator();
 
-		add(editor.bind("Delete", mxGraphActions.getDeleteAction(),
-				"/de/unibi/hbp/ncc/images/delete.gif"));
+		add(editor.bind("Delete", mxGraphActions.getDeleteAction(), IMAGE_PATH + "delete.gif"));
 
 		addSeparator();
 
-		add(editor.bind("Undo", new HistoryAction(true),
-				"/de/unibi/hbp/ncc/images/undo.gif"));
-		add(editor.bind("Redo", new HistoryAction(false),
-				"/de/unibi/hbp/ncc/images/redo.gif"));
+		add(editor.bind("Undo", new HistoryAction(true), IMAGE_PATH + "undo.gif"));
+		add(editor.bind("Redo", new HistoryAction(false), IMAGE_PATH + "redo.gif"));
 
 		addSeparator();
 
@@ -171,9 +164,9 @@ public class EditorToolBar extends JToolBar
 		add(synapseTypeCombo);
 		addSeparator();
 
-		checkAction = editor.bind("Check", new CheckAction(), "/de/unibi/hbp/ncc/images/check.png");
+		checkAction = editor.bind("Check", new CheckAction(), IMAGE_PATH + "check.png");
 		add(checkAction);
-		add(editor.bind("Run", new RunAction(), "/de/unibi/hbp/ncc/images/run.png"));
+		add(editor.bind("Run", new RunAction(), IMAGE_PATH + "run.png"));
 		final JComboBox<NmpiClient.Platform> platformCombo = new JComboBox<>(NmpiClient.Platform.values());
 		platformCombo.setEditable(false);
 		platformCombo.setMinimumSize(new Dimension(120, 0));
@@ -221,9 +214,6 @@ public class EditorToolBar extends JToolBar
 	}
 
 	public void setProblemStatus (boolean anyProblems) {
-		checkAction.putValue(Action.SMALL_ICON,
-							 anyProblems
-									 ? "/de/unibi/hbp/ncc/images/problem.png"
-									 : "/de/unibi/hbp/ncc/images/check.png");
+		checkAction.putValue(Action.SMALL_ICON, IMAGE_PATH + (anyProblems ? "problem.png" : "check.png"));
 	}
 }

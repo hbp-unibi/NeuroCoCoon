@@ -21,6 +21,9 @@ public class DataPlot extends NamedEntity<DataPlot> {
       return list;
    }
 
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Plot"; }
+
    protected DataPlot (Namespace<DataPlot> namespace, String name, NeuronPopulation population, DataSeries series) {
       super(namespace, name);
       Namespace<NeuronPopulation> neuronPopulations = namespace.getContainingScope().getNeuronPopulations();

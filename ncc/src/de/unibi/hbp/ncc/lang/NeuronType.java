@@ -78,6 +78,9 @@ public class NeuronType extends NamedEntity<NeuronType> {
       this.izhikevichD = new DoubleProp("d", this, izhikevichD).setUnit("mV/ms");
    }
 
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Neuron Type"; }
+
    public NeuronType (Namespace<NeuronType> namespace, String name) {
       this(namespace, name, NeuronKind.IF_COND_EXP,
            -70.0, -80.0, -65.0, 0.0, -100.0,

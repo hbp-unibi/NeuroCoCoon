@@ -56,20 +56,6 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
       this(orig.synapseTypeNamespace, orig.synapseType.getValue());
    }
 
-   public static final EntityCreator<NeuronConnection> CREATOR = new Creator();
-
-   private static class Creator implements EntityCreator<NeuronConnection> {
-      @Override
-      public NeuronConnection create () {
-         return new NeuronConnection();
-      }
-
-      @Override
-      public String toString () {  // used by drag&drop tooltips
-         return "Neuron Connection";
-      }
-   }
-
    @Override
    public String toString () {
       return synapseType.getValue().getSummary();

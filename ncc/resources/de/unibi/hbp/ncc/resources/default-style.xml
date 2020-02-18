@@ -8,6 +8,7 @@
 		<add as="fontSize" value="12"/>
 		<add as="fontColor" value="#000000"/>
 		<add as="fontFamily" value="SansSerif"/>
+		<add as="spacingTop" value="2"/> <!-- should be 0, but this value looks visually correct -->
 	</add>
 	<add as="defaultEdge" extend="defaultEdge">
 		<add as="editable" value="0"/>
@@ -39,16 +40,26 @@
 	</add>
 	<add as="module" extend="defaultVertex">
 		<add as="foldable" value="0"/>
-		<add as="shape" value="rectangle"/>
+		<add as="shape" value="label"/>
+		<add as="perimeter" value="rectanglePerimeter"/>
 		<add as="rounded" value="1"/>
 		<add as="arcSize" value="5"/>
 		<add as="fillColor" value="#ffddff"/>
 		<add as="strokeColor" value="#ddbbdd"/>
 		<add as="strokeWidth" value="3"/>
+		<add as="imageAlign" value="center"/>
+		<add as="imageWidth" value="48"/>
+		<add as="imageHeight" value="48"/>
 		<add as="verticalAlign" value="top"/>
+		<add as="verticalLabelPosition" value="bottom"/>
 	</add>
 	<add as="moduleWide" extend="module">
+		<add as="verticalLabelPosition" value="middle"/>
 		<add as="verticalAlign" value="middle"/>
+		<add as="labelPosition" value="left"/>
+		<add as="align" value="right"/>
+		<!-- <add as="spacingTop" value="2"/> should be 0, but this value looks visually correct -->
+		<add as="spacingRight" value="2"/>
 	</add>
 	<add as="portAny" extend="defaultVertex">
 		<add as="shape" value="triangle"/>
@@ -56,22 +67,33 @@
 		<add as="fillColor" value="#ff77ff"/>
 		<add as="strokeColor" value="#dd66dd"/>
 		<add as="strokeWidth" value="1"/>
+		<add as="verticalLabelPosition" value="middle"/>
+		<add as="verticalAlign" value="middle"/>
+		<add as="labelPosition" value="center"/>
+		<add as="align" value="center"/>
+		<add as="spacingTop" value="2"/>
 	</add>
 	<add as="portLeft" extend="portAny">
 		<add as="direction" value="east"/>
 		<add as="labelPosition" value="right"/>
+		<add as="align" value="left"/>
 	</add>
 	<add as="portRight" extend="portAny">
 		<add as="direction" value="east"/>
 		<add as="labelPosition" value="left"/>
+		<add as="align" value="right"/>
 	</add>
 	<add as="portTop" extend="portAny">
 		<add as="direction" value="south"/>
 		<add as="verticalLabelPosition" value="bottom"/>
+		<add as="verticalAlign" value="top"/>
 	</add>
 	<add as="portBottom" extend="portAny">
 		<add as="direction" value="south"/>
 		<add as="verticalLabelPosition" value="top"/>
+		<add as="verticalAlign" value="bottom"/>
+		<!-- <add as="spacingTop" value="0"/> does not matter for display -->
+		<add as="spacingBottom" value="-4"/> <!-- looks visually correct, quite tight for letters with descenders -->
 	</add>
 	<add as="straight" extend="defaultEdge">
 		<add as="shape" value="connector"/>
@@ -119,6 +141,9 @@
 		<add as="fontStyle" value="0"/>
 		<add as="imageWidth" value="48"/>
 		<add as="imageHeight" value="48"/>
+	</add>
+	<add as="iconWinner" extend="icon">
+		<add as="image" value="/de/unibi/hbp/ncc/images/lang/winner.png"/>
 	</add>
 	<add as="entity">
 		<add as="edgeStyle" value="entityRelationEdgeStyle"/>

@@ -759,22 +759,6 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class ToggleDirtyAction extends AbstractAction
-	{
-
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getSource() instanceof mxGraphComponent)
-			{
-				mxGraphComponent graphComponent = (mxGraphComponent) e
-						.getSource();
-				graphComponent.showDirtyRectangle = !graphComponent.showDirtyRectangle;
-			}
-		}
-
-	}
-
-	@SuppressWarnings("serial")
 	public static class ToggleConnectModeAction extends AbstractAction
 	{
 
@@ -821,164 +805,123 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class PromptPropertyAction extends AbstractAction
-	{
+	public static class PromptPropertyAction extends AbstractAction {
 
 		protected Object target;
 
-		protected String fieldname, message;
+		protected String fieldName, message;
 
-		public PromptPropertyAction(Object target, String message)
-		{
+		public PromptPropertyAction(Object target, String message) {
 			this(target, message, message);
 		}
 
-		public PromptPropertyAction(Object target, String message,
-				String fieldname)
-		{
+		public PromptPropertyAction(Object target, String message, String fieldName) {
 			this.target = target;
 			this.message = message;
-			this.fieldname = fieldname;
+			this.fieldName = fieldName;
 		}
 
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getSource() instanceof Component)
-			{
-				try
-				{
-					Method getter = target.getClass().getMethod(
-							"get" + fieldname);
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() instanceof Component) {
+				try {
+					Method getter = target.getClass().getMethod("get" + fieldName);
 					Object current = getter.invoke(target);
 
 					// TODO: Support other atomic types
-					if (current instanceof Integer)
-					{
-						Method setter = target.getClass().getMethod(
-								"set" + fieldname, new Class[] { int.class });
+					if (current instanceof Integer) {
+						Method setter = target.getClass().getMethod("set" + fieldName, int.class);
 
 						String value = (String) JOptionPane.showInputDialog(
 								(Component) e.getSource(), "Value", message,
 								JOptionPane.PLAIN_MESSAGE, null, null, current);
 
 						if (value != null)
-						{
 							setter.invoke(target, Integer.parseInt(value));
-						}
 					}
 				}
-				catch (Exception ex)
-				{
+				catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 
 			// Repaints the graph component
-			if (e.getSource() instanceof mxGraphComponent)
-			{
-				mxGraphComponent graphComponent = (mxGraphComponent) e
-						.getSource();
+			if (e.getSource() instanceof mxGraphComponent) {
+				mxGraphComponent graphComponent = (mxGraphComponent) e.getSource();
 				graphComponent.repaint();
 			}
 		}
 	}
 
 	@SuppressWarnings("serial")
-	public static class TogglePropertyItem extends JCheckBoxMenuItem
-	{
+	public static class TogglePropertyItem extends JCheckBoxMenuItem {
 
-		public TogglePropertyItem(Object target, String name, String fieldname)
+		public TogglePropertyItem(Object target, String name, String fieldName)
 		{
-			this(target, name, fieldname, false);
+			this(target, name, fieldName, false);
 		}
 
-		public TogglePropertyItem(Object target, String name, String fieldname,
-				boolean refresh)
-		{
-			this(target, name, fieldname, refresh, null);
+		public TogglePropertyItem(Object target, String name, String fieldName, boolean refresh) {
+			this(target, name, fieldName, refresh, null);
 		}
 
-		public TogglePropertyItem(final Object target, String name,
-				final String fieldname, final boolean refresh,
-				ActionListener listener)
-		{
+		public TogglePropertyItem(final Object target, String name, final String fieldName, final boolean refresh,
+								  ActionListener listener) {
 			super(name);
 
 			// Since action listeners are processed last to first we add the given
 			// listener here which means it will be processed after the one below
 			if (listener != null)
-			{
 				addActionListener(listener);
-			}
 
-			addActionListener(e -> execute(target, fieldname, refresh));
+			addActionListener(e -> execute(target, fieldName, refresh));
 
 			PropertyChangeListener propertyChangeListener = evt -> {
-				if (evt.getPropertyName().equalsIgnoreCase(fieldname))
-				{
-					update(target, fieldname);
-				}
+				if (evt.getPropertyName().equalsIgnoreCase(fieldName))
+					update(target, fieldName);
 			};
 
 			if (target instanceof mxGraphComponent)
-			{
 				((mxGraphComponent) target).addPropertyChangeListener(propertyChangeListener);
-			}
 			else if (target instanceof mxGraph)
-			{
 				((mxGraph) target).addPropertyChangeListener(propertyChangeListener);
-			}
 
-			update(target, fieldname);
+			update(target, fieldName);
 		}
 
-		public void update(Object target, String fieldname)
-		{
-			if (target != null && fieldname != null)
-			{
-				try
-				{
-					Method getter = target.getClass().getMethod("is" + fieldname);
+		public void update(Object target, String fieldName) {
+			if (target != null && fieldName != null) {
+				try {
+					Method getter = target.getClass().getMethod("is" + fieldName);
 
-					if (getter != null)
-					{
+					if (getter != null) {
 						Object current = getter.invoke(target);
 
 						if (current instanceof Boolean)
-						{
 							setSelected((Boolean) current);
-						}
 					}
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					// ignore
 				}
 			}
 		}
 
-		public void execute(Object target, String fieldname, boolean refresh)
+		public void execute(Object target, String fieldName, boolean refresh)
 		{
-			if (target != null && fieldname != null)
-			{
-				try
-				{
-					Method getter = target.getClass().getMethod(
-							"is" + fieldname);
-					Method setter = target.getClass().getMethod(
-							"set" + fieldname, boolean.class);
+			if (target != null && fieldName != null) {
+				try {
+					Method getter = target.getClass().getMethod("is" + fieldName);
+					Method setter = target.getClass().getMethod("set" + fieldName, boolean.class);
 
 					Object current = getter.invoke(target);
 
-					if (current instanceof Boolean)
-					{
+					if (current instanceof Boolean) {
 						boolean value = !(Boolean) current;
 						setter.invoke(target, value);
 						setSelected(value);
 					}
 
-					if (refresh)
-					{
+					if (refresh) {
 						mxGraph graph = null;
 
 						if (target instanceof mxGraph)
@@ -990,8 +933,7 @@ public class EditorActions
 							graph.refresh();
 					}
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					// ignore
 				}
 			}

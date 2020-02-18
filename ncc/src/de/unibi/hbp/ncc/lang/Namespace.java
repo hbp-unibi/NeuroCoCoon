@@ -16,8 +16,8 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    private Class<T> memberClazz;
    private Map<String, T> members;
    private T mostRecentlyAdded;
-   private String generatedNamesPrefix;
-   private int nameGenerator;
+   private String memberDescription;  // for error messages
+   private Map<String, Integer> nameGenerators;
    private String pythonDiscriminator;
    private int id;  // for data transfer
    private NamespaceModel listModel;  // created lazily on demand
@@ -26,12 +26,12 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
 
    private static final int MAX_GENERATOR_VALUE = 9999;
 
-   Namespace (Scope containingScope, Class<T> clazz, String generatedNamesPrefix, String pythonDiscriminator) {
+   Namespace (Scope containingScope, Class<T> clazz, String memberDescription, String pythonDiscriminator) {
       this.containingScope = containingScope;
       this.memberClazz = clazz;
       this.members = new HashMap<>();
-      this.generatedNamesPrefix = generatedNamesPrefix.trim() + " ";
-      this.nameGenerator = 0;
+      this.memberDescription = memberDescription;
+      this.nameGenerators = new HashMap<>();
       if (pythonDiscriminator.isEmpty() || pythonDiscriminator.startsWith("_") || pythonDiscriminator.endsWith("_"))
          throw new IllegalArgumentException("invalid Python name fragment");
       this.pythonDiscriminator = pythonDiscriminator;
@@ -109,32 +109,20 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
 
    public Scope getContainingScope () { return containingScope; }
 
-   String generateName () {
+   String generateName (NamedEntity<T> futureMember) {
+      String namePrefix = futureMember.getGeneratedNamesPrefix();
+      int nameGenerator = nameGenerators.getOrDefault(namePrefix, 0);
       String result;
       do {
-         result = generatedNamesPrefix + (++nameGenerator);
+         result = namePrefix + " " + (++nameGenerator);
          if (nameGenerator > MAX_GENERATOR_VALUE)
-            throw new LanguageException("failed to generate name for prefix " + generatedNamesPrefix);
+            throw new LanguageException("failed to generate name for prefix " + namePrefix);
       } while (members.containsKey(result));
+      nameGenerators.put(namePrefix, nameGenerator);
       return result;
    }
 
-   String generateSpecificName (String namePrefix) {
-      namePrefix = namePrefix.trim() + " ";
-      int numberGenerator = 0;
-      String result;
-      do {
-         result = namePrefix + (++numberGenerator);
-         if (numberGenerator > MAX_GENERATOR_VALUE)
-            throw new LanguageException("failed to generate name for specific prefix " + namePrefix);
-      } while (members.containsKey(result));
-      return result;
-   }
-
-   String getGeneratedNamesPrefix () { return generatedNamesPrefix; }
-
-   // maybe this needs to be distinct from the generated names prefix?
-   public String getDescription () { return generatedNamesPrefix.toLowerCase(); }
+   public String getDescription () { return memberDescription; }
 
    String getPythonDiscriminator () {
       return pythonDiscriminator;

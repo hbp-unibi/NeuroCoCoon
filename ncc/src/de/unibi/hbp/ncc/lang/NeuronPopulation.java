@@ -2,11 +2,12 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
+import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
 import java.util.List;
 
 public abstract class NeuronPopulation extends NamedEntity<NeuronPopulation>
-      implements Connectable {
+      implements Connectable, PlotDataSource {
    private IntegerProp neuronCount;  // TODO support a multi-dimensional shape instead of a simple count
 
    private static Namespace<NeuronPopulation> globalNamespace;
@@ -24,12 +25,7 @@ public abstract class NeuronPopulation extends NamedEntity<NeuronPopulation>
 
    protected NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, int neuronCount) {
       super(namespace, name);
-      this.neuronCount = new IntegerProp("Neuron Count", this, neuronCount) {
-         @Override
-         public boolean isValid (Integer proposedValue) {
-            return super.isValid(proposedValue) && proposedValue >= 1;
-         }
-      };
+      this.neuronCount = new StrictlyPositiveIntegerProp("Neuron Count", this, neuronCount);
    }
 
    protected IntegerProp getNeuronCountProp () { return neuronCount; }

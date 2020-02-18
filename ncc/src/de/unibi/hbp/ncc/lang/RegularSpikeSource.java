@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
@@ -20,8 +21,11 @@ public class RegularSpikeSource extends NeuronPopulation {
       return list;
    }
 
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Spike Source"; }
+
    public RegularSpikeSource (Namespace<NeuronPopulation> namespace, String name, int neuronCount,
-                         double interval, double perNeuronOffset, double start, double duration) {
+                              double interval, double perNeuronOffset, double start, double duration) {
       super(namespace, name, neuronCount);
       this.interval = new StrictlyPositiveDoubleProp("Interval", this, interval).setUnit("ms");
       this.perNeuronOffset = new NonNegativeDoubleProp("Offset per Neuron", this, perNeuronOffset).setUnit("ms");
@@ -52,6 +56,18 @@ public class RegularSpikeSource extends NeuronPopulation {
       public String toString () {  // used by drag&drop tooltips
          return "Spike Source";
       }
+
+      @Override
+      public String getIconFileName () { return "spikesource.png"; }
+
+      @Override
+      public String getIconCaption () { return "Spikes"; }
+
+      @Override
+      public String getCellStyle () { return "spikeSource"; }
+
+      @Override
+      public int getInitialCellHeight () { return 100; }
    }
 
    @Override

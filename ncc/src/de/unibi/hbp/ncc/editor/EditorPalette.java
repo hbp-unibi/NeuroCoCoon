@@ -13,7 +13,6 @@ import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
-import de.unibi.hbp.ncc.lang.EntityCreator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -27,6 +26,7 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
@@ -147,28 +147,38 @@ public class EditorPalette extends JPanel
 		mxCell cell = new mxCell(value, geometry, style);
 		cell.setEdge(true);
 
-		addTemplate(name, icon, cell);
+		addTemplate(name, name, icon, cell);
 	}
 
-	public void addTemplate(final String name, ImageIcon icon, String style, int width, int height,
-							EntityCreator<?> value)
+	public void addTemplate(final String name, ImageIcon icon, String style, int width, int height, EntityCreator<?> value)
 	{
 		mxCell cell = new mxCell(value, new mxGeometry(0, 0, width, height), style);
 		cell.setVertex(true);
 
-		addTemplate(name, icon, cell);
+		addTemplate(name, name, icon, cell);
 	}
 
-	public void addTemplate(final String name, ImageIcon icon, mxCell cell)
+	public void addTemplate (EntityCreator<?> creator)
 	{
+		mxCell cell = new mxCell(creator, new mxGeometry(0, 0,
+														 creator.getInitialCellWidth(), creator.getInitialCellHeight()),
+								 creator.getCellStyle());
+		cell.setVertex(true);
+
+		addTemplate(creator.getIconCaption(), creator.getTooltip(),
+					new ImageIcon(EditorPalette.class.getResource("../images/lang/" + creator.getIconFileName())),
+					cell);
+	}
+
+	public void addTemplate (final String caption, final String tooltip, ImageIcon icon, mxCell cell) {
 		mxRectangle bounds = (mxGeometry) cell.getGeometry().clone();
-		final mxGraphTransferable t = new mxGraphTransferable(
-				new Object[] { cell }, bounds);
+		final mxGraphTransferable t = new mxGraphTransferable(new Object[] { cell }, bounds);
 
 		// Scales the image if it's too large for the library
 		if (icon != null) {
+			// TODO this requires the icon to be square (e.g. by padding)
 			if (icon.getIconWidth() > MAX_ICON_SIZE || icon.getIconHeight() > MAX_ICON_SIZE)
-				icon = new ImageIcon(icon.getImage().getScaledInstance(MAX_ICON_SIZE, MAX_ICON_SIZE, 0));
+				icon = new ImageIcon(icon.getImage().getScaledInstance(MAX_ICON_SIZE, MAX_ICON_SIZE, Image.SCALE_SMOOTH));
 		}
 
 		final JLabel entry = new JLabel(icon);
@@ -180,8 +190,8 @@ public class EditorPalette extends JPanel
 		entry.setHorizontalTextPosition(JLabel.CENTER);
 		entry.setIconTextGap(0);
 
-		entry.setToolTipText(name);
-		entry.setText(name);
+		entry.setToolTipText(tooltip);
+		entry.setText(caption);
 
 		entry.addMouseListener(new MouseAdapter() {
 			@Override

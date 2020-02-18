@@ -132,7 +132,6 @@ public class DetailsEditor {
             italicsCellFont = new Font(normalCellFont.getName(), Font.ITALIC, normalCellFont.getSize());
          }
          component.setFont(column == 1 && tableModel.isIndirectProp(row) ? italicsCellFont : normalCellFont);
-         // TODO use component.setFont(); with italics instead of blue
          return component;
       }
    }

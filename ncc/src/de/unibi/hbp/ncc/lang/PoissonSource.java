@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
@@ -18,6 +19,9 @@ public class PoissonSource extends NeuronPopulation {
       list.add(start);
       return list;
    }
+
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Poisson Source"; }
 
    public PoissonSource (Namespace<NeuronPopulation> namespace, String name, int neuronCount,
                          double rate, double start, double duration) {
@@ -50,6 +54,18 @@ public class PoissonSource extends NeuronPopulation {
       public String toString () {  // used by drag&drop tooltips
          return "Poisson Source";
       }
+
+      @Override
+      public String getIconFileName () { return "poissonsource.png"; }
+
+      @Override
+      public String getIconCaption () { return "Poisson"; }
+
+      @Override
+      public String getCellStyle () { return "poissonSource"; }
+
+      @Override
+      public int getInitialCellHeight () { return 80; }
    }
 
    @Override

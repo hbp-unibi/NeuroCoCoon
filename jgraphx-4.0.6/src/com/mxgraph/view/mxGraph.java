@@ -468,13 +468,13 @@ public class mxGraph extends mxEventSource
 
 	/**
 	 * Specifies if edges with disconnected terminals are
-	 * allowed in the graph. Default is false.
+	 * allowed in the graph. Default is true.
 	 */
 	protected boolean allowDanglingEdges = true;
 
 	/**
 	 * Specifies if edges that are cloned should be validated and only inserted
-	 * if they are valid. Default is true.
+	 * if they are valid. Default is false.
 	 */
 	protected boolean cloneInvalidEdges = false;
 
@@ -503,7 +503,7 @@ public class mxGraph extends mxEventSource
 	/**
 	 * Specifies the maximum number of changes that should be processed to find
 	 * the dirty region. If the number of changes is larger, then the complete
-	 * grah is repainted. A value of zero will always compute the dirty region
+	 * graph is repainted. A value of zero will always compute the dirty region
 	 * for any number of changes. Default is 1000.
 	 */
 	protected int changesRepaintThreshold = 1000;

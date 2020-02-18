@@ -7,6 +7,7 @@ import de.unibi.hbp.ncc.lang.serialize.SerializedEntityName;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,9 +26,9 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
    }
 
    protected NamedEntity (Namespace<E> namespace, String name) {
-      this.namespace = namespace;
+      this.namespace = Objects.requireNonNull(namespace);
       if (name == null)
-         name = namespace.generateName();
+         name = namespace.generateName(this);
       this.nameProp = new StringProp("Name", this, name) {
          @Override
          public boolean isValid (String proposedValue) {
@@ -64,6 +65,8 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       }
       return copiedName;
    }
+
+   protected abstract String getGeneratedNamesPrefix ();
 
    protected Namespace<E> getNamespace () { return namespace; }
 
@@ -107,15 +110,16 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       return getName();
    }
 
-   protected String getDisplayNamePrefix () { return namespace.getGeneratedNamesPrefix(); }
+   protected String getDisplayNamePrefix () { return getGeneratedNamesPrefix(); }
 
    @Override
    public String getLongDisplayName () {
       String prefix = getDisplayNamePrefix();
-      if (prefix != null && !prefix.isEmpty())
-         return prefix + " " + getName();
+      String name = getName();
+      if (prefix != null && !prefix.isEmpty() && !name.startsWith(prefix))
+         return prefix + " " + name;
       else
-         return getName();
+         return name;
    }
 
    @Override

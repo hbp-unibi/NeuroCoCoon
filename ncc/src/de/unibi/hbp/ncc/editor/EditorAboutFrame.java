@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,8 +31,7 @@ public class EditorAboutFrame extends JDialog
 
 	private static final long serialVersionUID = -3378029138434324390L;
 
-	public EditorAboutFrame(Frame owner)
-	{
+	public EditorAboutFrame (Frame owner) {
 		super(owner);
 		setTitle(mxResources.get("aboutGraphEditor"));
 		setLayout(new BorderLayout());
@@ -48,8 +48,7 @@ public class EditorAboutFrame extends JDialog
 
 				// Paint gradient background
 				Graphics2D g2d = (Graphics2D) g;
-				g2d.setPaint(new GradientPaint(0, 0, Color.WHITE, getWidth(),
-						0, getBackground()));
+				g2d.setPaint(new GradientPaint(0, 0, Color.WHITE, getWidth(), 0, getBackground()));
 				g2d.fillRect(0, 0, getWidth(), getHeight());
 			}
 
@@ -81,59 +80,45 @@ public class EditorAboutFrame extends JDialog
 		content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 		content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-		content.add(new JLabel("NeuroCoCoon - Neuromorphic Computing Cocoon"));
-		content.add(new JLabel(" "));
-		content.add(new JLabel("Contributed by Universität Bielefeld, Germany"));
-		content.add(new JLabel("Version " + NeuroCoCoonEditor.VERSION));
+		content.add(new JLabel(
+				"<html><p><b>NeuroCoCoon - Neuromorphic Computing Cocoon</b><br>" +
+						"Contributed by Universität Bielefeld, Germany<br>" +
+						"Version " + NeuroCoCoonEditor.VERSION + "</p><p></p>" +
+						"<p>Based on: mxGraph Version " + mxGraph.VERSION +
+						"<br>Copyright (C) 2009 by JGraph Ltd.<br>All rights reserved.</p>" +
+						"<p></p><b>Icon Credits:</b><br>" +
+						"Chain by Kick from the Noun Project<br>" +
+						"growth by pongsakorn from the Noun Project<br>" +
+						"module by Juan Carlos Altamirano from the Noun Project<br>" +
+						"Neural Network by Knut M. Synstad from the Noun Project<br>" +
+						"retina by sachin modgekar from the Noun Project<br>" +
+						"Robot by Adrien Coquet from the Noun Project<br>" +
+						"winner by cindy clegane from the Noun Project</html>"));
 
-		content.add(new JLabel(" "));
-		content.add(new JLabel("Based on:"));
-		content.add(new JLabel("mxGraph Version " + mxGraph.VERSION));
-		content.add(new JLabel("Copyright (C) 2009 by JGraph Ltd."));
-		content.add(new JLabel("All rights reserved."));
-		content.add(new JLabel(" "));
-
-		try
-		{
-			content.add(new JLabel("Operating System Name: "
-					+ System.getProperty("os.name")));
-			content.add(new JLabel("Operating System Version: "
-					+ System.getProperty("os.version")));
-			content.add(new JLabel(" "));
-
-			content.add(new JLabel("Java Vendor: "
-					+ System.getProperty("java.vendor", "undefined")));
-			content.add(new JLabel("Java Version: "
-					+ System.getProperty("java.version", "undefined")));
-			content.add(new JLabel(" "));
-
-			content.add(new JLabel("Total Memory: "
-					+ Runtime.getRuntime().totalMemory()));
-			content.add(new JLabel("Free Memory: "
-					+ Runtime.getRuntime().freeMemory()));
+		try {
+			content.add(new JLabel(
+					"<html><p></p>Operating System Name: " + System.getProperty("os.name") +
+							"<br>Operating System Version: " + System.getProperty("os.version") +
+							"<br>Java Vendor: " + System.getProperty("java.vendor", "?") +
+							"<br>Java Version: " + System.getProperty("java.version", "?") +
+							"<br>Total Memory: " + Runtime.getRuntime().totalMemory() +
+							"<br>Free Memory: " + Runtime.getRuntime().freeMemory() + "</html>"));
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			// ignore
 		}
 
 		getContentPane().add(content, BorderLayout.CENTER);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		buttonPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createMatteBorder(1, 0, 0, 0, Color.GRAY), BorderFactory
-				.createEmptyBorder(16, 8, 8, 8)));
+		buttonPanel.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY),
+				BorderFactory.createEmptyBorder(16, 8, 8, 8)));
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 		// Adds OK button to close window
 		JButton closeButton = new JButton("Close");
-		closeButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				setVisible(false);
-			}
-		});
+		closeButton.addActionListener(e -> setVisible(false));
 
 		buttonPanel.add(closeButton);
 
@@ -141,24 +126,18 @@ public class EditorAboutFrame extends JDialog
 		getRootPane().setDefaultButton(closeButton);
 
 		setResizable(false);
-		setSize(400, 400);
+		pack();
+		// setSize(400, 600);
 	}
 
 	/**
 	 * Overrides {@link JDialog#createRootPane()} to return a root pane that
-	 * hides the window when the user presses the ESCAPE key.O
+	 * hides the window when the user presses the ESCAPE key.
 	 */
-	protected JRootPane createRootPane()
-	{
+	protected JRootPane createRootPane() {
 		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		JRootPane rootPane = new JRootPane();
-		rootPane.registerKeyboardAction(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent actionEvent)
-			{
-				setVisible(false);
-			}
-		}, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+		rootPane.registerKeyboardAction(actionEvent -> setVisible(false), stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 		return rootPane;
 	}
 

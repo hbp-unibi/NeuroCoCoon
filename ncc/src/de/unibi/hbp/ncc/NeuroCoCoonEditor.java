@@ -25,7 +25,7 @@ import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
 import de.unibi.hbp.ncc.editor.props.Notificator;
 import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.DataPlot;
-import de.unibi.hbp.ncc.lang.EntityCreator;
+import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.ModuleExample;
@@ -51,13 +51,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 {
 
 	public static final String VERSION = "0.9.0";
-
-	/**
-	 * Holds the shared number formatter.
-	 * 
-	 * @see NumberFormat#getInstance()
-	 */
-	public static final NumberFormat numberFormat = NumberFormat.getInstance();
 
 	private ProgramGraphComponent programGraphComponent;
 	private DetailsEditor detailsEditor;
@@ -114,20 +107,31 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		// Adds some template cells for dropping into the graph
 
-		basicPalette.addTemplate("Spikes",
-								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/spikesource.png")),
-								 "spikeSource",
-								 100, 100, RegularSpikeSource.CREATOR);
-		basicPalette.addTemplate("Poisson",
-								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/poissonsource.png")),
-								 "poissonSource",
-								 100, 80, PoissonSource.CREATOR);
-		basicPalette.addTemplate("Population",
-								 new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/population.png")),
-								 "population",
-								 100, 60, StandardPopulation.CREATOR);
-		modulesPalette.addTemplate("Example",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/rectangle.png")),
+		basicPalette.addTemplate(RegularSpikeSource.CREATOR);
+		basicPalette.addTemplate(PoissonSource.CREATOR);
+		basicPalette.addTemplate(StandardPopulation.CREATOR);
+		modulesPalette.addTemplate("Chain",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/chain.png")),
+								   "module",
+								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate("Winner",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/winner.png")),
+								   "module",
+								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate("Retina",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/retina.png")),
+								   "module",
+								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate("Inception",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/inception.png")),
+								   "module",
+								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate("Direction",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/robot_head.png")),
+								   "module",
+								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate("Generic",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/module.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
 	}
@@ -229,6 +233,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			program.setGraphModel(this.getModel());
 			this.program = program;
 			setGridEnabled(false);
+			setAllowDanglingEdges(false);
+			setMultigraph(false);
 //			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
 
 			addListener(mxEvent.CELLS_ADDED, (sender, evt ) -> {

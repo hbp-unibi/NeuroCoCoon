@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
@@ -20,6 +21,9 @@ public class StandardPopulation extends NeuronPopulation {
    protected List<EditableProp<?>> addIndirectEditableProps (List<EditableProp<?>> list) {
       return neuronType.getValue().addExportedEditableProps(list);
    }
+
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Population"; }
 
    public StandardPopulation (Namespace<NeuronPopulation> namespace, String name, NeuronType neuronType, int neuronCount) {
       super(namespace, name, neuronCount);
@@ -55,6 +59,18 @@ public class StandardPopulation extends NeuronPopulation {
       public String toString () {  // used by drag&drop tooltips
          return "Standard Population";
       }
+
+      @Override
+      public String getIconFileName () { return "population.png"; }
+
+      @Override
+      public String getIconCaption () { return "Population"; }
+
+      @Override
+      public String getCellStyle () { return "population"; }
+
+      @Override
+      public int getInitialCellHeight () { return 60; }
    }
 
    @Override

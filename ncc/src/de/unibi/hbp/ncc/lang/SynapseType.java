@@ -93,6 +93,9 @@ public class SynapseType extends NamedEntity<SynapseType> {
             .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
    }
 
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Synapse Type"; }
+
    public SynapseType (Namespace<SynapseType> namespace, String name, ConnectorKind kind) {
       this(namespace, name, kind, 1.0, 0.0, 0.5, SynapseKind.STATIC);
    }

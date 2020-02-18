@@ -1,14 +1,10 @@
 package de.unibi.hbp.ncc.editor;
 
-import com.eclipsesource.json.WriterConfig;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
-import de.unibi.hbp.ncc.env.JavaScriptBridge;
 import de.unibi.hbp.ncc.env.NmpiClient;
 
 import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
