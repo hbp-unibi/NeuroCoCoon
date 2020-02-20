@@ -1,2 +1,2 @@
 # NeuroCoCoon
-visual language and associated editor for SNN model building
+Visual language and associated editor for SNN model building
