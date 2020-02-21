@@ -13,6 +13,12 @@ public class IntegerProp extends SimpleEditableProp<Integer> {
    }
 
    @Override
+   public IntegerProp setImpact (Impact impact) {  // to get the more precise covariant return type
+      super.setImpact(impact);
+      return this;
+   }
+
+   @Override
    public TableCellEditor getTableCellEditor (JTable table) {
       return new IntegerValueCellEditor(this);
    }

@@ -88,7 +88,7 @@ public class BasicGraphEditor extends JPanel
 	 */
 	protected boolean modified = false;
 
-	protected mxRubberband rubberband;
+	protected mxRubberband rubberBand;
 	protected mxKeyboardHandler keyboardHandler;
 
 	protected mxIEventListener undoHandler = new mxIEventListener() {
@@ -190,7 +190,7 @@ public class BasicGraphEditor extends JPanel
 
 	protected void installHandlers()
 	{
-		rubberband = new mxRubberband(graphComponent);
+		rubberBand = new mxRubberband(graphComponent);
 		keyboardHandler = new EditorKeyboardHandler(graphComponent);
 	}
 
@@ -386,16 +386,13 @@ public class BasicGraphEditor extends JPanel
 	 * @return a new Action bound to the specified string name and icon
 	 */
 	@SuppressWarnings("serial")
-	public Action bind(String name, final Action action, String iconUrl)
-	{
+	public Action bind(String name, final Action action, String iconUrl) {
+		// System.err.println("BasicGraphEditor.bind: " + name + ", " + iconUrl);
 		AbstractAction newAction = new AbstractAction(name, (iconUrl != null)
 				? new ImageIcon(BasicGraphEditor.class.getResource(iconUrl))
-				: null)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				action.actionPerformed(new ActionEvent(getGraphComponent(),
-													   e.getID(), e.getActionCommand()));
+				: null) {
+			public void actionPerformed(ActionEvent e) {
+				action.actionPerformed(new ActionEvent(getGraphComponent(), e.getID(), e.getActionCommand()));
 			}
 		};
 		

@@ -14,22 +14,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Program extends LanguageEntity implements DisplayNamed, PythonNamed {
-   private StringProp programNameProp;
-   private DoubleProp timeStepProp;
-   // TODO add property for simulation time
+   private StringProp programName;
+   private DoubleProp runTime, timeStep;
    private final Scope global;
    private mxIGraphModel graphModel;
    private ErrorCollector lastDiagnostics;
 
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
-      list.add(programNameProp);
-      list.add(timeStepProp);
+      list.add(programName);
+      list.add(runTime);
+      list.add(timeStep);
       return list;
    }
 
    public Program () {
-      programNameProp = new StringProp("Program Name", this, "My Experiment");
-      timeStepProp = new StrictlyPositiveDoubleProp("Time Step", this, 0.1).setUnit("s");
+      programName = new StringProp("Program Name", this, "My Experiment");
+      timeStep = new StrictlyPositiveDoubleProp("Time Step", this, 0.1).setUnit("ms");
+      runTime = new StrictlyPositiveDoubleProp("Run Time", this, 2000.0).setUnit("ms");
       global = new Scope();
       NeuronPopulation.setGlobalNamespace(global.getNeuronPopulations());
       final Namespace<SynapseType> synapseTypes = global.getSynapseTypes();
@@ -84,12 +85,12 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
    }
 
    @Override
-   public String getDisplayName () { return programNameProp.getValue(); }
+   public String getDisplayName () { return programName.getValue(); }
 
    @Override
    public String getPythonName () {
-      return NamedEntity.buildTopLevelPythonName(programNameProp.getValue());
+      return NamedEntity.buildTopLevelPythonName(programName.getValue());
    }
 
-   public double getTimeStep () { return timeStepProp.getValue(); }
+   public double getTimeStep () { return timeStep.getValue(); }
 }

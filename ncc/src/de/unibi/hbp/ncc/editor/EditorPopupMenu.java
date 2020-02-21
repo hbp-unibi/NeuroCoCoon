@@ -18,22 +18,22 @@ public class EditorPopupMenu extends JPopupMenu
 		boolean selected = !editor.getGraphComponent().getGraph().isSelectionEmpty();
 
 		add(editor.bind(mxResources.get("undo"), new HistoryAction(true),
-				"/de/unibi/hbp/ncc/images/undo.gif"));
+						"/de/unibi/hbp/ncc/editor/images/undo.gif"));
 
 		addSeparator();
 
 		add(editor.bind(mxResources.get("cut"), TransferHandler.getCutAction(),
-						"/de/unibi/hbp/ncc/images/cut.gif")).setEnabled(selected);
+						"/de/unibi/hbp/ncc/editor/images/cut.gif")).setEnabled(selected);
 		add(editor.bind(mxResources.get("copy"), TransferHandler.getCopyAction(),
-						"/de/unibi/hbp/ncc/images/copy.gif")).setEnabled(selected);
+						"/de/unibi/hbp/ncc/editor/images/copy.gif")).setEnabled(selected);
 		add(editor.bind(mxResources.get("paste"), TransferHandler.getPasteAction(),
-				"/de/unibi/hbp/ncc/images/paste.gif"));
+						"/de/unibi/hbp/ncc/editor/images/paste.gif"));
 
 		addSeparator();
 
 		add(
 				editor.bind(mxResources.get("delete"), mxGraphActions.getDeleteAction(),
-						"/de/unibi/hbp/ncc/images/delete.gif")).setEnabled(selected);
+							"/de/unibi/hbp/ncc/editor/images/delete.gif")).setEnabled(selected);
 
 		addSeparator();
 

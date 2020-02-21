@@ -106,12 +106,15 @@ public class DetailsEditor {
       }
    }
 
-   public void setSubject (mxGraphComponent graphComponent, LanguageEntity subject) {
-      tableModel.setSubject(graphComponent, subject);
-   }
-
-   public void setSubject (LanguageEntity subject) {  // for entities without a visual representation
-      tableModel.setSubject(null, subject);
+   public void setSubject (LanguageEntity subject) {
+      if (!Objects.equals(subject, tableModel.getSubject())) {
+         if (table.isEditing()) {
+            TableCellEditor editor = table.getCellEditor();
+            if (editor != null && !editor.stopCellEditing())
+               editor.cancelCellEditing();
+         }
+         tableModel.updateSubject(subject);
+      }
    }
 
    public JComponent getComponent () { return component; }
@@ -174,7 +177,6 @@ public class DetailsEditor {
 
    static class PropsTableModel extends AbstractTableModel
          implements PropPerRowModel, PropChangeListener {
-      private mxGraphComponent graphComponent;
       private LanguageEntity subject;
       List<ReadOnlyProp<?>> readOnlyProps;
       List<EditableProp<?>> editableProps;
@@ -185,13 +187,9 @@ public class DetailsEditor {
          editableProps = Collections.emptyList();
       }
 
-      void setSubject (mxGraphComponent graphComponent, LanguageEntity subject) {
-         this.graphComponent = graphComponent;
-         if (!Objects.equals(this.subject, subject))
-            updateSubject(subject);
-      }
+      LanguageEntity getSubject () { return subject; }
 
-      private void updateSubject (LanguageEntity subject) {
+      void updateSubject (LanguageEntity subject) {
          this.subject = subject;
          if (subject != null) {
             readOnlyProps = subject.getDirectAndIndirectReadOnlyProps();

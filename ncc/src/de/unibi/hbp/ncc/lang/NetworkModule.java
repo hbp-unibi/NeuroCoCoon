@@ -162,7 +162,7 @@ public abstract class NetworkModule extends NamedEntity<NetworkModule>
    }
 
    private String computeCellStyle () {
-      return (useWideLayout ? "moduleWide" : "module") + ";image=/de/unibi/hbp/ncc/images/lang/" + iconFileName;
+      return (useWideLayout ? "moduleWide" : "module") + ";image=/de/unibi/hbp/ncc/editor/images/lang/" + iconFileName;
    }
 
    private void updatePorts (mxGraph graph, mxCell moduleCell, int layoutSteps) {
@@ -226,7 +226,7 @@ public abstract class NetworkModule extends NamedEntity<NetworkModule>
       // this is called as part of a graph model update transaction
       final mxGeometry moduleGeo = existingCell.getGeometry();
       boolean changeToWideLayout = moduleGeo.getWidth() >= 3 * moduleGeo.getHeight();
-      System.err.println("resizeExisting: " + moduleGeo);
+      // System.err.println("resizeExisting: " + moduleGeo);
       if (changeToWideLayout != useWideLayout) {
          useWideLayout = changeToWideLayout;
          graph.getModel().setStyle(existingCell, computeCellStyle());
@@ -240,9 +240,32 @@ public abstract class NetworkModule extends NamedEntity<NetworkModule>
       this.iconFileName = Objects.requireNonNull(iconFileName);
    }
 
+   protected static NeuronType ensureDefaultType (Namespace<NeuronType> neuronTypes, String typeName) {
+      NeuronType neuronType = neuronTypes.get(typeName);
+      if (neuronType == null) {
+         neuronType = new NeuronType(neuronTypes, typeName,
+                                     NeuronType.NeuronKind.IF_COND_EXP,
+                                     -70.0, -80.0, -60.0, 0.0, -100.0,
+                                     3.0, 3.0, 1.0, 10.0, 0.2, 0.0);
+      }
+      return neuronType;
+   }
+
+   protected List<String> getPortNames (List<String> cache, int count, String prefix) {
+      if (cache == null || cache.size() != count) {
+         cache = new ArrayList<>(count);
+         for (int nr = 1; nr <= count; nr++)
+            cache.add(prefix + " " + nr);
+      }
+      return cache;
+   }
+
    protected abstract List<String> getPortNames (Port.Direction direction);
 
-   protected abstract Integer getPortDimension (Port.Direction direction, int portIndex);
+   protected abstract int getPortDimension (Port.Direction direction, int portIndex);
    // TODO need to provide a cardinality (neuron count) per port as well
 
+   protected boolean getPortIsOptional (Port.Direction direction, int portIndex) {
+      return false;
+   }
 }

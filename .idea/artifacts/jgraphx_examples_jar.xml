@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/web</output-path>
     <root id="archive" name="jgraphx-examples.jar">
       <element id="module-output" name="jgraphx-examples" />
-      <element id="module-output" name="jgraphx-4.0.6" />
+      <element id="module-output" name="jgraphx-4_0_6" />
     </root>
   </artifact>
 </component>

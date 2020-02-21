@@ -22,7 +22,7 @@ public class EditorMenuBar extends JMenuBar
 
 	private static final long serialVersionUID = 4060203894740766714L;
 
-	private static final String IMAGE_PATH = "../images/";
+	private static final String IMAGE_PATH = "images/";
 
 	public EditorMenuBar(final BasicGraphEditor editor)
 	{

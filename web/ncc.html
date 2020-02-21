@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>NeuroCoCoon</title>
+   <link rel="stylesheet" href="./lib/collaboratory.bootstrap.css">
+   <link rel="stylesheet" href="ncc.css">
+   <script src="https://cjrtnc.leaningtech.com/1.4/loader.js"></script>
+</head>
+<body>
+   <h1><img src="Logo_NCC.png" title="NeuroCoCoon Logo" height="80" alt="Logo"> <b><span class="nccRed">Neuro</span><span  class="nccBlue">Co</span><span class="nccDarkViolet">Coon</span></b> — Neuromorphic Computing Cocoon</h1>
+
+   <script src="./lib/jquery-2.1.4.min.js" charset="utf-8"></script>
+   <script src="./lib/hello.all.js" charset="utf-8"></script>
+   <script src="./lib/hbp.hello.js" charset="utf-8"></script>
+   <script src="./app.js" charset="utf-8"></script>
+   <script>
+      // cheerpjInit({javaProperties:["java.protocol.handler.pkgs=com.leaningtech.handlers"]});
+      // above shortcut does NOT work
+      cheerpjInit();
+      cjCall("java.lang.System", "setProperty", "java.protocol.handler.pkgs", "com.leaningtech.handlers");
+      cheerpjCreateDisplay(1200,900);
+      cheerpjRunJar("/app/ncc.jar");  // "de.unibi.hbp.ncc.NeuroCoCoonEditor"
+      // cheerpjRunMain("de.unibi.hbp.ncc.toys.HelloWorld", "/app/ncc.jar"); 
+   </script>
+</body>
+</html>

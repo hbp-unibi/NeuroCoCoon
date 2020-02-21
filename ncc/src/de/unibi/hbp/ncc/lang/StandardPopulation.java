@@ -27,11 +27,11 @@ public class StandardPopulation extends NeuronPopulation {
 
    public StandardPopulation (Namespace<NeuronPopulation> namespace, String name, NeuronType neuronType, int neuronCount) {
       super(namespace, name, neuronCount);
-      Namespace<NeuronType> neuronTypes = getGlobalNamespace().getContainingScope().getNeuronTypes();
+      Namespace<NeuronType> neuronTypes = namespace.getContainingScope().getNeuronTypes();
       if (neuronType == null)
          neuronType = neuronTypes.get("Default");
-      this.neuronType = new EditableNameProp<NeuronType>("Neuron Type", NeuronType.class, this,
-                                                         Objects.requireNonNull(neuronType), neuronTypes);
+      this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this,
+                                               Objects.requireNonNull(neuronType), neuronTypes);
    }
 
    public StandardPopulation (Namespace<NeuronPopulation> namespace) {

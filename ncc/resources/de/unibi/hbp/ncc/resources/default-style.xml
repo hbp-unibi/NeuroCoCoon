@@ -142,9 +142,6 @@
 		<add as="imageWidth" value="48"/>
 		<add as="imageHeight" value="48"/>
 	</add>
-	<add as="iconWinner" extend="icon">
-		<add as="image" value="/de/unibi/hbp/ncc/images/lang/winner.png"/>
-	</add>
 	<add as="entity">
 		<add as="edgeStyle" value="entityRelationEdgeStyle"/>
 	</add>

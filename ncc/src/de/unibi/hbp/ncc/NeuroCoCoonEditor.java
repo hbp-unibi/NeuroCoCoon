@@ -28,7 +28,7 @@ import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
-import de.unibi.hbp.ncc.lang.ModuleExample;
+import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
@@ -37,6 +37,8 @@ import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
 import de.unibi.hbp.ncc.lang.SynapseType;
+import de.unibi.hbp.ncc.lang.modules.SynfireChain;
+import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
@@ -44,7 +46,6 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import java.awt.Color;
-import java.text.NumberFormat;
 import java.util.Collection;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor
@@ -75,6 +76,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 	@Override
 	public void initialize () {
+		// System.err.println("NeuroCoCoonEditor.initialize: enter");
 		super.initialize();
 
 		programGraphComponent.getProgramGraph().setToolBar(getEditorToolBar());
@@ -99,45 +101,41 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					if (tmp instanceof mxCell) {
 						Object value = ((mxCell) tmp).getValue();
 						if (value instanceof LanguageEntity)
-							detailsEditor.setSubject(graphComponent, (LanguageEntity) value);
+							detailsEditor.setSubject((LanguageEntity) value);
 					}
 				}
 			}
 		});
 
 		// Adds some template cells for dropping into the graph
+		// System.err.println("NeuroCoCoonEditor.initialize: palette");
 
 		basicPalette.addTemplate(RegularSpikeSource.CREATOR);
 		basicPalette.addTemplate(PoissonSource.CREATOR);
 		basicPalette.addTemplate(StandardPopulation.CREATOR);
-		modulesPalette.addTemplate("Chain",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/chain.png")),
-								   "module",
-								   100, 60, ModuleExample.CREATOR);
-		modulesPalette.addTemplate("Winner",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/winner.png")),
-								   "module",
-								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate(SynfireChain.CREATOR);
+		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
 		modulesPalette.addTemplate("Retina",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/retina.png")),
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/retina.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
 		modulesPalette.addTemplate("Inception",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/inception.png")),
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/inception.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
 		modulesPalette.addTemplate("Direction",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/robot_head.png")),
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/robot_head.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
 		modulesPalette.addTemplate("Generic",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("images/lang/module.png")),
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/module.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
 	}
 
 	@Override
 	protected void addInspectorTabs (JTabbedPane inspector) {
+		// System.err.println("NeuroCoCoonEditor.addInspectorTabs: enter");
 		detailsEditor = new DetailsEditor();
 		inspector.addTab("Inspector", detailsEditor.getComponent());
 		Scope global = programGraphComponent.getProgramGraph().getProgram().getGlobalScope();
@@ -357,15 +355,20 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
 		catch (Exception excp) {
-			excp.printStackTrace();
+			excp.printStackTrace(System.err);
 		}
 
 		mxSwingConstants.SHADOW_COLOR = Color.LIGHT_GRAY;
 		mxConstants.W3C_SHADOWCOLOR = "#D3D3D3";
 
-		NeuroCoCoonEditor editor = new NeuroCoCoonEditor();
-		editor.initialize();  // moved from constructor so that subclass object fields have been initialized already
-		JFrame frame = editor.createFrame(new EditorMenuBar(editor), 1200, 800);
-		frame.setVisible(true);
+		try {  // CheerpJ Debugging
+			NeuroCoCoonEditor editor = new NeuroCoCoonEditor();
+			editor.initialize();  // moved from constructor so that subclass object fields have been initialized already
+			JFrame frame = editor.createFrame(new EditorMenuBar(editor), 1200, 800);
+			frame.setVisible(true);
+		}
+		catch (Throwable t) {
+			t.printStackTrace(System.err);
+		}
 	}
 }

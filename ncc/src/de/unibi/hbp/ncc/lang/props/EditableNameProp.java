@@ -17,7 +17,7 @@ public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditablePr
 
    public EditableNameProp (String propName, Class<E> valueClass, LanguageEntity owner,
                             E value, Namespace<E> targetNamespace) {
-      super(propName, valueClass, owner, value);
+      super(propName, valueClass, owner, Objects.requireNonNull(value));
       this.targetNamespace = Objects.requireNonNull(targetNamespace);
    }
 

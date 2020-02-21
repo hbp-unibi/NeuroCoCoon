@@ -7,6 +7,7 @@ import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
+import de.unibi.hbp.ncc.lang.props.ProbabilityProp;
 
 import java.util.List;
 import java.util.Objects;
@@ -82,12 +83,7 @@ public class SynapseType extends NamedEntity<SynapseType> {
             .setImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
       // FIXME styles in dependent cells (edges) are NOT updated when the sign of the weight is changed (cell collector ok?)
       this.delay = new NonNegativeDoubleProp("Delay", this, delay).setUnit("ms");
-      this.probability = new NonNegativeDoubleProp("Probability", this, probability) {
-         @Override
-         public boolean isValid (Double proposedValue) {
-            return super.isValid(proposedValue) && proposedValue <= 1.0;
-         }
-      };
+      this.probability = new ProbabilityProp("Probability", this, probability);
       this.synapseKind = new EditableEnumProp<>("Synapse Kind", SynapseKind.class, this,
                                                 Objects.requireNonNull(synapseKind))
             .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);

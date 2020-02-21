@@ -78,19 +78,29 @@ public class NeuronType extends NamedEntity<NeuronType> {
       this.izhikevichD = new DoubleProp("d", this, izhikevichD).setUnit("mV/ms");
    }
 
-   @Override
-   protected String getGeneratedNamesPrefix () { return "Neuron Type"; }
+   public NeuronType (Namespace<NeuronType> namespace, String name, NeuronKind neuronKind,
+                      double vRest, double vReset, double vThresh, double eRevE, double eRevI,
+                      double tauSynE, double tauSynI, double tauRefrac, double tauM, double cm,
+                      double iOffset) {
+      this(namespace, name, neuronKind, vRest, vReset, vThresh, eRevE, eRevI,
+           tauSynE, tauSynI, tauRefrac, tauM, cm,
+           iOffset,
+           0.02, 0.2, -65.0, 2.0);
+   }
 
    public NeuronType (Namespace<NeuronType> namespace, String name) {
       this(namespace, name, NeuronKind.IF_COND_EXP,
            -70.0, -80.0, -65.0, 0.0, -100.0,
            2.0, 2.0, 2.0, 10.0, 0.2,
-           0.0,
-           0.02, 0.2, -65.0, 2.0);
+           0.0);
    }
+
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Neuron Type"; }
+
    public NeuronType (Namespace<NeuronType> namespace) { this(namespace, null); }
 
-   public NeuronType (NeuronType orig) {
+   protected NeuronType (NeuronType orig) {
       this(orig.getNamespace(), orig.getCopiedName(), orig.neuronKind.getValue(),
            orig.vRest.getValue(), orig.vReset.getValue(), orig.vThresh.getValue(), orig.eRevE.getValue(), orig.eRevI.getValue(),
            orig.tauSynE.getValue(), orig.tauSynI.getValue(), orig.tauRefrac.getValue(), orig.tauM.getValue(), orig.cm.getValue(),

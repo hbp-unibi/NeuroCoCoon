@@ -58,8 +58,8 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
    @Override
    public String toString () {
-      return synapseType.getValue().getSummary();
-   }
+      return synapseType.getValue().getDisplayName();
+   }  // TODO append .getSummary() for synapse type as well?
 
    // @Override
    public NeuronConnection duplicate () {

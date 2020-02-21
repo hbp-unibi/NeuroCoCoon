@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.WriterConfig;
+import de.unibi.hbp.ncc.lang.DisplayNamed;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -29,19 +30,22 @@ public class NmpiClient {
    private static final String JOB_SERVICE_ROOT = "https://nmpi.hbpneuromorphic.eu";
    private static final String JOB_SERVICE = JOB_SERVICE_ROOT + "/api/v2/";
 
-   public enum Platform {
-      BRAINSCALES("BrainScaleS"), SPIKEY("Spikey"), SPINNAKER("SpiNNaker");
+   public enum Platform implements DisplayNamed {
+      BRAINSCALES("BrainScaleS"), NEST("NEST"), SPIKEY("Spikey"), SPINNAKER("SpiNNaker");
 
-      private String name;
+      private String pynnName;
 
-      Platform (String name) { this.name = name; }
+      Platform (String pynnName) { this.pynnName = pynnName; }
 
-      String getName () { return name; }
+      String getPynnName () { return pynnName; }
 
       @Override
       public String toString () {
-         return name;
-      }
+         return getDisplayName();
+      }  // for the combo box
+
+      @Override
+      public String getDisplayName () { return pynnName; }  // maybe make this distinct from the PyNN API name
    }
 
    private String authToken;
@@ -324,7 +328,7 @@ public class NmpiClient {
 
       JsonObject jobData = new JsonObject();
       jobData.add("command", "run.py {system}");
-      jobData.add("hardware_platform", platform.getName());
+      jobData.add("hardware_platform", platform.getPynnName());
       jobData.add("collab_id", getCollabId());
       jobData.add("user_id", String.valueOf(getUserId()));
 

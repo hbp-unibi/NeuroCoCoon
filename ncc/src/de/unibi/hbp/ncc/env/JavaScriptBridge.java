@@ -43,4 +43,12 @@ public class JavaScriptBridge {
          return "Status 999";  // fake a real response similar to a HTTP status code
       }
    }
+
+   private static Boolean cachedWebPlatform = null;
+
+   public static boolean isWebPlatform () {
+      if (cachedWebPlatform == null)
+         cachedWebPlatform = System.getProperty("java.vendor", "?").startsWith(("Leaning Technologies"));
+      return cachedWebPlatform;
+   }
 }

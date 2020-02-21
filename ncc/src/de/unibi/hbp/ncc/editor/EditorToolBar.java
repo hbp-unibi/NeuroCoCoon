@@ -38,7 +38,7 @@ public class EditorToolBar extends JToolBar
 	private NmpiClient.Platform currentPlatform;
 	private SynapseType currentSynapseType;
 
-	private static final String IMAGE_PATH = "../images/";
+	private static final String IMAGE_PATH = "images/"; // "/de/unibi/hbp/ncc/editor/images/";  // "../images/";
 
 	public EditorToolBar(final BasicGraphEditor editor, int orientation)
 	{

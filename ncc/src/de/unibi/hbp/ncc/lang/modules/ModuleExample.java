@@ -1,7 +1,10 @@
-package de.unibi.hbp.ncc.lang;
+package de.unibi.hbp.ncc.lang.modules;
 
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.editor.ModuleInstanceCreator;
+import de.unibi.hbp.ncc.lang.LanguageEntity;
+import de.unibi.hbp.ncc.lang.Namespace;
+import de.unibi.hbp.ncc.lang.NetworkModule;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +42,7 @@ public class ModuleExample extends NetworkModule {
    }
 
    @Override
-   protected Integer getPortDimension (Port.Direction direction, int portIndex) {
+   protected int getPortDimension (Port.Direction direction, int portIndex) {
       if (direction == Port.Direction.IN)
          return inputPortDimensions.get(portIndex);
       else if (direction == Port.Direction.OUT)
