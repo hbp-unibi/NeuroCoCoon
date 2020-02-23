@@ -9,6 +9,7 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.ProbabilityProp;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,12 +79,15 @@ public class SynapseType extends NamedEntity<SynapseType> {
       super(namespace, name);
       this.connectorKind = new EditableEnumProp<>("Connector", ConnectorKind.class, this,
                                                   Objects.requireNonNull(connectorKind))
-            .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
+            .setImpact(EnumSet.of(EditableProp.Impact.OTHER_PROPS_VISIBILITY,
+                                  EditableProp.Impact.DEPENDENT_CELLS_LABEL,
+                                  EditableProp.Impact.DEPENDENT_CELLS_STYLE));
       this.weight = new DoubleProp("Weight", this, weight)
             .setImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
       // FIXME styles in dependent cells (edges) are NOT updated when the sign of the weight is changed (cell collector ok?)
       this.delay = new NonNegativeDoubleProp("Delay", this, delay).setUnit("ms");
-      this.probability = new ProbabilityProp("Probability", this, probability);
+      this.probability = new ProbabilityProp("Probability", this, probability)
+            .setImpact(EditableProp.Impact.DEPENDENT_CELLS_LABEL);
       this.synapseKind = new EditableEnumProp<>("Synapse Kind", SynapseKind.class, this,
                                                 Objects.requireNonNull(synapseKind))
             .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
@@ -130,6 +134,9 @@ public class SynapseType extends NamedEntity<SynapseType> {
       return new AbstractCellsCollector(false, true) {
          @Override
          protected boolean matches (mxICell cell, LanguageEntity entity) {
+            if (entity instanceof NeuronConnection)
+               System.err.println("getDependentCells: " + cell + ", " + entity + ", " + SynapseType.this + ", " +
+                                        ((NeuronConnection) entity).getSynapseType());
             return entity instanceof NeuronConnection &&
                   SynapseType.this.equals(((NeuronConnection) entity).getSynapseType());
          }
@@ -141,7 +148,10 @@ public class SynapseType extends NamedEntity<SynapseType> {
    }
    // TODO add synapse kind info, if not STATIC
 
-   public String getEdgeStyle () { return connectorKind.getValue().getEdgeStyle(this); }
+   @Override
+   public String getCellStyle () {  // has no visual representation of its own, but NeuronConenction delegates here
+      return connectorKind.getValue().getEdgeStyle(this);
+   }
 
    // @Override
    public SynapseType duplicate () {

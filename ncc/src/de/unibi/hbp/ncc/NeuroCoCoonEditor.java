@@ -19,16 +19,15 @@ import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
+import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.editor.TooltipProvider;
 import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
 import de.unibi.hbp.ncc.editor.props.Notificator;
 import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.DataPlot;
-import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
-import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
@@ -37,6 +36,7 @@ import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
 import de.unibi.hbp.ncc.lang.SynapseType;
+import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.modules.SynfireChain;
 import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
 import org.w3c.dom.Document;
@@ -265,6 +265,31 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		public Program getProgram () { return program; }
 
+		// @Override
+		public Object[] cloneCells_deactivated (Object[] cells, boolean allowInvalidEdges) {
+			Object[] clones =  super.cloneCells(cells, allowInvalidEdges);
+			int index = 0;
+			for (Object clone: clones) {
+				if (clone instanceof mxCell) {
+					mxCell cell = (mxCell) clone;
+					Object value = cell.getValue();
+					LanguageEntity duplicatedValue = null;
+					if (value instanceof EntityCreator) {
+						duplicatedValue = ((EntityCreator<?>) value).create();
+					}
+					else if (value instanceof LanguageEntity && ((mxCell) cells[index]).getParent() != null)
+						// TODO duplicate() the value only, if original cell is part of the graph
+						duplicatedValue = ((LanguageEntity) value).duplicate();
+					if (duplicatedValue != null) {
+						cell.setValue(duplicatedValue);
+						duplicatedValue.setOwningCell(cell);
+					}
+				}
+				index += 1;
+			}
+			return clones;
+		}
+
 		@Override
 		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
 								boolean absolute, boolean constrain) {
@@ -276,8 +301,15 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					if (value instanceof EntityCreator) {
 						duplicatedValue = ((EntityCreator<?>) value).create();
 					}
-					else if (value instanceof LanguageEntity)
-						duplicatedValue = ((LanguageEntity) value).duplicate();
+					else if (value instanceof LanguageEntity) {
+						LanguageEntity entityValue = (LanguageEntity) value;
+						mxCell owner = entityValue.getOwningCell();
+						if (owner != cell && owner != null && owner.getParent() != null)
+							// reference has been cloned to another cell and both are part of a graph
+							duplicatedValue = entityValue.duplicate();
+						else if (owner != cell)
+							duplicatedValue = entityValue;  // adopt existing value from previous owner cell outside graph
+					}
 					if (duplicatedValue != null) {
 						cell.setValue(duplicatedValue);
 						duplicatedValue.setOwningCell(cell);
@@ -286,6 +318,12 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 				}
 			}
 			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
+		}
+
+		@Override
+		public Object[] removeCells (Object[] cells, boolean includeEdges) {
+			return super.removeCells(cells, includeEdges);
+			// TODO detach any language entities and remove named entities from their name spaces
 		}
 
 		// Ports are not used as terminals for edges, they are
@@ -341,7 +379,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			SynapseType synapseType = toolBar.getCurrentSynapseType();
 
-			mxCell edge = (mxCell) super.createEdge(parent, id, value, source, target, synapseType.getEdgeStyle());
+			mxCell edge = (mxCell) super.createEdge(parent, id, value, source, target, synapseType.getCellStyle());
 			edge.setValue(new NeuronConnection(synapseType));
 			return edge;
 		}

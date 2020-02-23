@@ -1,6 +1,9 @@
 package de.unibi.hbp.ncc.editor;
 
+import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
+import de.unibi.hbp.ncc.graph.AbstractCellsCollector;
+import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.Program;
 
 import javax.swing.AbstractAction;
@@ -22,7 +25,19 @@ public class CheckAction extends AbstractAction {
          editor.status("Checking …");
          NeuroCoCoonEditor neuroCoCoonEditor = (NeuroCoCoonEditor) editor;
          Program program = neuroCoCoonEditor.getProgram();
-         StringBuilder pythonCode = program.generatePythonCode();
+         StringBuilder pythonCode;
+         // pythonCode = program.generatePythonCode();
+         pythonCode = new AbstractCellsCollector(true, true) {
+            @Override
+            protected boolean matches (mxICell cell, LanguageEntity entity) {
+               return true;
+            }
+
+            @Override
+            protected boolean matchesOtherValue (mxICell cell, Object value) {
+               return true;
+            }
+         }.printMatchingCells(program.getGraphModel());
          if (pythonCode != null) {
             editor.status("Success!");
             JFrame frame = new JFrame("Python Code");

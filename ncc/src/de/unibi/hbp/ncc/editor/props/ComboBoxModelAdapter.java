@@ -33,9 +33,12 @@ public class ComboBoxModelAdapter<E> extends AbstractListModel<E> implements Com
          private void updateSelection () {
             if (selectedObject != null) {
                int size = delegate.getSize();
-               for (int index = 0; index <= size; index++)
-                  if (selectedObject.equals(delegate.getElementAt(index)))
+               for (int index = 0; index < size; index++)
+                  if (selectedObject == delegate.getElementAt(index)) {
+                     setSelectedItem(selectedObject);
+                     // after rename: identical object might no longer be equal (name-based) to itself
                      return;
+                  }
                if (size > 0)
                   setSelectedItem(delegate.getElementAt(0));
                else

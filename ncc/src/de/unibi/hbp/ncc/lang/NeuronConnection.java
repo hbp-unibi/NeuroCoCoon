@@ -4,6 +4,7 @@ import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedNeuronConnection;
 
+import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.List;
@@ -19,6 +20,12 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
    protected Object writeReplace() throws ObjectStreamException {
       return new SerializedNeuronConnection(synapseTypeNamespace.getId(), synapseType.getValue().getName());
+   }
+
+   // readObject method for the serialization proxy pattern
+   // See Effective Java, Second Ed., Item 78.
+   private void readObject(java.io.ObjectInputStream stream) throws InvalidObjectException {
+      throw new InvalidObjectException("SerializedNeuronConnection required");
    }
 
    @Override
@@ -58,7 +65,8 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
    @Override
    public String toString () {
-      return synapseType.getValue().getDisplayName();
+      SynapseType type = synapseType.getValue();
+      return type.getDisplayName() + " (" + type.getSummary() + ")";
    }  // TODO append .getSummary() for synapse type as well?
 
    // @Override
@@ -70,6 +78,6 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
    @Override
    public String getCellStyle () {
-      return synapseType.getValue().getEdgeStyle();
+      return synapseType.getValue().getCellStyle();
    }
 }

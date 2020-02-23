@@ -22,7 +22,6 @@ public class Notificator {
       propChangeListeners = new ArrayList<>();
    }
 
-   // TODO subscribe interested objects during editor initialization
    public void subscribe (mxGraphComponent graphComponent) {
       if (this.graphComponent != null)
          throw new IllegalStateException("only one graph component is currently supported: " + this.graphComponent);
@@ -88,13 +87,22 @@ public class Notificator {
             graph.getModel().endUpdate();
          }
       }
-      if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_STYLE)) {
+      List<mxICell> dependentCells = null;
+      if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_STYLE)) {  // update this before the label (more visually important)
          String style = enclosingEntity.getCellStyle();
+         // System.err.println("DEPENDENT_CELLS_STYLE: " + style);
          if (style != null) {
             mxGraph graph = graphComponent.getGraph();
-            List<mxICell> dependentCells = enclosingEntity.getDependentCells(graph.getModel());
+            dependentCells = enclosingEntity.getDependentCells(graph.getModel());
             graph.setCellStyle(style, dependentCells.toArray());
          }
+      }
+      if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_LABEL)) {
+         mxGraph graph = graphComponent.getGraph();
+         if (dependentCells == null)  // might have been computed above already
+            dependentCells = enclosingEntity.getDependentCells(graph.getModel());
+         for (mxICell dependentCell: dependentCells)
+            graphComponent.labelChanged(dependentCell, dependentCell.getValue(), null);
       }
    }
 

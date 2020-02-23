@@ -89,7 +89,7 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
 
    @Override
    public String getPythonName () {
-      return NamedEntity.buildTopLevelPythonName(programName.getValue());
+      return Namespace.buildTopLevelPythonName(programName.getValue());
    }
 
    public double getTimeStep () { return timeStep.getValue(); }

@@ -6,15 +6,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
+public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
    private Scope containingScope;  // for access to sibling namespaces
    private Namespace<T> parent;  // would be used for nested namespaces
    private Class<T> memberClazz;
    private Map<String, T> members;
+   private Set<String> normalizedMemberNames;
    private T mostRecentlyAdded;
    private String memberDescription;  // for error messages
    private Map<String, Integer> nameGenerators;
@@ -30,6 +33,7 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       this.containingScope = containingScope;
       this.memberClazz = clazz;
       this.members = new HashMap<>();
+      this.normalizedMemberNames = new HashSet<>();
       this.memberDescription = memberDescription;
       this.nameGenerators = new HashMap<>();
       if (pythonDiscriminator.isEmpty() || pythonDiscriminator.startsWith("_") || pythonDiscriminator.endsWith("_"))
@@ -44,11 +48,17 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
 
    public static Namespace<?> forId (int id) { return byId.get(id); }
 
-   // TODO should name validation (and normalization?) been done here?
+   static String normalizedName (String name) {
+      return name.replace(' ', '_');
+   }
+
+   // TODO should name validation been done here, too?
    void add (T member) {
       T oldValue = members.put(member.getName(), member);
       if (oldValue != null)
          throw new LanguageException(member, "duplicate name " + member.getName());
+      if (!normalizedMemberNames.add(normalizedName(member.getName())))
+         throw new LanguageException(member, "duplicate normalized name " + normalizedName(member.getName()));
       mostRecentlyAdded = member;
       if (listModel != null)
          listModel.addElement(member);
@@ -63,6 +73,8 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
       T oldValue = members.remove(memberName);
       if (oldValue == null)
          throw new LanguageException("name " + memberName + " does not exist");
+      if (!normalizedMemberNames.remove(normalizedName(memberName)))
+         throw new LanguageException("normalized name " + normalizedName(memberName) + " does not exist");
       if (oldValue.isPredefined())
          throw new LanguageException(oldValue, "predefined member " + memberName + " must not be removed");
       if (oldValue.equals(mostRecentlyAdded))
@@ -106,6 +118,13 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
    public boolean contains (String name) {
       return members.containsKey(name);
    }
+   public boolean containsAnyVariantOf (String name) {
+      return normalizedMemberNames.contains(normalizedName(name));
+   }
+
+   static boolean areNameVariants (String nameA, String nameB) {
+      return normalizedName(nameA).equals(normalizedName(nameB));
+   }
 
    public Scope getContainingScope () { return containingScope; }
 
@@ -124,8 +143,15 @@ public class Namespace<T extends NamedEntity<T>> implements Iterable<T> {
 
    public String getDescription () { return memberDescription; }
 
-   String getPythonDiscriminator () {
-      return pythonDiscriminator;
+   private static final String PYTHON_USER_NAME_PREFIX = "_usr_";  // we disallow leading underscores
+
+   String buildPythonName (String memberName) {
+      assert members.containsKey(memberName);
+      return PYTHON_USER_NAME_PREFIX + pythonDiscriminator + "_" + normalizedName(memberName);
+   }
+
+   static String buildTopLevelPythonName (String name) {
+      return normalizedName(name);
    }
 
    private class NamespaceModel extends AbstractListModel<T> {

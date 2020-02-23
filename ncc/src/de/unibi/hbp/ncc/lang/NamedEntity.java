@@ -4,6 +4,7 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.StringProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedEntityName;
 
+import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.List;
@@ -11,13 +12,19 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEntity
+public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEntity
       implements DisplayNamed, PythonNamed, Serializable, Comparable<NamedEntity<?>> {
    private StringProp nameProp;
-   private Namespace<E> namespace;
+   private Namespace<N> namespace;
 
    protected Object writeReplace() throws ObjectStreamException {
       return new SerializedEntityName(namespace.getId(), getName());
+   }
+
+   // readObject method for the serialization proxy pattern
+   // See Effective Java, Second Ed., Item 78.
+   private void readObject(java.io.ObjectInputStream stream) throws InvalidObjectException {
+      throw new InvalidObjectException("SerializedEntityName required");
    }
 
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
@@ -25,7 +32,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       return list;
    }
 
-   protected NamedEntity (Namespace<E> namespace, String name) {
+   protected NamedEntity (Namespace<N> namespace, String name) {
       this.namespace = Objects.requireNonNull(namespace);
       if (name == null)
          name = namespace.generateName(this);
@@ -45,7 +52,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       // would be problematic, if T were not the concrete NamedEntity subclass itself
    }
 
-   protected NamedEntity (Namespace<E> namespace) {
+   protected NamedEntity (Namespace<N> namespace) {
       this(namespace, null);
    }
 
@@ -57,9 +64,9 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       if (matcher.find())
          copiedName = copiedName.substring(0, matcher.start());
       copiedName += " Copy";
-      if (namespace.contains(normalizedName(copiedName))) {
+      if (namespace.containsAnyVariantOf(copiedName)) {
          int counter = 2;
-         while (namespace.contains(normalizedName((copiedName + " " + counter))))
+         while (namespace.containsAnyVariantOf((copiedName + " " + counter)))
             counter += 1;
          copiedName += " " + counter;
       }
@@ -68,7 +75,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
 
    protected abstract String getGeneratedNamesPrefix ();
 
-   protected Namespace<E> getNamespace () { return namespace; }
+   protected Namespace<N> getNamespace () { return namespace; }
 
    public EditableProp<String> getNameProp () { return nameProp; }
 
@@ -84,14 +91,9 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       return IDENTIFIER_REGEXP.matcher(name).matches();
    }
 
-   private static String normalizedName (String name) {
-      return name.replace(' ', '_');
-   }
-
    public boolean canRenameTo (String name) {
-      String newNormalizedName = normalizedName(name);
-      return !namespace.contains(newNormalizedName) ||
-            normalizedName(getName()).equals(newNormalizedName);
+      return !namespace.containsAnyVariantOf(name) ||
+            Namespace.areNameVariants(getName(), name);
       // allow renaming, if name does not change (after normalization), i.e. name "conflict" with the entity itself
    }
 
@@ -100,6 +102,7 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
          throw new LanguageException(this, "name " + name + " conflicts with an existing name");
       if (name.equals(getName()))
          return;  // a no-op
+      // TODO need an atomic way to rename something in the namespace (without temporarily removing it and adding it back) to avoid loss of combo box selections
       namespace.remove(getName());
       nameProp.setValueInternal(name);
       namespace.castAndAdd(this);
@@ -132,20 +135,8 @@ public abstract class NamedEntity<E extends NamedEntity<E>> extends LanguageEnti
       return getDisplayName();
    }
 
-   private static final String PYTHON_USER_NAME_PREFIX = "_usr_";  // we disallow leading underscores
-
    public String getPythonName () {
-      return buildPythonName(namespace.getPythonDiscriminator(), getName());
+      return namespace.buildPythonName(this.getName());
    }
 
-   static String buildPythonName (String discriminator, String name) {
-      assert !discriminator.isEmpty() && !discriminator.startsWith("_") && !discriminator.endsWith("_");
-      assert isValidName(name);
-      return PYTHON_USER_NAME_PREFIX + discriminator + "_" + normalizedName(name);
-   }
-
-   static String buildTopLevelPythonName (String name) {
-      assert isValidName(name);
-      return normalizedName(name);
-   }
 }
