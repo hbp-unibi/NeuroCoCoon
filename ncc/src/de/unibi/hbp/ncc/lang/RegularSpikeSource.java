@@ -40,7 +40,7 @@ public class RegularSpikeSource extends NeuronPopulation {
    public RegularSpikeSource () { this(getGlobalNamespace()); }
 
    protected RegularSpikeSource (RegularSpikeSource orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.getNeuronCountProp().getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronCountProp().getValue(),
            orig.interval.getValue(), orig.perNeuronOffset.getValue(), orig.start.getValue(), orig.duration.getValue());
    }
 

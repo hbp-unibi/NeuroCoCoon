@@ -6,7 +6,7 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import java.util.List;
 
-public class NeuronType extends NamedEntity<NeuronType> {
+public class NeuronType extends NamedEntity {
 
    public enum NeuronKind implements DisplayNamed {
       IF_COND_EXP("IF Cond Exp", true),
@@ -49,6 +49,8 @@ public class NeuronType extends NamedEntity<NeuronType> {
       }
    }
 
+   private final Namespace<NeuronType> moreSpecificNamespace;
+
    private EditableEnumProp<NeuronKind> neuronKind;
    private DoubleProp eRevE, eRevI, tauSynE, tauSynI, vRest, vReset, vThresh, tauRefrac, tauM, cm, iOffset;
    private DoubleProp izhikevichA, izhikevichB, izhikevichC, izhikevichD;
@@ -59,6 +61,7 @@ public class NeuronType extends NamedEntity<NeuronType> {
                       double iOffset,
                       double izhikevichA, double izhikevichB, double izhikevichC, double izhikevichD) {
       super(namespace, name);
+      moreSpecificNamespace = namespace;
       this.neuronKind = new EditableEnumProp<>("Neuron Kind", NeuronKind.class, this, neuronKind)
             .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
       this.vRest = new DoubleProp("v rest", this, vRest).setUnit("mV");
@@ -101,7 +104,7 @@ public class NeuronType extends NamedEntity<NeuronType> {
    public NeuronType (Namespace<NeuronType> namespace) { this(namespace, null); }
 
    protected NeuronType (NeuronType orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.neuronKind.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronKind.getValue(),
            orig.vRest.getValue(), orig.vReset.getValue(), orig.vThresh.getValue(), orig.eRevE.getValue(), orig.eRevI.getValue(),
            orig.tauSynE.getValue(), orig.tauSynI.getValue(), orig.tauRefrac.getValue(), orig.tauM.getValue(), orig.cm.getValue(),
            orig.iOffset.getValue(),

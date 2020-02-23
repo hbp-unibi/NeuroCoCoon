@@ -7,7 +7,8 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import java.util.List;
 import java.util.Objects;
 
-public class DataPlot extends NamedEntity<DataPlot> {
+public class DataPlot extends NamedEntity {
+   private final Namespace<DataPlot> moreSpecificNamespace;
    private EditableNameProp<NeuronPopulation> population;
    private EditableEnumProp<DataSeries> series;
 
@@ -26,6 +27,7 @@ public class DataPlot extends NamedEntity<DataPlot> {
 
    protected DataPlot (Namespace<DataPlot> namespace, String name, NeuronPopulation population, DataSeries series) {
       super(namespace, name);
+      moreSpecificNamespace = namespace;
       Namespace<NeuronPopulation> neuronPopulations = namespace.getContainingScope().getNeuronPopulations();
       if (population == null)
          population = neuronPopulations.getFallbackDefault();
@@ -47,8 +49,9 @@ public class DataPlot extends NamedEntity<DataPlot> {
       else
          return new DataPlot(namespace);
    }
+
    protected DataPlot (DataPlot orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.population.getValue(), orig.series.getValue());
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.population.getValue(), orig.series.getValue());
    }
 
    @Override

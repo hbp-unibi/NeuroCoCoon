@@ -234,6 +234,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			setAllowDanglingEdges(false);
 			setMultigraph(false);
 //			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
+			// TODO reactivate with a useful alternate connector style
 
 			addListener(mxEvent.CELLS_ADDED, (sender, evt ) -> {
 				Object[] cells = (Object[]) evt.getProperty("cells");

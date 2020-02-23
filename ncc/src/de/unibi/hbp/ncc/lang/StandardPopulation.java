@@ -43,7 +43,7 @@ public class StandardPopulation extends NeuronPopulation {
    }
 
    protected StandardPopulation (StandardPopulation orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.neuronType.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
            orig.getNeuronCountProp().getValue());
    }
 

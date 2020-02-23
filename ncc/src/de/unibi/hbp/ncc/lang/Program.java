@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 import de.unibi.hbp.ncc.lang.codegen.CodeGenVisitor;
@@ -9,6 +10,7 @@ import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveDoubleProp;
 import de.unibi.hbp.ncc.lang.props.StringProp;
+import de.unibi.hbp.ncc.lang.serialize.LanguageEntityCodec;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +46,14 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       SynapseType defProbSynapseType = new SynapseType(synapseTypes, "Prob Default", SynapseType.ConnectorKind.FIXED_PROBABILITY);
       defProbSynapseType.makePredefined();
       NetworkModule.setGlobalNamespace(global.getModuleInstances());
+
+      registerCodecs();
+   }
+
+   private void registerCodecs () {
+      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
+      mxCodecRegistry.register(new LanguageEntityCodec(new RegularSpikeSource()));
+      // FIXME this is an experiment only
    }
 
    public void setGraphModel (mxIGraphModel graphModel) { this.graphModel = graphModel; }

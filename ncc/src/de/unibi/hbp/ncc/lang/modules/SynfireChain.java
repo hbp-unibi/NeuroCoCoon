@@ -11,19 +11,16 @@ import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
-import de.unibi.hbp.ncc.lang.props.ProbabilityProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class SynfireChain extends NetworkModule {
-   private EditableNameProp<NeuronType> neuronType;
-   private IntegerProp numberOfPopulations, numberOfNeurons;
-   private DoubleProp inhibitionWeight, excitationWeight;
-   private DoubleProp synapseDelay;
+   private final EditableNameProp<NeuronType> neuronType;
+   private final IntegerProp numberOfPopulations, numberOfNeurons;
+   private final DoubleProp inhibitionWeight, excitationWeight;
+   private final DoubleProp synapseDelay;
 
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
@@ -71,7 +68,7 @@ public class SynfireChain extends NetworkModule {
    }
 
    protected SynfireChain (SynfireChain orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.neuronType.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
            orig.numberOfPopulations.getValue(), orig.numberOfNeurons.getValue(),
            orig.inhibitionWeight.getValue(), orig.excitationWeight.getValue(),
            orig.synapseDelay.getValue());

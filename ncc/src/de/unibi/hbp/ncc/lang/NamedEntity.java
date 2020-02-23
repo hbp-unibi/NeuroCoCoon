@@ -12,10 +12,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEntity
-      implements DisplayNamed, PythonNamed, Serializable, Comparable<NamedEntity<?>> {
+public abstract class NamedEntity extends LanguageEntity
+      implements DisplayNamed, PythonNamed, Serializable, Comparable<NamedEntity> {
    private StringProp nameProp;
-   private Namespace<N> namespace;
+   private final transient Namespace<? extends NamedEntity> namespace;
 
    protected Object writeReplace() throws ObjectStreamException {
       return new SerializedEntityName(namespace.getId(), getName());
@@ -32,7 +32,7 @@ public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEnti
       return list;
    }
 
-   protected NamedEntity (Namespace<N> namespace, String name) {
+   protected NamedEntity (Namespace<? extends NamedEntity> namespace, String name) {
       this.namespace = Objects.requireNonNull(namespace);
       if (name == null)
          name = namespace.generateName(this);
@@ -52,7 +52,7 @@ public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEnti
       // would be problematic, if T were not the concrete NamedEntity subclass itself
    }
 
-   protected NamedEntity (Namespace<N> namespace) {
+   protected NamedEntity (Namespace<? extends NamedEntity> namespace) {
       this(namespace, null);
    }
 
@@ -75,7 +75,7 @@ public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEnti
 
    protected abstract String getGeneratedNamesPrefix ();
 
-   protected Namespace<N> getNamespace () { return namespace; }
+   protected Namespace<? extends NamedEntity> getNamespace () { return namespace; }
 
    public EditableProp<String> getNameProp () { return nameProp; }
 
@@ -103,7 +103,7 @@ public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEnti
       if (name.equals(getName()))
          return;  // a no-op
       // TODO need an atomic way to rename something in the namespace (without temporarily removing it and adding it back) to avoid loss of combo box selections
-      namespace.remove(getName());
+      namespace.remove(this);
       nameProp.setValueInternal(name);
       namespace.castAndAdd(this);
    }
@@ -126,8 +126,16 @@ public abstract class NamedEntity<N extends NamedEntity<?>> extends LanguageEnti
    }
 
    @Override
-   public int compareTo (NamedEntity<?> other) {
+   public int compareTo (NamedEntity other) {
       return this.getName().compareTo(other.getName());
+   }
+
+   @Override
+   public boolean equals (Object obj) {
+      NamedEntity other;
+      return obj instanceof NamedEntity &&
+            this.getName().equals((other = (NamedEntity) obj).getName()) &&
+            this.getNamespace().equals(other.getNamespace());
    }
 
    @Override

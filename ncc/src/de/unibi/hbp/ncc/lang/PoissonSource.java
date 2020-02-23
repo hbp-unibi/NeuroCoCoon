@@ -38,7 +38,7 @@ public class PoissonSource extends NeuronPopulation {
    public PoissonSource () { this(getGlobalNamespace()); }
 
    protected PoissonSource (PoissonSource orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.getNeuronCountProp().getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronCountProp().getValue(),
            orig.rate.getValue(), orig.start.getValue(), orig.duration.getValue());
    }
 

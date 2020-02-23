@@ -31,7 +31,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.function.Function;
 
-public class MasterDetailsEditor<E extends NamedEntity<E>> {
+public class MasterDetailsEditor<E extends NamedEntity> {
    private final ListModel<E> listModel;
    private final JTable masterTable;
    private final DetailsEditor detailsEditor;
@@ -100,7 +100,7 @@ public class MasterDetailsEditor<E extends NamedEntity<E>> {
                                                    "References to this entity still exist.",
                                              "Deletion failed!", JOptionPane.ERROR_MESSAGE);
             else
-               namespace.remove(candidateEntity.getName());
+               namespace.remove(candidateEntity);
          }
       });
       buttonBar.add(addButton);

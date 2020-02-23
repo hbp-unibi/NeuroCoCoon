@@ -28,6 +28,7 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
       return this;
    }
 
+   // TODO provide an addImpact method instead (e.g. SynapseType needs to augment the impact of its name property)
    public SimpleEditableProp<T> setImpact (EnumSet<Impact> impactSet) {
       assert this.impact == null : "may only be set once at creation time";
       this.impact = Objects.requireNonNull(impactSet);

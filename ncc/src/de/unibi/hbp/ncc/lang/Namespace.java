@@ -10,9 +10,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
+public class Namespace<T extends NamedEntity> implements Iterable<T> {
+
    private Scope containingScope;  // for access to sibling namespaces
    private Namespace<T> parent;  // would be used for nested namespaces
    private Class<T> memberClazz;
@@ -26,6 +28,7 @@ public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
    private NamespaceModel listModel;  // created lazily on demand
 
    private static List<Namespace<?>> byId = new ArrayList<>();
+   // TODO more deterministic (manual, explicit) assignment of numeric ids for saving and loading
 
    private static final int MAX_GENERATOR_VALUE = 9999;
 
@@ -52,7 +55,7 @@ public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
       return name.replace(' ', '_');
    }
 
-   // TODO should name validation been done here, too?
+   // TODO should name validation been done here, too? likely yes
    void add (T member) {
       T oldValue = members.put(member.getName(), member);
       if (oldValue != null)
@@ -64,12 +67,11 @@ public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
          listModel.addElement(member);
    }
 
-   void castAndAdd (NamedEntity<T> entity) {
-      add(memberClazz.cast(entity));
+   void castAndAdd (NamedEntity entity) {
+      add(memberClazz.cast(Objects.requireNonNull(entity)));
    }
 
-   // TODO make this package scoped again and provide a public safe method (with reference checking) here instead [currently in MasterDetailsEditor]
-   public void remove (String memberName) {
+   private void remove (String memberName) {
       T oldValue = members.remove(memberName);
       if (oldValue == null)
          throw new LanguageException("name " + memberName + " does not exist");
@@ -81,6 +83,13 @@ public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
          mostRecentlyAdded = null;
       if (listModel != null)
          listModel.removeElement(oldValue);
+   }
+
+   // TODO make this package scoped again and provide a public safe method (with reference checking) here instead [currently in MasterDetailsEditor]
+   public void remove (NamedEntity member) {
+      if (!this.equals(member.getNamespace()))
+         throw new IllegalArgumentException("member not part of this namespace: " + member);
+      remove(member.getName());
    }
 
    public T get (String name) {
@@ -128,7 +137,7 @@ public class Namespace<T extends NamedEntity<?>> implements Iterable<T> {
 
    public Scope getContainingScope () { return containingScope; }
 
-   String generateName (NamedEntity<T> futureMember) {
+   String generateName (NamedEntity futureMember) {
       String namePrefix = futureMember.getGeneratedNamesPrefix();
       int nameGenerator = nameGenerators.getOrDefault(namePrefix, 0);
       String result;

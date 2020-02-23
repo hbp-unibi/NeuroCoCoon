@@ -17,10 +17,10 @@ import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 import java.util.List;
 
 public class WinnerTakeAll extends NetworkModule {
-   private EditableNameProp<NeuronType> neuronType;
-   private IntegerProp numberOfPopulations, numberOfNeurons;
-   private DoubleProp noiseWeight, inhibitionWeight, excitationWeight;
-   private DoubleProp noiseRate, noiseProbability, inhibitionProbability, synapseDelay;
+   private final EditableNameProp<NeuronType> neuronType;
+   private final IntegerProp numberOfPopulations, numberOfNeurons;
+   private final DoubleProp noiseWeight, inhibitionWeight, excitationWeight;
+   private final DoubleProp noiseRate, noiseProbability, inhibitionProbability, synapseDelay;
 
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
@@ -78,7 +78,7 @@ public class WinnerTakeAll extends NetworkModule {
    }
 
    protected WinnerTakeAll (WinnerTakeAll orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.neuronType.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
            orig.numberOfPopulations.getValue(), orig.numberOfNeurons.getValue(),
            orig.noiseWeight.getValue(), orig.inhibitionWeight.getValue(), orig.excitationWeight.getValue(),
            orig.noiseRate.getValue(), orig.noiseProbability.getValue(), orig.inhibitionProbability.getValue(),

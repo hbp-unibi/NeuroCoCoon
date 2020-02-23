@@ -11,7 +11,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import java.util.Objects;
 
-public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditableProp<E>
+public class EditableNameProp<E extends NamedEntity> extends SimpleEditableProp<E>
       implements NameProp<E> {
    private Namespace<E> targetNamespace;
 
@@ -30,9 +30,7 @@ public class EditableNameProp<E extends NamedEntity<E>> extends SimpleEditablePr
    public Namespace<E> getTargetNamespace () { return targetNamespace; }
 
    @Override
-   public NamedEntity<E> getTargetEntity () {
-      return getValue();
-   }
+   public NamedEntity getTargetEntity () { return getValue(); }
 
    @Override
    public TableCellEditor getTableCellEditor (JTable table) {

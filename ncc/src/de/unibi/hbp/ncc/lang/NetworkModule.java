@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class NetworkModule extends NamedEntity<NetworkModule>
+public abstract class NetworkModule extends NamedEntity
       implements GraphCellConfigurator, PlotDataSource {
-   private String iconFileName;
+   protected final Namespace<NetworkModule> moreSpecificNamespace;
+
+   private String iconFileName;  // TODO store file basename (shared between icon and ST4 template file)
    private List<Port> inputPorts, outputPorts;
    private boolean useWideLayout;
    // TODO provide list of supported plots
@@ -237,6 +239,7 @@ public abstract class NetworkModule extends NamedEntity<NetworkModule>
 
    protected NetworkModule (Namespace<NetworkModule> namespace, String name, String iconFileName) {
       super(namespace, name);
+      moreSpecificNamespace = namespace;
       this.iconFileName = Objects.requireNonNull(iconFileName);
    }
 

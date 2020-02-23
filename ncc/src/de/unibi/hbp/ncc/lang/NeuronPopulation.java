@@ -6,8 +6,9 @@ import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
 import java.util.List;
 
-public abstract class NeuronPopulation extends NamedEntity<NeuronPopulation>
+public abstract class NeuronPopulation extends NamedEntity
       implements Connectable, PlotDataSource {
+   protected final transient Namespace<NeuronPopulation> moreSpecificNamespace;
    private IntegerProp neuronCount;  // TODO support a multi-dimensional shape instead of a simple count
 
    private static Namespace<NeuronPopulation> globalNamespace;
@@ -25,6 +26,7 @@ public abstract class NeuronPopulation extends NamedEntity<NeuronPopulation>
 
    protected NeuronPopulation (Namespace<NeuronPopulation> namespace, String name, int neuronCount) {
       super(namespace, name);
+      moreSpecificNamespace = namespace;
       this.neuronCount = new StrictlyPositiveIntegerProp("Neuron Count", this, neuronCount);
    }
 

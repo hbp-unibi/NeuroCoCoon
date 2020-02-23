@@ -13,7 +13,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
-public class SynapseType extends NamedEntity<SynapseType> {
+public class SynapseType extends NamedEntity {
 
    public enum ConnectorKind implements DisplayNamed {
       ALL_TO_ALL("All:All", "allToAll"),
@@ -69,14 +69,16 @@ public class SynapseType extends NamedEntity<SynapseType> {
       }
    }
 
-   private EditableEnumProp<ConnectorKind> connectorKind;
-   private DoubleProp weight, delay, probability;
-   private EditableEnumProp<SynapseKind> synapseKind;
+   private final Namespace<SynapseType> moreSpecificNamespace;
+   private final EditableEnumProp<ConnectorKind> connectorKind;
+   private final DoubleProp weight, delay, probability;
+   private final EditableEnumProp<SynapseKind> synapseKind;
 
    public SynapseType (Namespace<SynapseType> namespace, String name, ConnectorKind connectorKind,
                        double weight, double delay, double probability,
                        SynapseKind synapseKind) {
       super(namespace, name);
+      moreSpecificNamespace = namespace;
       this.connectorKind = new EditableEnumProp<>("Connector", ConnectorKind.class, this,
                                                   Objects.requireNonNull(connectorKind))
             .setImpact(EnumSet.of(EditableProp.Impact.OTHER_PROPS_VISIBILITY,
@@ -105,7 +107,7 @@ public class SynapseType extends NamedEntity<SynapseType> {
    }
 
    public SynapseType (SynapseType orig) {
-      this(orig.getNamespace(), orig.getCopiedName(), orig.connectorKind.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.connectorKind.getValue(),
            orig.weight.getValue(), orig.delay.getValue(), orig.probability.getValue(),
            orig.synapseKind.getValue());
    }
