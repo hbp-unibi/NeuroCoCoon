@@ -43,13 +43,13 @@ public class SynfireChain extends NetworkModule {
                         int numberOfPopulations, int numberOfNeurons,
                         double inhibitionWeight, double excitationWeight,
                         double synapseDelay) {
-      super(namespace, name, CREATOR.getIconFileName());
+      super(namespace, name, CREATOR.getResourceFileBaseName());
       Namespace<NeuronType> neuronTypes = namespace.getContainingScope().getNeuronTypes();
       if (neuronType == null)
          neuronType = ensureDefaultType(neuronTypes, DEFAULT_NEURON_TYPE_NAME);
       this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this, neuronType, neuronTypes);
       this.numberOfPopulations = new StrictlyPositiveIntegerProp("Length of Chain", this, numberOfPopulations)
-      .setImpact(EditableProp.Impact.CELL_STRUCTURE);
+            .addImpact(EditableProp.Impact.CELL_STRUCTURE);
       this.numberOfNeurons = new StrictlyPositiveIntegerProp("Neurons per Population", this, numberOfNeurons);
       this.inhibitionWeight = new NonNegativeDoubleProp("Inhibitory Weight", this, inhibitionWeight);
       this.excitationWeight = new NonNegativeDoubleProp("Excitatory Weight", this, excitationWeight);
@@ -122,7 +122,7 @@ public class SynfireChain extends NetworkModule {
       }
 
       @Override
-      public String getIconFileName () { return "chain.png"; }
+      public String getResourceFileBaseName () { return "chain"; }
 
       @Override
       public String getIconCaption () { return "Chain"; }

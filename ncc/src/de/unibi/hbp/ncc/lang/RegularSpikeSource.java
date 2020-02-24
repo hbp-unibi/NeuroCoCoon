@@ -59,7 +59,7 @@ public class RegularSpikeSource extends NeuronPopulation {
       }
 
       @Override
-      public String getIconFileName () { return "spikesource.png"; }
+      public String getResourceFileBaseName () { return "spikesource"; }
 
       @Override
       public String getIconCaption () { return "Spikes"; }

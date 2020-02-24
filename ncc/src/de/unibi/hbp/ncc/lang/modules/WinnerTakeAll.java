@@ -48,13 +48,13 @@ public class WinnerTakeAll extends NetworkModule {
                          double noiseWeight, double inhibitionWeight, double excitationWeight,
                          double noiseRate, double noiseProbability, double inhibitionProbability,
                          double synapseDelay) {
-      super(namespace, name, CREATOR.getIconFileName());
+      super(namespace, name, CREATOR.getResourceFileBaseName());
       Namespace<NeuronType> neuronTypes = namespace.getContainingScope().getNeuronTypes();
       if (neuronType == null)
          neuronType = ensureDefaultType(neuronTypes, DEFAULT_NEURON_TYPE_NAME);
       this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this, neuronType, neuronTypes);
       this.numberOfPopulations = new StrictlyPositiveIntegerProp("Number of Outcomes", this, numberOfPopulations)
-      .setImpact(EditableProp.Impact.CELL_STRUCTURE);
+            .addImpact(EditableProp.Impact.CELL_STRUCTURE);
       this.numberOfNeurons = new StrictlyPositiveIntegerProp("Neurons per Population", this, numberOfNeurons);
       this.noiseWeight = new NonNegativeDoubleProp("Noise Weight", this, noiseWeight);
       this.inhibitionWeight = new NonNegativeDoubleProp("Inhibitory Weight", this, inhibitionWeight);
@@ -127,7 +127,7 @@ public class WinnerTakeAll extends NetworkModule {
       }
 
       @Override
-      public String getIconFileName () { return "winner.png"; }
+      public String getResourceFileBaseName () { return "winner"; }
 
       @Override
       public String getIconCaption () { return "Winner"; }

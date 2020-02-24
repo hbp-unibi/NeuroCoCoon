@@ -24,10 +24,9 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
    private String memberDescription;  // for error messages
    private Map<String, Integer> nameGenerators;
    private String pythonDiscriminator;
-   private int id;  // for data transfer
    private NamespaceModel listModel;  // created lazily on demand
 
-   private static List<Namespace<?>> byId = new ArrayList<>();
+   private static Map<String, Namespace<?>> byId = new HashMap<>();
    // TODO more deterministic (manual, explicit) assignment of numeric ids for saving and loading
 
    private static final int MAX_GENERATOR_VALUE = 9999;
@@ -42,14 +41,16 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
       if (pythonDiscriminator.isEmpty() || pythonDiscriminator.startsWith("_") || pythonDiscriminator.endsWith("_"))
          throw new IllegalArgumentException("invalid Python name fragment");
       this.pythonDiscriminator = pythonDiscriminator;
-      this.id = byId.size();
-      byId.add(this);
+      Namespace<?> oldValue = byId.put(pythonDiscriminator, this);
+      if (oldValue != null)
+         throw new IllegalStateException("duplicate namespace id/discriminator: " + pythonDiscriminator +
+                                               " for " + oldValue + " and " + this);
    }
 
    // for (temporary) serialization by mxGraph operations
-   int getId () { return id; }
+   String getId () { return pythonDiscriminator; }
 
-   public static Namespace<?> forId (int id) { return byId.get(id); }
+   public static Namespace<?> forId (String id) { return byId.get(id); }
 
    static String normalizedName (String name) {
       return name.replace(' ', '_');

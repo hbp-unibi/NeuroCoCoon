@@ -34,13 +34,14 @@ public class StandardPopulation extends NeuronPopulation {
                                                Objects.requireNonNull(neuronType), neuronTypes);
    }
 
-   public StandardPopulation (Namespace<NeuronPopulation> namespace) {
-      this(namespace, null, null, 1);
+   public StandardPopulation (Namespace<NeuronPopulation> namespace, String name) {
+      this(namespace, name, null, 1);
    }
 
-   public StandardPopulation () {
-      this(getGlobalNamespace());
+   public StandardPopulation (String name) {
+      this(getGlobalNamespace(), name);
    }
+   public StandardPopulation () { this((String) null); }
 
    protected StandardPopulation (StandardPopulation orig) {
       this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
@@ -61,7 +62,7 @@ public class StandardPopulation extends NeuronPopulation {
       }
 
       @Override
-      public String getIconFileName () { return "population.png"; }
+      public String getResourceFileBaseName () { return "population"; }
 
       @Override
       public String getIconCaption () { return "Population"; }

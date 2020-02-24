@@ -16,7 +16,7 @@ public abstract class NetworkModule extends NamedEntity
       implements GraphCellConfigurator, PlotDataSource {
    protected final Namespace<NetworkModule> moreSpecificNamespace;
 
-   private String iconFileName;  // TODO store file basename (shared between icon and ST4 template file)
+   private String resourceFileBaseName;  // TODO store file basename (shared between icon and ST4 template file)
    private List<Port> inputPorts, outputPorts;
    private boolean useWideLayout;
    // TODO provide list of supported plots
@@ -110,8 +110,6 @@ public abstract class NetworkModule extends NamedEntity
       mxCell portCell = port.getCell();
       if (portCell == null) {
          portCell = new mxCell(port, portGeo, style);
-         // TODO label needs some padding on the left (too close to triangle)
-         // TODO label on right side overlaps with triangle (caused by offset?)
          portCell.setVertex(true);
          graph.addCell(portCell, moduleCell);
          port.setCell(portCell);
@@ -164,7 +162,8 @@ public abstract class NetworkModule extends NamedEntity
    }
 
    private String computeCellStyle () {
-      return (useWideLayout ? "moduleWide" : "module") + ";image=/de/unibi/hbp/ncc/editor/images/lang/" + iconFileName;
+      return (useWideLayout ? "moduleWide" : "module") + ";image=/de/unibi/hbp/ncc/editor/images/lang/" +
+            resourceFileBaseName + ".png";
    }
 
    private void updatePorts (mxGraph graph, mxCell moduleCell, int layoutSteps) {
@@ -237,10 +236,10 @@ public abstract class NetworkModule extends NamedEntity
       }
    }
 
-   protected NetworkModule (Namespace<NetworkModule> namespace, String name, String iconFileName) {
+   protected NetworkModule (Namespace<NetworkModule> namespace, String name, String resourceFileBaseName) {
       super(namespace, name);
       moreSpecificNamespace = namespace;
-      this.iconFileName = Objects.requireNonNull(iconFileName);
+      this.resourceFileBaseName = Objects.requireNonNull(resourceFileBaseName);
    }
 
    protected static NeuronType ensureDefaultType (Namespace<NeuronType> neuronTypes, String typeName) {

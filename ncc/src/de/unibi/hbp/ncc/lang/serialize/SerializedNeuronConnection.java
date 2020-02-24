@@ -8,15 +8,16 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 public class SerializedNeuronConnection implements Serializable {
-   private int namespaceId;
+   private String namespaceId;
    private String name;
 
-   public SerializedNeuronConnection (int namespaceId, String name) {
+   public SerializedNeuronConnection (String namespaceId, String name) {
       this.namespaceId = namespaceId;
       this.name = name;
    }
 
    Object readResolve() throws ObjectStreamException {
+      @SuppressWarnings("unchecked")
       Namespace<SynapseType> namespace = (Namespace<SynapseType>) Namespace.forId(namespaceId);
       return new NeuronConnection(namespace, namespace.get(name));
    }

@@ -31,11 +31,12 @@ public class PoissonSource extends NeuronPopulation {
       this.duration = new StrictlyPositiveDoubleProp("Duration", this, duration).setUnit("ms");
    }
 
-   public PoissonSource (Namespace<NeuronPopulation> namespace) {
-      this(namespace, null, 1, 1.0, 0.0, 1.0e9);
+   public PoissonSource (Namespace<NeuronPopulation> namespace, String name) {
+      this(namespace, name, 1, 1.0, 0.0, 1.0e9);
    }
 
-   public PoissonSource () { this(getGlobalNamespace()); }
+   public PoissonSource (String name) { this(getGlobalNamespace(), name); }
+   public PoissonSource () { this((String) null); }
 
    protected PoissonSource (PoissonSource orig) {
       this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronCountProp().getValue(),
@@ -56,7 +57,7 @@ public class PoissonSource extends NeuronPopulation {
       }
 
       @Override
-      public String getIconFileName () { return "poissonsource.png"; }
+      public String getResourceFileBaseName () { return "poissonsource"; }
 
       @Override
       public String getIconCaption () { return "Poisson"; }

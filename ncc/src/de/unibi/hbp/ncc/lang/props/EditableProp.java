@@ -24,7 +24,7 @@ public interface EditableProp<T> extends ReadOnlyProp<T> {
    }
 
    void setValueFromString (String encodedValue);
-   EnumSet<Impact> getChangeImpact ();
+   boolean hasChangeImpact (Impact impact);
    TableCellEditor getTableCellEditor (JTable table);
 
 }

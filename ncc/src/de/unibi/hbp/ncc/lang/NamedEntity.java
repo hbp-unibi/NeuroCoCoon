@@ -32,11 +32,13 @@ public abstract class NamedEntity extends LanguageEntity
       return list;
    }
 
+   public static final String NAME_PROPERTY_NAME = "Name";
+
    protected NamedEntity (Namespace<? extends NamedEntity> namespace, String name) {
       this.namespace = Objects.requireNonNull(namespace);
       if (name == null)
          name = namespace.generateName(this);
-      this.nameProp = new StringProp("Name", this, name) {
+      this.nameProp = new StringProp(NAME_PROPERTY_NAME, this, name) {
          @Override
          public boolean isValid (String proposedValue) {
             return isValidName(proposedValue) && canRenameTo(proposedValue);
@@ -47,7 +49,7 @@ public abstract class NamedEntity extends LanguageEntity
             renameTo(value);
          }
       };
-      this.nameProp.setImpact(EditableProp.Impact.CELL_LABEL);
+      this.nameProp.addImpact(EditableProp.Impact.CELL_LABEL);
       this.namespace.castAndAdd(this);
       // would be problematic, if T were not the concrete NamedEntity subclass itself
    }
@@ -76,6 +78,11 @@ public abstract class NamedEntity extends LanguageEntity
    protected abstract String getGeneratedNamesPrefix ();
 
    protected Namespace<? extends NamedEntity> getNamespace () { return namespace; }
+
+   protected NamedEntity addNamePropImpact (EditableProp.Impact impact) {
+      nameProp.addImpact(impact);
+      return this;
+   }
 
    public EditableProp<String> getNameProp () { return nameProp; }
 

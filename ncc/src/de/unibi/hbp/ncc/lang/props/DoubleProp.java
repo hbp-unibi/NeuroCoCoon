@@ -23,14 +23,8 @@ public class DoubleProp extends SimpleEditableProp<Double> {
    }
 
    @Override
-   public DoubleProp setImpact (EnumSet<Impact> impactSet) {  // to get the more precise co-variant return type
-      super.setImpact(impactSet);
-      return this;
-   }
-
-   @Override
-   public DoubleProp setImpact (Impact impact) {  // to get the more precise co-variant return type
-      super.setImpact(impact);
+   public DoubleProp addImpact (Impact impact) {  // to get the more precise co-variant return type
+      super.addImpact(impact);
       return this;
    }
 

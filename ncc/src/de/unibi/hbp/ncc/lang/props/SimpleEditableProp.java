@@ -8,7 +8,7 @@ import java.util.Objects;
 public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    private String propName, unit;
    private Class<T> valueClass;
-   private EnumSet<Impact> impact;
+   private EnumSet<Impact> impactSet;
    private LanguageEntity owner;
    private T value;
 
@@ -29,17 +29,12 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    }
 
    // TODO provide an addImpact method instead (e.g. SynapseType needs to augment the impact of its name property)
-   public SimpleEditableProp<T> setImpact (EnumSet<Impact> impactSet) {
-      assert this.impact == null : "may only be set once at creation time";
-      this.impact = Objects.requireNonNull(impactSet);
-      assert !impactSet.isEmpty() : "impact must not be empty";
-      return this;
-   }
 
-   public SimpleEditableProp<T> setImpact (Impact impact) {
-      assert this.impact == null : "may only be set once at creation time";
+   public SimpleEditableProp<T> addImpact (Impact impact) {
       assert impact != Impact.OWN_VALUE : "impact on own value is assumed by default anyway";
-      this.impact = EnumSet.of(Impact.OWN_VALUE, Objects.requireNonNull(impact));
+      if (impactSet == null)
+         impactSet = EnumSet.copyOf(DEFAULT_IMPACT);
+      impactSet.add(impact);
       return this;
    }
 
@@ -83,6 +78,7 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    public Class<T> getValueClass () { return valueClass; }
 
    @Override
-   public EnumSet<Impact> getChangeImpact () { return impact != null ? impact : DEFAULT_IMPACT; }
-
+   public boolean hasChangeImpact (Impact impact) {
+      return (impactSet != null ? impactSet : DEFAULT_IMPACT).contains(impact);
+   }
 }

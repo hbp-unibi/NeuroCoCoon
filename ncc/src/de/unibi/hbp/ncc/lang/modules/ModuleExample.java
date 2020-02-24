@@ -16,7 +16,7 @@ public class ModuleExample extends NetworkModule {
    protected String getGeneratedNamesPrefix () { return CREATOR.getIconCaption(); }
 
    public ModuleExample (Namespace<NetworkModule> namespace, String name) {
-      super(namespace, name, CREATOR.getIconFileName());
+      super(namespace, name, CREATOR.getResourceFileBaseName());
       inputPortDimensions = Arrays.asList(1, 2);
       outputPortDimensions = Arrays.asList(4, 8);
    }
@@ -60,7 +60,7 @@ public class ModuleExample extends NetworkModule {
       }
 
       @Override
-      public String getIconFileName () { return "module.png"; }
+      public String getResourceFileBaseName () { return "module"; }
 
       @Override
       public String getIconCaption () { return "Example"; }

@@ -50,9 +50,8 @@ public class Notificator {
    // all other listeners get an unknown position
    public void notify (PropChangeListener source, EditableProp<?> changed, int positionInSource) {
       // no need to notify the originating editor (may be null to notify all editors)
-      EnumSet<EditableProp.Impact> impact = changed.getChangeImpact();
       LanguageEntity enclosingEntity = changed.getEnclosingEntity();
-      if (impact.contains(EditableProp.Impact.OWN_VALUE)) {  // should always be included
+      if (changed.hasChangeImpact(EditableProp.Impact.OWN_VALUE)) {  // should always be included
          for (PropChangeListener listener: propChangeListeners) {
             listener.propertyChanged(changed,
                                      listener.equals(source)
@@ -60,24 +59,24 @@ public class Notificator {
                                            : PropChangeListener.UNKNOWN_POSITION);
          }
       }
-      if (impact.contains(EditableProp.Impact.OTHER_PROPS_VALUES)) {
+      if (changed.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VALUES)) {
          for (PropChangeListener listener: propChangeListeners)
             listener.multiplePropertyValuesChanged(enclosingEntity);
       }
-      if (impact.contains(EditableProp.Impact.OTHER_PROPS_VISIBILITY)) {
+      if (changed.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY)) {
          for (PropChangeListener listener: propChangeListeners)
             listener.otherPropertiesVisibilityChanged(enclosingEntity);
       }
       mxCell cell = enclosingEntity.getOwningCell();
-      if (cell != null && impact.contains(EditableProp.Impact.CELL_LABEL)) {
+      if (cell != null && changed.hasChangeImpact(EditableProp.Impact.CELL_LABEL)) {
          graphComponent.labelChanged(cell, enclosingEntity, null);  // enclosingEntity == cell.getValue()
       }
-      if (cell != null && impact.contains(EditableProp.Impact.CELL_STYLE)) {
+      if (cell != null && changed.hasChangeImpact(EditableProp.Impact.CELL_STYLE)) {
          String style = enclosingEntity.getCellStyle();
          if (style != null)
             graphComponent.getGraph().setCellStyle(style, new Object[] { cell });
       }
-      if (cell != null && impact.contains(EditableProp.Impact.CELL_STRUCTURE)) {
+      if (cell != null && changed.hasChangeImpact(EditableProp.Impact.CELL_STRUCTURE)) {
          mxGraph graph = graphComponent.getGraph();
          graph.getModel().beginUpdate();
          try {
@@ -88,7 +87,7 @@ public class Notificator {
          }
       }
       List<mxICell> dependentCells = null;
-      if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_STYLE)) {  // update this before the label (more visually important)
+      if (changed.hasChangeImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE)) {  // update this before the label (more visually important)
          String style = enclosingEntity.getCellStyle();
          // System.err.println("DEPENDENT_CELLS_STYLE: " + style);
          if (style != null) {
@@ -97,7 +96,7 @@ public class Notificator {
             graph.setCellStyle(style, dependentCells.toArray());
          }
       }
-      if (impact.contains(EditableProp.Impact.DEPENDENT_CELLS_LABEL)) {
+      if (changed.hasChangeImpact(EditableProp.Impact.DEPENDENT_CELLS_LABEL)) {
          mxGraph graph = graphComponent.getGraph();
          if (dependentCells == null)  // might have been computed above already
             dependentCells = enclosingEntity.getDependentCells(graph.getModel());

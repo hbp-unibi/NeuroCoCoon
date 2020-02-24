@@ -6,10 +6,10 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 public class SerializedEntityName implements Serializable {
-   private int namespaceId;
+   private String namespaceId;
    private String name;
 
-   public SerializedEntityName (int namespaceId, String name) {
+   public SerializedEntityName (String namespaceId, String name) {
       this.namespaceId = namespaceId;
       this.name = name;
    }

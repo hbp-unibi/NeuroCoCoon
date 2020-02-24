@@ -79,20 +79,20 @@ public class SynapseType extends NamedEntity {
                        SynapseKind synapseKind) {
       super(namespace, name);
       moreSpecificNamespace = namespace;
+      addNamePropImpact(EditableProp.Impact.DEPENDENT_CELLS_LABEL);
       this.connectorKind = new EditableEnumProp<>("Connector", ConnectorKind.class, this,
                                                   Objects.requireNonNull(connectorKind))
-            .setImpact(EnumSet.of(EditableProp.Impact.OTHER_PROPS_VISIBILITY,
-                                  EditableProp.Impact.DEPENDENT_CELLS_LABEL,
-                                  EditableProp.Impact.DEPENDENT_CELLS_STYLE));
+            .addImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY)
+            .addImpact(EditableProp.Impact.DEPENDENT_CELLS_LABEL)
+            .addImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
       this.weight = new DoubleProp("Weight", this, weight)
-            .setImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
-      // FIXME styles in dependent cells (edges) are NOT updated when the sign of the weight is changed (cell collector ok?)
+            .addImpact(EditableProp.Impact.DEPENDENT_CELLS_STYLE);
       this.delay = new NonNegativeDoubleProp("Delay", this, delay).setUnit("ms");
       this.probability = new ProbabilityProp("Probability", this, probability)
-            .setImpact(EditableProp.Impact.DEPENDENT_CELLS_LABEL);
+            .addImpact(EditableProp.Impact.DEPENDENT_CELLS_LABEL);
       this.synapseKind = new EditableEnumProp<>("Synapse Kind", SynapseKind.class, this,
                                                 Objects.requireNonNull(synapseKind))
-            .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
+            .addImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
    }
 
    @Override

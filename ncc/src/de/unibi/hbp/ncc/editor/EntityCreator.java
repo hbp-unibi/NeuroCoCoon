@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public interface EntityCreator<E extends LanguageEntity> extends Serializable, TooltipProvider {
    E create ();
-   String getIconFileName ();
+   String getResourceFileBaseName ();
    String getIconCaption ();
    String getCellStyle ();
    default int getInitialCellWidth () { return 100; }

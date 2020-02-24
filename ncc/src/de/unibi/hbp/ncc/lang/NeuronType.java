@@ -63,7 +63,7 @@ public class NeuronType extends NamedEntity {
       super(namespace, name);
       moreSpecificNamespace = namespace;
       this.neuronKind = new EditableEnumProp<>("Neuron Kind", NeuronKind.class, this, neuronKind)
-            .setImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
+            .addImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
       this.vRest = new DoubleProp("v rest", this, vRest).setUnit("mV");
       this.vReset = new DoubleProp("v reset", this, vReset).setUnit("mV");
       this.vThresh = new DoubleProp("v thresh", this, vThresh).setUnit("mV");

@@ -22,7 +22,12 @@ public abstract class AbstractCellsCollector {
    }
 
    // looks like edges have to be visited separately
-   // TODO visit edges only once: from their source node, unless there is no source node
+   // visits edges only once: from their source node, dangling edges without source node are visited from their target
+   // completely detached edges are visited separately (in the end)
+
+   private static boolean isUnconnectedEdge (mxICell cell) {
+      return cell.isEdge() && cell.getTerminal(true) == null && cell.getTerminal(false) == null;
+   }
 
    private void addOneMatch (mxICell cell, List<mxICell> matches) {
       Object value = cell.getValue();
@@ -32,15 +37,20 @@ public abstract class AbstractCellsCollector {
    }
 
    private void addMatches (mxICell parent, List<mxICell> matches) {
-      if (checkVertices && parent.isVertex())
+      if (checkVertices && parent.isVertex() || checkEdges && isUnconnectedEdge(parent))
          addOneMatch(parent, matches);
       int count = parent.getChildCount();
       for (int i = 0; i < count; i++)
             addMatches(parent.getChildAt(i), matches);
       if (checkEdges) {
          int edgeCount = parent.getEdgeCount();
-         for (int i = 0; i < edgeCount; i++)
-            addOneMatch(parent.getEdgeAt(i), matches);
+         for (int i = 0; i < edgeCount; i++) {
+            mxICell edge = parent.getEdgeAt(i);
+            mxICell source = edge.getTerminal(true);
+            // visit only outgoing edges and dangling incoming edges
+            if (source == null || source.equals(parent))
+               addOneMatch(edge, matches);
+         }
       }
    }
 
@@ -52,6 +62,41 @@ public abstract class AbstractCellsCollector {
       return matchingCells;
    }
 
+   private int matchCounter;
+
+   private void countOneMatch (mxICell cell) {
+      Object value = cell.getValue();
+      if (value instanceof LanguageEntity && matches(cell, (LanguageEntity) value) ||
+            matchesOtherValue(cell, value))
+         matchCounter += 1;
+   }
+
+   private void countMatches (mxICell parent) {
+      if (checkVertices && parent.isVertex() || checkEdges && isUnconnectedEdge(parent))
+         countOneMatch(parent);
+      int count = parent.getChildCount();
+      for (int i = 0; i < count; i++)
+         countMatches(parent.getChildAt(i));
+      if (checkEdges) {
+         int edgeCount = parent.getEdgeCount();
+         for (int i = 0; i < edgeCount; i++) {
+            mxICell edge = parent.getEdgeAt(i);
+            mxICell source = edge.getTerminal(true);
+            // visit only outgoing edges and dangling incoming edges
+            if (source == null || source.equals(parent))
+               countOneMatch(edge);
+         }
+      }
+   }
+
+   public int countMatchingCells (mxIGraphModel graphModel) {
+      matchCounter = 0;
+      Object root = graphModel.getRoot();
+      if (root instanceof mxICell)
+         countMatches((mxICell) root);
+      return matchCounter;
+   }
+
    private boolean haveOneMatch (mxICell cell) {
       Object value = cell.getValue();
       return value instanceof LanguageEntity && matches(cell, (LanguageEntity) value) ||
@@ -59,7 +104,7 @@ public abstract class AbstractCellsCollector {
    }
 
    private boolean haveMatches (mxICell parent) {
-      if (checkVertices && parent.isVertex() && haveOneMatch(parent))
+      if ((checkVertices && parent.isVertex() || checkEdges && isUnconnectedEdge(parent)) && haveOneMatch(parent))
          return true;
       int count = parent.getChildCount();
       for (int i = 0; i < count; i++)
@@ -67,9 +112,13 @@ public abstract class AbstractCellsCollector {
             return true;
       if (checkEdges) {
          int edgeCount = parent.getEdgeCount();
-         for (int i = 0; i < edgeCount; i++)
-            if (haveOneMatch(parent.getEdgeAt(i)))
-               return true;
+         for (int i = 0; i < edgeCount; i++) {
+            mxICell edge = parent.getEdgeAt(i);
+            mxICell source = edge.getTerminal(true);
+            // consider only outgoing edges and dangling incoming edges
+            if ((source == null || source.equals(parent)) && haveOneMatch(edge))
+                  return true;
+         }
       }
       return false;
    }
@@ -90,19 +139,29 @@ public abstract class AbstractCellsCollector {
                .append("id=").append(cell.getId()).append(", value=").append(value)
                .append(", parent=").append(cell.getParent())
                .append('\n');
+         if (cell.isEdge()) {
+            matches.append("\tsource=").append(cell.getTerminal(true))
+                  .append(", target=").append(cell.getTerminal(false))
+                  .append('\n');
+         }
       }
    }
 
    private void printMatches (mxICell parent, StringBuilder matches, int indent) {
-      if (checkVertices && parent.isVertex())
+      if (checkVertices && parent.isVertex() || checkEdges && isUnconnectedEdge(parent))
          printOneMatch(parent, matches, indent);
       int count = parent.getChildCount();
       for (int i = 0; i < count; i++)
          printMatches(parent.getChildAt(i), matches, indent + 1);
       if (checkEdges) {
          int edgeCount = parent.getEdgeCount();
-         for (int i = 0; i < edgeCount; i++)
-            printOneMatch(parent.getEdgeAt(i), matches, indent);
+         for (int i = 0; i < edgeCount; i++) {
+            mxICell edge = parent.getEdgeAt(i);
+            mxICell source = edge.getTerminal(true);
+            // consider only outgoing edges and dangling incoming edges
+            if (source == null || source.equals(parent))
+               printOneMatch(edge, matches, indent);
+         }
       }
    }
 
