@@ -47,12 +47,10 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       defProbSynapseType.makePredefined();
       NetworkModule.setGlobalNamespace(global.getModuleInstances());
 
-      registerCodecs();
+      mxCodecRegistry.register(new LanguageEntityCodec());
    }
 
    private void registerCodecs () {
-      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
-      mxCodecRegistry.register(new LanguageEntityCodec(new RegularSpikeSource()));
       // FIXME this is an experiment only
    }
 

@@ -16,10 +16,14 @@ public interface EditableProp<T> extends ReadOnlyProp<T> {
 
    boolean isValid (T proposedValue);
    void setValue (T value);
+
    default void setRawValue (Object rawValue) {
-      System.err.println("setRawValue: " + rawValue + " --> " + getValueClass().getName());
+      System.err.println("setRawValue: " + rawValue + " (" + rawValue.getClass().getName() + ") --> " +
+                               getValueClass().getName());
       setValue(getValueClass().cast(rawValue));
    }
+
+   void setValueFromString (String encodedValue);
    EnumSet<Impact> getChangeImpact ();
    TableCellEditor getTableCellEditor (JTable table);
 

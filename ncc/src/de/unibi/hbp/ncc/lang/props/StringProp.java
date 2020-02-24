@@ -13,5 +13,8 @@ public class StringProp extends SimpleEditableProp<String> {
    }
 
    @Override
+   public void setValueFromString (String encodedValue) { setValue(encodedValue); }
+
+   @Override
    public TableCellEditor getTableCellEditor (JTable table) { return new StringValueCellEditor(this); }
 }

@@ -14,6 +14,9 @@ public class DoubleProp extends SimpleEditableProp<Double> {
    }
 
    @Override
+   public void setValueFromString (String encodedValue) { setValue(Double.valueOf(encodedValue)); }
+
+   @Override
    public DoubleProp setUnit (String unit) {  // to get the more precise co-variant return type
       super.setUnit(unit);
       return this;

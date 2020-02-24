@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class NeuronPopulation extends NamedEntity
       implements Connectable, PlotDataSource {
-   protected final transient Namespace<NeuronPopulation> moreSpecificNamespace;
+   protected final Namespace<NeuronPopulation> moreSpecificNamespace;
    private IntegerProp neuronCount;  // TODO support a multi-dimensional shape instead of a simple count
 
    private static Namespace<NeuronPopulation> globalNamespace;

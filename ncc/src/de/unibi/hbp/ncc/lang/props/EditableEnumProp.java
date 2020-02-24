@@ -21,6 +21,9 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
    }
 
    @Override
+   public void setValueFromString (String encodedValue) { setValue(Enum.valueOf(getValueClass(), encodedValue)); }
+
+   @Override
    public EditableEnumProp<E> setImpact (EnumSet<Impact> impactSet) {  // to get the more precise co-variant return type
       super.setImpact(impactSet);
       return this;

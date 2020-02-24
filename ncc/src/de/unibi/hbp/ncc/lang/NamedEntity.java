@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public abstract class NamedEntity extends LanguageEntity
       implements DisplayNamed, PythonNamed, Serializable, Comparable<NamedEntity> {
    private StringProp nameProp;
-   private final transient Namespace<? extends NamedEntity> namespace;
+   private final Namespace<? extends NamedEntity> namespace;
 
    protected Object writeReplace() throws ObjectStreamException {
       return new SerializedEntityName(namespace.getId(), getName());

@@ -33,11 +33,12 @@ public class RegularSpikeSource extends NeuronPopulation {
       this.duration = new StrictlyPositiveDoubleProp("Duration", this, duration).setUnit("ms");
    }
 
-   public RegularSpikeSource (Namespace<NeuronPopulation> namespace) {
-      this(namespace, null, 1, 100.0, 0.0, 0.0, 1.0e9);
+   public RegularSpikeSource (Namespace<NeuronPopulation> namespace, String name) {
+      this(namespace, name, 1, 100.0, 0.0, 0.0, 1.0e9);
    }
 
-   public RegularSpikeSource () { this(getGlobalNamespace()); }
+   public RegularSpikeSource (String name) { this(getGlobalNamespace(), name); }
+   public RegularSpikeSource () { this((String) null); }
 
    protected RegularSpikeSource (RegularSpikeSource orig) {
       this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronCountProp().getValue(),

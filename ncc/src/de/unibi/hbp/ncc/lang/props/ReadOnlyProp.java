@@ -10,5 +10,7 @@ public interface ReadOnlyProp<T> {
    default String getUnit () { return null; }
    LanguageEntity getEnclosingEntity ();
    T getValue ();
+
+   default String getValueEncodedAsString () { return getValue().toString(); }
    Class<T> getValueClass ();
 }

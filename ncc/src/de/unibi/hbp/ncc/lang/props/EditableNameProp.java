@@ -22,9 +22,7 @@ public class EditableNameProp<E extends NamedEntity> extends SimpleEditableProp<
    }
 
    @Override
-   public boolean isValid (E proposedValue) {
-      return super.isValid(proposedValue) && proposedValue != null;
-   }
+   public void setValueFromString (String encodedValue) { setValue(targetNamespace.get(encodedValue)); }
 
    @Override
    public Namespace<E> getTargetNamespace () { return targetNamespace; }

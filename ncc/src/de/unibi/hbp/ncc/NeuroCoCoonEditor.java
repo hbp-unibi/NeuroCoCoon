@@ -163,6 +163,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			// menu item for grid is based on gridEnabled property of graph
 			setToolTips(true);
 			getConnectionHandler().setCreateTarget(false);
+			// Stops editing after enter has been pressed instead of adding a newline to the current editing value
+			setEnterStopsCellEditing(true);  // TODO does this help with our Enter inspector problems?
+
 
 			// Loads the default stylesheet from an external file
 			mxCodec codec = new mxCodec();
@@ -319,6 +322,13 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 				}
 			}
 			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
+		}
+
+		@Override
+		public Object flipEdge (Object edge) {
+			return super.flipEdge(edge);
+			// TODO augment existing edge style, instead of replacing it
+			// TODO support three different edge styles? (cyclic)
 		}
 
 		@Override

@@ -13,6 +13,9 @@ public class IntegerProp extends SimpleEditableProp<Integer> {
    }
 
    @Override
+   public void setValueFromString (String encodedValue) { setValue(Integer.valueOf(encodedValue)); }
+
+   @Override
    public IntegerProp setImpact (Impact impact) {  // to get the more precise covariant return type
       super.setImpact(impact);
       return this;

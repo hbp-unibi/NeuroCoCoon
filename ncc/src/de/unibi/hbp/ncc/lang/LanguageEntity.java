@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class LanguageEntity {
    private boolean predefined;  // such entities cannot be deleted and all their properties cannot be edited
-   private transient mxCell owningCell;
+   private mxCell owningCell;
 
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       return list;
