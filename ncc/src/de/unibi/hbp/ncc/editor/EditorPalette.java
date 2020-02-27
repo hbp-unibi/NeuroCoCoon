@@ -158,6 +158,24 @@ public class EditorPalette extends JPanel
 		addTemplate(name, name, icon, cell);
 	}
 
+	public void addEdgeTemplate (EntityCreator<?> creator)
+	{
+		int width = creator.getInitialCellWidth(),
+				height = creator.getInitialCellHeight();
+		mxGeometry geometry = new mxGeometry(0, 0, width, height);
+		geometry.setTerminalPoint(new mxPoint(0, height), true);
+		geometry.setTerminalPoint(new mxPoint(width, 0), false);
+		geometry.setRelative(true);
+
+		mxCell cell = new mxCell(creator, geometry, creator.getCellStyle());
+		cell.setEdge(true);
+
+		addTemplate(creator.getIconCaption(), creator.getTooltip(),
+					new ImageIcon(EditorPalette.class.getResource("images/lang/" +
+																		  creator.getResourceFileBaseName() + ".png")),
+					cell);
+	}
+
 	public void addTemplate (EntityCreator<?> creator)
 	{
 		mxCell cell = new mxCell(creator, new mxGeometry(0, 0,

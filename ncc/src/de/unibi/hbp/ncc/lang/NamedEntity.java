@@ -2,7 +2,7 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.StringProp;
-import de.unibi.hbp.ncc.lang.serialize.SerializedEntityName;
+import de.unibi.hbp.ncc.lang.serialize.SerializedNamedEntity;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
@@ -18,7 +18,7 @@ public abstract class NamedEntity extends LanguageEntity
    private final Namespace<? extends NamedEntity> namespace;
 
    protected Object writeReplace() throws ObjectStreamException {
-      return new SerializedEntityName(namespace.getId(), getName());
+      return new SerializedNamedEntity(this);
    }
 
    // readObject method for the serialization proxy pattern
@@ -78,6 +78,8 @@ public abstract class NamedEntity extends LanguageEntity
    protected abstract String getGeneratedNamesPrefix ();
 
    protected Namespace<? extends NamedEntity> getNamespace () { return namespace; }
+
+   public Namespace.Id getNamespaceId () { return namespace.getId(); }
 
    protected NamedEntity addNamePropImpact (EditableProp.Impact impact) {
       nameProp.addImpact(impact);
@@ -152,6 +154,10 @@ public abstract class NamedEntity extends LanguageEntity
 
    public String getPythonName () {
       return namespace.buildPythonName(this.getName());
+   }
+
+   public String getDerivedPythonName (String purposeDiscriminator) {
+      return namespace.buildDerivedPythonName(purposeDiscriminator, this.getName());
    }
 
 }

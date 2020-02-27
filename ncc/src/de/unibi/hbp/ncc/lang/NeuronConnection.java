@@ -1,5 +1,8 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.editor.EntityCreator;
+import de.unibi.hbp.ncc.editor.ModuleInstanceCreator;
+import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedNeuronConnection;
@@ -19,7 +22,7 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
    public static void setGlobalSynapseTypeNamespace (Namespace<SynapseType> ns) { globalSynapseTypeNamespace = ns; }
 
    protected Object writeReplace() throws ObjectStreamException {
-      return new SerializedNeuronConnection(synapseTypeNamespace.getId(), synapseType.getValue().getName());
+      return new SerializedNeuronConnection(synapseType.getValue());
    }
 
    // readObject method for the serialization proxy pattern
@@ -79,5 +82,35 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
    @Override
    public String getCellStyle () {
       return synapseType.getValue().getCellStyle();
+   }
+
+   public static final EntityCreator<NeuronConnection> CREATOR = new Creator();
+
+   private static class Creator implements EntityCreator<NeuronConnection> {
+      @Override
+      public NeuronConnection create () {
+         return new NeuronConnection();
+      }
+
+      @Override
+      public String toString () {  // used by drag&drop tooltips
+         return "All:All Connection";
+      }
+
+      @Override
+      public String getResourceFileBaseName () { return "synapse"; }
+
+      @Override
+      public String getIconCaption () { return "Synapse"; }
+
+      @Override
+      public String getCellStyle () { return "allToAll"; }
+
+      @Override
+      public int getInitialCellHeight () { return 60; }
+
+      @Override
+      public int getInitialCellWidth () { return 60; }
+
    }
 }

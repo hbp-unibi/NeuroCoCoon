@@ -2,6 +2,7 @@ package de.unibi.hbp.ncc.lang;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,10 +25,27 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
    private String memberDescription;  // for error messages
    private Map<String, Integer> nameGenerators;
    private String pythonDiscriminator;
+   private Id id;
    private NamespaceModel listModel;  // created lazily on demand
 
-   private static Map<String, Namespace<?>> byId = new HashMap<>();
-   // TODO more deterministic (manual, explicit) assignment of numeric ids for saving and loading
+   public static class Id implements Serializable {  // abstract this away for future expansion beyond global scope namespaces only
+      private String id;
+
+      Id (String id) { this.id = id; }
+
+      @Override
+      public boolean equals (Object other) {
+         return this == other || other instanceof Id && this.id.equals(((Id) other).id);
+      }
+
+      @Override
+      public int hashCode () { return Objects.hash(id); }
+
+      @Override
+      public String toString () { return "Namespace.Id " + id; }
+   }
+
+   private static Map<Id, Namespace<?>> byId = new HashMap<>();
 
    private static final int MAX_GENERATOR_VALUE = 9999;
 
@@ -39,18 +57,19 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
       this.memberDescription = memberDescription;
       this.nameGenerators = new HashMap<>();
       if (pythonDiscriminator.isEmpty() || pythonDiscriminator.startsWith("_") || pythonDiscriminator.endsWith("_"))
-         throw new IllegalArgumentException("invalid Python name fragment");
+         throw new IllegalArgumentException("invalid Python name fragment " + pythonDiscriminator);
       this.pythonDiscriminator = pythonDiscriminator;
-      Namespace<?> oldValue = byId.put(pythonDiscriminator, this);
+      this.id = new Id(pythonDiscriminator);
+      Namespace<?> oldValue = byId.put(this.id, this);
       if (oldValue != null)
          throw new IllegalStateException("duplicate namespace id/discriminator: " + pythonDiscriminator +
                                                " for " + oldValue + " and " + this);
    }
 
    // for (temporary) serialization by mxGraph operations
-   String getId () { return pythonDiscriminator; }
+   Id getId () { return id; }
 
-   public static Namespace<?> forId (String id) { return byId.get(id); }
+   public static Namespace<?> forId (Id id) { return byId.get(id); }
 
    static String normalizedName (String name) {
       return name.replace(' ', '_');
@@ -154,10 +173,19 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
    public String getDescription () { return memberDescription; }
 
    private static final String PYTHON_USER_NAME_PREFIX = "_usr_";  // we disallow leading underscores
+   private static final String PYTHON_GENERATED_NAME_PREFIX = "_gen_";  // we disallow leading underscores
 
    String buildPythonName (String memberName) {
       assert members.containsKey(memberName);
       return PYTHON_USER_NAME_PREFIX + pythonDiscriminator + "_" + normalizedName(memberName);
+   }
+
+   String buildDerivedPythonName (String purposeDiscriminator, String memberName) {
+      if (purposeDiscriminator.isEmpty() || purposeDiscriminator.startsWith("_") || purposeDiscriminator.endsWith("_"))
+         throw new IllegalArgumentException("invalid Python name fragment " + purposeDiscriminator);
+      assert members.containsKey(memberName);
+      return PYTHON_GENERATED_NAME_PREFIX + pythonDiscriminator + "_" + purposeDiscriminator + "_" +
+            normalizedName(memberName);
    }
 
    static String buildTopLevelPythonName (String name) {

@@ -51,7 +51,7 @@ public class mxElbowEdgeHandler extends mxEdgeHandler
 
 	protected boolean isFlipEvent(MouseEvent e)
 	{
-		return e.getClickCount() == 2 && index == 1;
+		return e != null && e.getClickCount() == 2 && index == 1 || super.isFlipEvent(e);
 	}
 
 	/**

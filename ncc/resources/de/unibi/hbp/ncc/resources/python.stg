@@ -2,7 +2,7 @@ define_population(pop) ::= <<
 <pop.pythonName> = sim.Population(<pop.neuronCount>, sim.IF_cond_exp, neuron_params)
 
 >>
-program(prog, pops) ::= <<
+program(prog, neuronTypes, synapseTypes, pops, moduleInstances, plots) ::= <<
 import numpy.random
 from pyNN.utility import get_simulator
 from pyNN.utility.plotting import Figure, Panel

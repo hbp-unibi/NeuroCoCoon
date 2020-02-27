@@ -22,7 +22,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
 
       String myName = getName();
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
-      // this list must be kep in sync with tht cases of the switch in afterDecode
+      // this list must be kep in sync with that cases of the switch in afterDecode
+      // TODO use reflection to gather all concrete subclasses of LanguageEntity?
       mxCodecRegistry.addAlias("RegularSpikeSource", myName);
       mxCodecRegistry.addAlias("PoissonSource", myName);
       mxCodecRegistry.addAlias("StandardPopulation", myName);

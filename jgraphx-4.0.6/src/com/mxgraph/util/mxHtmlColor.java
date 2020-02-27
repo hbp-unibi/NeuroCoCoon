@@ -59,9 +59,8 @@ public class mxHtmlColor
 	 * Convert a string representing a 24/32bit hex color value into a Color
 	 * object. All 147 CSS color names and none are also supported. None returns
 	 * null.
-	 * Examples of possible hex color values are: #C3D9FF, #6482B9 and #774400,
-	 * but note that you do not include the "#" in the string passed in
-	 * 
+	 * Examples of possible hex color values are: #C3D9FF, #6482B9 and #774400.
+	 *
 	 * @param str
 	 *            the 24/32bit hex string value (ARGB)
 	 * @return java.awt.Color (24bit RGB on JDK 1.1, 24/32bit ARGB on JDK1.2)
@@ -69,94 +68,68 @@ public class mxHtmlColor
 	 *                if the specified string cannot be interpreted as a
 	 *                hexidecimal integer
 	 */
-	public static Color parseColor(String str, double alpha) throws NumberFormatException
-	{
+	public static Color parseColor(String str, double alpha)  {
 		if (str == null || str.equals(mxConstants.NONE))
-		{
 			return null;
-		}
 		else if (rgbRegex.matcher(str).matches())
-		{
 			return parseRgb(str);
-		}
-		else if (!str.startsWith("#"))
-		{
+		else if (!str.startsWith("#")) {
 			Color result = htmlColors.get(str);
-
-			// LATER: Return the result even if it's null to avoid invalid color codes
-			if (result != null)
-			{
-				return result;
-			}
+			return result != null ? result : Color.RED;
 		}
-		else if (str.length() == 4)
-		{
+		else if (str.length() == 4) {
 			// Adds support for special short notation of hex colors, eg. #abc=#aabbcc
-			str = new String(
-					new char[] { '#', str.charAt(1), str.charAt(1),
-							str.charAt(2), str.charAt(2), str.charAt(3),
-							str.charAt(3) });
+			str = "#" + str.charAt(1) + str.charAt(1) + str.charAt(2) + str.charAt(2) +
+					str.charAt(3) + str.charAt(3);
 		}
 
 		int value = 0;
-		try
-		{
-			String tmp = str;
-
-			if (tmp.startsWith("#"))
-			{
-				tmp = tmp.substring(1);
-			}
-			
-			value = (int) (Long.parseLong(tmp, 16) | (((int) (alpha * 255)) << 24));
+		try {
+			value = Integer.parseUnsignedInt(str.substring(1), 16);
+			if (str.length() <= 7)  // did not include an explicit alpha hex value
+				value |= ((int) (alpha * 255)) << 24;
 		}
 		catch (NumberFormatException nfe)
 		{
-			try
-			{
-				value = Long.decode(str).intValue();
+			try {
+				value = Integer.decode(str);
 			}
-			catch (NumberFormatException e)
-			{
+			catch (NumberFormatException e) {
 				// ignores exception and returns black
 				log.log(Level.SEVERE, "Failed to parse color value", e);
 			}
 		}
 
-		return (alpha < 1) ? new Color(value, true) : new Color(value);
+		return (alpha < 1 || str.length() > 7) ? new Color(value, true) : new Color(value);
 	}
 
 	protected static Color parseRgb(String rgbString)
 	{
 		String[] values = rgbString.split("[,()]");
 
+		// values[0] is the part preceding the opening (
 		String red = values[1].trim();
 		String green = values[2].trim();
 		String blue = values[3].trim();
-		String alpha = "1.0";
+		// trailing empty strings are NOT included, i.e. no garbage value after the closing )
 
-		if (values.length >= 5)
-		{
-			alpha = values[4].trim();
+		if (values.length >= 5) {
+			String alpha = values[4].trim();
+			return new Color(parseValue(red), parseValue(green), parseValue(blue), parseAlpha(alpha));
 		}
-
-		return new Color(parseValue(red, 255), parseValue(green, 255),
-				parseValue(blue, 255), parseAlpha(alpha));
+		else
+			return new Color(parseValue(red), parseValue(green), parseValue(blue));
 	}
 
-	protected static float parseValue(String val, int max)
-	{
+	protected static float parseValue (String val) {
 		if (val.endsWith("%"))
-		{
-			return (float) (parsePercent(val) * max / max);
-		}
-		
-		return (float) (Integer.parseInt(val) / max);
+			return parsePercent(val) * 255f / 255f;
+
+		return Integer.parseInt(val) / 255f;
 	}
 
-	protected static double parsePercent(String perc)
-	{
-		return Integer.parseInt(perc.substring(0, perc.length() - 1)) / 100.0;
+	protected static float parsePercent (String perc) {
+		return Integer.parseInt(perc.substring(0, perc.length() - 1)) / 100f;
 	}
 
 	protected static float parseAlpha(String alpha)

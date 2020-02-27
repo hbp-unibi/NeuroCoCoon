@@ -131,6 +131,13 @@ public class SynapseType extends NamedEntity {
       return list;
    }
 
+   public ConnectorKind getConnectorKind () { return connectorKind.getValue(); }
+
+   public double getWeight () { return weight.getValue(); }
+   public double getDelay () { return delay.getValue(); }
+
+   public SynapseKind getSynapseKind () { return synapseKind.getValue(); }
+
    @Override
    public List<mxICell> getDependentCells (mxIGraphModel graphModel) {
       return new AbstractCellsCollector(false, true) {

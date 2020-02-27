@@ -8,12 +8,12 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 public class SerializedNeuronConnection implements Serializable {
-   private String namespaceId;
+   private Namespace.Id namespaceId;
    private String name;
 
-   public SerializedNeuronConnection (String namespaceId, String name) {
-      this.namespaceId = namespaceId;
-      this.name = name;
+   public SerializedNeuronConnection (SynapseType synapseType) {
+      this.namespaceId = synapseType.getNamespaceId();
+      this.name = synapseType.getName();
    }
 
    Object readResolve() throws ObjectStreamException {

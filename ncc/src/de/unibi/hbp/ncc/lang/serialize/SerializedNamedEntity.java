@@ -1,17 +1,18 @@
 package de.unibi.hbp.ncc.lang.serialize;
 
+import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
-public class SerializedEntityName implements Serializable {
-   private String namespaceId;
+public class SerializedNamedEntity implements Serializable {
+   private Namespace.Id namespaceId;
    private String name;
 
-   public SerializedEntityName (String namespaceId, String name) {
-      this.namespaceId = namespaceId;
-      this.name = name;
+   public SerializedNamedEntity (NamedEntity entity) {
+      this.namespaceId = entity.getNamespaceId();
+      this.name = entity.getName();
    }
 
    Object readResolve() throws ObjectStreamException {

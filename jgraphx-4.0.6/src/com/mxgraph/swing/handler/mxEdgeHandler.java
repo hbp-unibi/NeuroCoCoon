@@ -124,7 +124,7 @@ public class mxEdgeHandler extends mxCellHandler
 
 	protected boolean isFlipEvent(MouseEvent e)
 	{
-		return false;
+		return e != null && e.isAltDown() && e.getClickCount() == 2;  // was false
 	}
 
 	/**

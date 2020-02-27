@@ -2344,7 +2344,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 
 	public boolean isEditEvent(MouseEvent e)
 	{
-		return (e != null) ? e.getClickCount() == 2 : false;
+		return e != null && e.getClickCount() == 2;
 	}
 
 	/**
@@ -2354,7 +2354,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	public boolean isCloneEvent(MouseEvent event)
 	{
-		return (event != null) ? event.isControlDown() : false;
+		return event != null && event.isControlDown();
 	}
 
 	/**
@@ -2367,11 +2367,10 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		// NOTE: IsMetaDown always returns true for right-clicks on the Mac, so
 		// toggle selection for left mouse buttons requires CMD key to be pressed,
 		// but toggle for right mouse buttons requires CTRL to be pressed.
-		return (event != null) ? ((mxUtils.IS_MAC) ? ((SwingUtilities
-				.isLeftMouseButton(event) && event.isMetaDown()) || (SwingUtilities
-				.isRightMouseButton(event) && event.isControlDown()))
-				: event.isControlDown())
-				: false;
+		return (event != null) && (mxUtils.IS_MAC
+				? (SwingUtilities.isLeftMouseButton(event) && event.isMetaDown() ||
+				SwingUtilities.isRightMouseButton(event) && event.isControlDown())
+				: event.isControlDown());
 	}
 
 	/**
@@ -2381,7 +2380,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	public boolean isGridEnabledEvent(MouseEvent event)
 	{
-		return (event != null) ? !event.isAltDown() : false;
+		return event != null && !event.isAltDown();
 	}
 
 	/**
@@ -2394,8 +2393,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	public boolean isPanningEvent(MouseEvent event)
 	{
-		return (event != null) ? event.isShiftDown() && event.isControlDown()
-				: false;
+		return event != null && event.isShiftDown() && event.isControlDown();
 	}
 
 	/**
@@ -2408,7 +2406,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	public boolean isConstrainedEvent(MouseEvent event)
 	{
-		return (event != null) ? event.isShiftDown() : false;
+		return event != null && event.isShiftDown();
 	}
 
 	/**
@@ -2421,7 +2419,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 */
 	public boolean isForceMarqueeEvent(MouseEvent event)
 	{
-		return (event != null) ? event.isAltDown() : false;
+		return event != null && event.isAltDown();
 	}
 
 	public mxPoint snapScaledPoint(mxPoint pt)

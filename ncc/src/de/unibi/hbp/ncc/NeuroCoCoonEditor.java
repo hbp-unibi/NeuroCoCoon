@@ -11,10 +11,12 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphSelectionModel;
+import com.sun.tools.javac.util.List;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
@@ -28,6 +30,7 @@ import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
+import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
@@ -113,6 +116,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		basicPalette.addTemplate(RegularSpikeSource.CREATOR);
 		basicPalette.addTemplate(PoissonSource.CREATOR);
 		basicPalette.addTemplate(StandardPopulation.CREATOR);
+		basicPalette.addEdgeTemplate(NeuronConnection.CREATOR);
+		// TODO add a generic connector edge template for drag&drop creation of synapses (web app?!)
 		modulesPalette.addTemplate(SynfireChain.CREATOR);
 		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
 		modulesPalette.addTemplate("Retina",
@@ -156,6 +161,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		{
 			super(graph);
 			programGraph = graph;
+			graph.getProgram().setGraphComponent(this);
 
 			// Sets switches typically used in an editor
 			setPageVisible(false);
@@ -164,7 +170,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			setToolTips(true);
 			getConnectionHandler().setCreateTarget(false);
 			// Stops editing after enter has been pressed instead of adding a newline to the current editing value
-			setEnterStopsCellEditing(true);  // TODO does this help with our Enter inspector problems?
+			setEnterStopsCellEditing(true);  // FIXME this does NOT help with our Enter inspector problems
 
 
 			// Loads the default stylesheet from an external file
@@ -231,13 +237,11 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		 */
 		public ProgramGraph (Program program)
 		{
-			program.setGraphModel(this.getModel());
 			this.program = program;
 			setGridEnabled(false);
-			setAllowDanglingEdges(false);
+			setAllowDanglingEdges(true);  // otherwise drag&drop of edge template effectively not be used
 			setMultigraph(false);
-//			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");
-			// TODO reactivate with a useful alternate connector style
+//			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");  // not used by our overridden version flipEdge
 
 			addListener(mxEvent.CELLS_ADDED, (sender, evt ) -> {
 				Object[] cells = (Object[]) evt.getProperty("cells");
@@ -324,17 +328,75 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
 		}
 
+
+		private static List<String> EDGE_STYLES_CYCLE = List.of(
+				// default (not present) is equivalent to edgeStyle=orthogonalEdgeStyle
+				// leading semicolon depends on all our edges having a named style set based on their connector kind
+				";edgeStyle=elbowEdgeStyle;elbow=vertical",
+				";edgeStyle=elbowEdgeStyle;elbow=horizontal",
+				";edgeStyle=entityRelationEdgeStyle",
+				";edgeStyle=topToBottomEdgeStyle",
+				";edgeStyle=sideToSideEdgeStyle"
+				// ";edgeStyle=segmentEdgeStyle",  // segment edges seem to allow additional control points,
+				// but how to edit them is unclear and toggling to some other edge style seems to leave garbage control points behind
+				// ";edgeStyle=loopEdgeStyle"  // this is applied automatically for loops?
+		);
+
 		@Override
 		public Object flipEdge (Object edge) {
-			return super.flipEdge(edge);
-			// TODO augment existing edge style, instead of replacing it
-			// TODO support three different edge styles? (cyclic)
+			if (edge != null) {
+				model.beginUpdate();
+				try
+				{
+					String edgeStyle = model.getStyle(edge);
+					// System.err.println("flipEdge: old = " + edgeStyle);
+
+					int presetIndex = -1, listIndex = 0;
+					for (String preset: EDGE_STYLES_CYCLE)
+						if (edgeStyle.contains(preset)) {
+							presetIndex = listIndex;
+							break;
+						}
+						else
+							listIndex += 1;
+
+					if (presetIndex < 0)
+						edgeStyle = edgeStyle + EDGE_STYLES_CYCLE.get(0);
+					else {
+						String nextPreset = presetIndex + 1 < EDGE_STYLES_CYCLE.size()
+								? EDGE_STYLES_CYCLE.get(presetIndex + 1)
+								: "";
+						edgeStyle = edgeStyle.replace(EDGE_STYLES_CYCLE.get(presetIndex), nextPreset);
+					}
+
+					// System.err.println("flipEdge: new = " + edgeStyle);
+					model.setStyle(edge, edgeStyle);
+					// Removes all existing control points
+					resetEdge(edge);
+					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge));
+				}
+				finally {
+					model.endUpdate();
+				}
+			}
+
+			return edge;
 		}
 
 		@Override
 		public Object[] removeCells (Object[] cells, boolean includeEdges) {
+			for (Object obj: cells) {
+				if (obj instanceof mxCell) {
+					mxCell cell = (mxCell) obj;
+					Object value = cell.getValue();
+					if (value instanceof NamedEntity) {
+						NamedEntity entityValue = (NamedEntity) value;
+						// TODO detach any language entities and remove named entities from their name spaces
+						// TODO also delete plots? referring to the removed population?
+					}
+				}
+			}
 			return super.removeCells(cells, includeEdges);
-			// TODO detach any language entities and remove named entities from their name spaces
 		}
 
 		// Ports are not used as terminals for edges, they are

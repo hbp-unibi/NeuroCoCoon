@@ -270,4 +270,13 @@ public abstract class NetworkModule extends NamedEntity
    protected boolean getPortIsOptional (Port.Direction direction, int portIndex) {
       return false;
    }
+
+   public int getPortDimension (Port port) {
+      return getPortDimension(port.getDirection(), port.getIndex());
+   }
+
+   public boolean isOptionalPort (Port port) {
+      return getPortIsOptional(port.getDirection(), port.getIndex());
+   }
+
 }
