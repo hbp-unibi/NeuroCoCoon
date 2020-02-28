@@ -76,7 +76,7 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
          diagnostics = new ErrorCollector(graphComponent);
       else
          diagnostics.reset();
-      lastDiagnostics = null;
+      lastDiagnostics = diagnostics;
       CodeGenVisitor visitor = new ProgramVisitor(this);
       visitor.check(diagnostics);
       if (!diagnostics.hasAnyErrors()) {
@@ -84,7 +84,6 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
          if (!diagnostics.hasAnyErrors())
             return code;
       }
-      lastDiagnostics = diagnostics;
       return null;
    }
 

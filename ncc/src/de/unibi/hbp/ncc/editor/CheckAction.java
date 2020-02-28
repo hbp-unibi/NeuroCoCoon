@@ -1,10 +1,8 @@
 package de.unibi.hbp.ncc.editor;
 
-import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
-import de.unibi.hbp.ncc.graph.AbstractCellsCollector;
-import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.Program;
+import de.unibi.hbp.ncc.lang.codegen.ErrorCollector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -27,8 +25,9 @@ public class CheckAction extends AbstractAction {
          Program program = neuroCoCoonEditor.getProgram();
          StringBuilder pythonCode;
          pythonCode = program.generatePythonCode();
+         ErrorCollector diagnostics = program.getLastDiagnostics();
          if (pythonCode != null) {
-            editor.status("Success!");
+            editor.status(diagnostics.hasAnyWarnings() ? "There were warnings." : "Success!");
             JFrame frame = new JFrame("Python Code");
             JTextArea textArea = new JTextArea(pythonCode.toString(), 25, 80);
             textArea.setEditable(false);
@@ -38,11 +37,12 @@ public class CheckAction extends AbstractAction {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
          }
-         else {
+         else
             editor.status("There were errors.");
+         if (diagnostics.hasAnyMessages()) {
             JFrame frame = new JFrame("Diagnostics");
-            Component display = program.getLastDiagnostics().getDisplayAndNavigationComponent();
-            frame.add(new JScrollPane(display));
+            Component display = diagnostics.buildDisplayAndNavigationComponent();
+            frame.add(new JScrollPane(display));  // TODO should the scroll pane be added by the error collector?
             frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
             frame.pack();
             frame.setLocationRelativeTo(null);

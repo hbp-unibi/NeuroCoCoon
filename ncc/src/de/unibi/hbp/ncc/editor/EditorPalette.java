@@ -171,8 +171,7 @@ public class EditorPalette extends JPanel
 		cell.setEdge(true);
 
 		addTemplate(creator.getIconCaption(), creator.getTooltip(),
-					new ImageIcon(EditorPalette.class.getResource("images/lang/" +
-																		  creator.getResourceFileBaseName() + ".png")),
+					new ImageIcon(EditorPalette.class.getResource("images/lang/" + creator.getIconFileName())),
 					cell);
 	}
 
@@ -184,8 +183,7 @@ public class EditorPalette extends JPanel
 		cell.setVertex(true);
 
 		addTemplate(creator.getIconCaption(), creator.getTooltip(),
-					new ImageIcon(EditorPalette.class.getResource("images/lang/" +
-																		  creator.getResourceFileBaseName() + ".png")),
+					new ImageIcon(EditorPalette.class.getResource("images/lang/" + creator.getIconFileName())),
 					cell);
 	}
 
