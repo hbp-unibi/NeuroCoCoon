@@ -188,7 +188,7 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
             normalizedName(memberName);
    }
 
-   static String buildTopLevelPythonName (String name) {
+   public static String buildUnadornedPythonName (String name) {
       return normalizedName(name);
    }
 

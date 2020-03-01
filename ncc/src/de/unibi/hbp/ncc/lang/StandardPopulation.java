@@ -81,4 +81,6 @@ public class StandardPopulation extends NeuronPopulation {
 
    public boolean isValidConnectionTarget () { return true; }
 
+   public NeuronType getNeuronType () { return neuronType.getValue(); }
+
 }

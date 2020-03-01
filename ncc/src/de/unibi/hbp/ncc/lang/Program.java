@@ -34,7 +34,7 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
    public Program () {
       programName = new StringProp("Program Name", this, "My Experiment");
       timeStep = new StrictlyPositiveDoubleProp("Time Step", this, 0.1).setUnit("ms");
-      runTime = new StrictlyPositiveDoubleProp("Run Time", this, 2000.0).setUnit("ms");
+      runTime = new StrictlyPositiveDoubleProp("Run Time", this, 5000.0).setUnit("ms");
       global = new Scope();
       NeuronPopulation.setGlobalNamespace(global.getNeuronPopulations());
       final Namespace<SynapseType> synapseTypes = global.getSynapseTypes();
@@ -102,8 +102,9 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
 
    @Override
    public String getPythonName () {
-      return Namespace.buildTopLevelPythonName(programName.getValue());
+      return Namespace.buildUnadornedPythonName(programName.getValue());
    }
 
    public double getTimeStep () { return timeStep.getValue(); }
+   public double getRunTime () { return runTime.getValue(); }
 }

@@ -3,30 +3,36 @@ package de.unibi.hbp.ncc.lang;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NeuronType extends NamedEntity {
 
-   public enum NeuronKind implements DisplayNamed {
-      IF_COND_EXP("IF Cond Exp", true),
-      IF_COND_ALPHA("IF Cond Alpha", true),
-      IZHIKEVICH("Izhikevich", false);
+   public enum NeuronKind implements DisplayNamed, PythonNamed {
+      IF_COND_EXP("IF Cond Exp", "IF_cond_exp", true),
+      IF_COND_ALPHA("IF Cond Alpha", "IF_cond_alpha", true),
+      IZHIKEVICH("Izhikevich", "Izhikevich", false),
+      IF_CURR_EXP("IF Cond Exp", "IF_curr_exp", false),
+      IF_CURR_ALPHA("IF Cond Alpha", "IF_curr_alpha", false);
 
-      private String displayName;
+      private String displayName, pythonName;
       private boolean conductanceBased;
 
-      NeuronKind (String displayName, boolean conductanceBased) {
+      NeuronKind (String displayName, String pythonName, boolean conductanceBased) {
          this.displayName = displayName;
+         this.pythonName = pythonName;
          this.conductanceBased = conductanceBased;
       }
 
       @Override
       public String getDisplayName () { return displayName; }
 
+
       public boolean isConductanceBased () { return conductanceBased; }
 
-      void addKindSpecificProps (List<EditableProp<?>> list, NeuronType type) {
+      void addKindSpecificProps (List<? super EditableProp<?>> list, NeuronType type) {
          if (this == IZHIKEVICH) {
             list.add(type.izhikevichA);
             list.add(type.izhikevichB);
@@ -47,6 +53,9 @@ public class NeuronType extends NamedEntity {
          }
          list.add(type.iOffset);
       }
+
+      @Override
+      public String getPythonName () { return pythonName; }
    }
 
    private final Namespace<NeuronType> moreSpecificNamespace;
@@ -128,6 +137,16 @@ public class NeuronType extends NamedEntity {
    // @Override
    public NeuronType duplicate () {
       return new NeuronType(this);
+   }
+
+   public String getParametersPythonName () { return getDerivedPythonName("npm"); }
+
+   public NeuronKind getNeuronKind () { return neuronKind.getValue(); }
+
+   public Iterable<ReadOnlyProp<?>> getNeuronParameters () {
+      List<ReadOnlyProp<?>> result = new ArrayList<>();
+      neuronKind.getValue().addKindSpecificProps(result, this);
+      return result;
    }
 
 }

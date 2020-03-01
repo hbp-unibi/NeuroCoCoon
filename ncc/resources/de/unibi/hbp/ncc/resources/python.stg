@@ -1,35 +1,41 @@
-define_population(pop) ::= <<
-<pop.pythonName> = sim.Population(<pop.neuronCount>, sim.IF_cond_exp, neuron_params)
-
+define_neuronType(neuronType) ::= <<
+<neuronType.parametersPythonName> = {
+    <neuronType.neuronParameters:{it | '<it.pythonName>': <it.value>}; separator=",\n">
+}
 >>
-program(prog, neuronTypes, synapseTypes, pops, moduleInstances, plots) ::= <<
+
+define_population(pop) ::= <<
+<pop.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>)
+>>
+define_spikeSource(src) ::= <<
+<src.pythonName> = sim.Population(<src.neuronCount>, sim.SpikeSourceArray(spike_times=<\\>
+<if(src.twoDimensional)>[
+    <src.twoLevelTimes:{it | [<it; separator=", ",wrap="\n    ">]}; separator=",\n">]<\\>
+<else>[<src.singleLevelTimes; separator=", ",wrap="\n    ">]<\\>
+<endif>))
+>>
+define_poissonSource(poi) ::= <<
+<poi.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>)
+>>
+program(prog, scope) ::= <<
 import numpy.random
 from pyNN.utility import get_simulator
 from pyNN.utility.plotting import Figure, Panel
 
-_usr_cnst_full = 0.015
-_usr_cnst_half = 0.0075
-_usr_cnst_inh_twice = -0.03
+<scope.neuronTypes:define_neuronType(); separator="\n"><! TODO output referenced neuron types only !>
 
-neuron_params = {
-    'e_rev_E': 0.0,
-    'e_rev_I': -100.0,
-    'tau_syn_E': 2.0,
-    'tau_syn_I': 2.0,
-    'v_rest': -70.0,
-    'v_reset': -80.0,
-    'v_thresh': -65.0,
-    'tau_refrac': 2.0,
-    'tau_m': 10,
-    'cm': 0.2
-}
-
-runtime = 300
+runtime = <prog.runTime>
 
 sim, options = get_simulator(("--image-viewer", "Executable for displaying PNG images of plots", {"default": '-'}))
 
 sim.setup(timestep=<prog.timeStep>)
-<pops:define_population()>
+<scope.standardPopulations:define_population(); separator="\n">
+<scope.spikeSources:define_spikeSource(); separator="\n">
+<scope.poissonSources:define_poissonSource(); separator="\n">
+
+one_to_one = sim.OneToOneConnector()
+all_to_all = sim.AllToAllConnector()
+
 _usr_ana_pop_1 = sim.Population(1, sim.IF_cond_exp, neuron_params)
 _usr_ana_pop_1 = sim.Population(1, sim.IF_cond_exp, neuron_params)
 _usr_ana_source_x = sim.Population(1, sim.SpikeSourceArray(spike_times=[50, 150]))

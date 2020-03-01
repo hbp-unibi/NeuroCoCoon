@@ -6,6 +6,7 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveDoubleProp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RegularSpikeSource extends NeuronPopulation {
@@ -34,7 +35,7 @@ public class RegularSpikeSource extends NeuronPopulation {
    }
 
    public RegularSpikeSource (Namespace<NeuronPopulation> namespace, String name) {
-      this(namespace, name, 1, 100.0, 0.0, 0.0, 1.0e9);
+      this(namespace, name, 1, 100.0, 0.0, 0.0, 5000.0);
    }
 
    public RegularSpikeSource (String name) { this(getGlobalNamespace(), name); }
@@ -74,5 +75,35 @@ public class RegularSpikeSource extends NeuronPopulation {
    @Override
    public RegularSpikeSource duplicate () {
       return new RegularSpikeSource(this);
+   }
+
+   public boolean isTwoDimensional () {
+      return perNeuronOffset.getValue() != 0 && getNeuronCount() > 1;
+   }
+
+   private List<Double> getTimes (double start) {
+      List<Double> result = new ArrayList<>();
+      double interval = this.interval.getValue(), end = start + this.duration.getValue();
+      for (int index = 0; ; index++) {
+         double time = start + index * interval;
+         if (time > end)
+            break;
+         result.add(time);
+      }
+      return result;
+   }
+
+   public List<Double> getSingleLevelTimes () {
+      return getTimes(this.start.getValue());
+   }
+
+   public List<List<Double>> getTwoLevelTimes () {
+      int neuronCount = getNeuronCount();
+      List<List<Double>> result = new ArrayList<>(neuronCount);
+      double start = this.start.getValue(), offset = perNeuronOffset.getValue();
+      for (int n = 0; n < neuronCount; n++) {
+         result.add(getTimes(start + n * offset));
+      }
+      return result;
    }
 }

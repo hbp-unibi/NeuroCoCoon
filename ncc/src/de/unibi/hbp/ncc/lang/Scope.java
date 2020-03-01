@@ -1,5 +1,7 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.lang.utils.Iterators;
+
 public class Scope {
    private Namespace<NeuronPopulation> neuronPopulations;
    private Namespace<NeuronType> neuronTypes;
@@ -26,4 +28,19 @@ public class Scope {
    }
    public Namespace<NetworkModule> getModuleInstances () { return moduleInstances; }
    public Namespace<DataPlot> getDataPlots () { return dataPlots; }
+
+   public Iterable<StandardPopulation> getStandardPopulations () {
+      return Iterators.partialMap(neuronPopulations,
+                                  pop -> pop instanceof StandardPopulation ? (StandardPopulation) pop : null);
+   }
+
+   public Iterable<RegularSpikeSource> getSpikeSources () {
+      return Iterators.partialMap(neuronPopulations,
+                                  pop -> pop instanceof RegularSpikeSource ? (RegularSpikeSource) pop : null);
+   }
+
+   public Iterable<PoissonSource> getPoissonSources () {
+      return Iterators.partialMap(neuronPopulations,
+                                  pop -> pop instanceof PoissonSource ? (PoissonSource) pop : null);
+   }
 }

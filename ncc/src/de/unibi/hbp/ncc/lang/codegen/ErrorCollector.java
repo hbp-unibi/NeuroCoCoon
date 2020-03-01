@@ -3,10 +3,10 @@ package de.unibi.hbp.ncc.lang.codegen;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
-import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
-import de.unibi.hbp.ncc.graph.AbstractCellsVisitor;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.misc.STMessage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ErrorCollector {
+public class ErrorCollector implements STErrorListener {
 
    // TODO see WarningAction on how to add markers to cells
    public enum Severity implements DisplayNamed {
@@ -114,8 +114,33 @@ public class ErrorCollector {
       record(responsible, Severity.ERROR, message);
    }
 
+   public void recordFatal (LanguageEntity responsible, String message) {
+      record(responsible, Severity.FATAL, message);
+   }
+
    public void recordFatal (LanguageEntity responsible, Throwable cause) {
-      record(responsible, Severity.FATAL, cause.getMessage());
+      recordFatal(responsible, cause.getMessage());
+   }
+
+   @Override
+   public void compileTimeError (STMessage msg) {
+      recordError(null, msg.toString());
+   }
+
+   @Override
+   public void runTimeError (STMessage msg) {
+      recordError(null, msg.toString());
+
+   }
+
+   @Override
+   public void IOError (STMessage msg) {
+      recordFatal(null, msg.toString());
+   }
+
+   @Override
+   public void internalError (STMessage msg) {
+      recordFatal(null, msg.toString());
    }
 
    public boolean hasAnyMessages () { return !entries.isEmpty(); }

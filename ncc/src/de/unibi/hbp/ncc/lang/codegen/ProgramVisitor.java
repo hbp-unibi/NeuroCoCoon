@@ -84,15 +84,12 @@ public class ProgramVisitor implements CodeGenVisitor {
    public StringBuilder visit (StringBuilder code, ErrorCollector diagnostics) {
       ST st = templateGroup.getInstanceOf("program");
       st.add("prog", program);
-      st.add("neuronTypes", global.getNeuronTypes());
-      st.add("synapseTypes", global.getSynapseTypes());
-      st.add("pops", global.getNeuronPopulations());
-      st.add("moduleInstances", global.getModuleInstances());
-      st.add("plots", global.getDataPlots());
+      st.add("scope", global);
 
       STWriter wr = new AutoIndentWriter(new BufferAppender(code));
-      wr.setLineWidth(STWriter.NO_WRAP);
-      st.write(wr, Locale.getDefault());
+      // wr.setLineWidth(STWriter.NO_WRAP);
+      wr.setLineWidth(72);
+      st.write(wr, Locale.getDefault(), diagnostics);
       return code;
    }
 
