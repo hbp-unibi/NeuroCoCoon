@@ -1,9 +1,6 @@
 package de.unibi.hbp.ncc.editor.props;
 
-import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
-import de.unibi.hbp.ncc.graph.AbstractCellsCollector;
-import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -87,22 +84,15 @@ public class MasterDetailsEditor<E extends NamedEntity> {
       final JButton deleteButton = new JButton("Delete");
       deleteButton.addActionListener(e -> {
          E candidateEntity = getSelectedEntity();
-         if (candidateEntity != null) {
-            if (new AbstractCellsCollector(true, true) {
-               @Override
-               protected boolean matches (mxICell cell, LanguageEntity entity) {
-                  return entity.hasReferenceTo(candidateEntity);
-               }
-            }.haveMatchingCells(editor.getGraphModel()))
-               JOptionPane.showMessageDialog(component,
-                                             "Could not delete " + namespace.getDescription() +
-                                                   "'" + candidateEntity.getName() + "'" + "!\n" +
-                                                   "References to this entity still exist.",
-                                             "Deletion failed!", JOptionPane.ERROR_MESSAGE);
-            else
-               namespace.remove(candidateEntity);
-         }
+         if (candidateEntity != null && !namespace.remove(candidateEntity, editor.getGraphModel()))
+            JOptionPane.showMessageDialog(component,
+                                          "Could not delete " + namespace.getDescription() +
+                                                "'" + candidateEntity.getName() + "'" + "!\n" +
+                                                "References to this entity still exist.",
+                                          "Deletion failed!", JOptionPane.ERROR_MESSAGE);
       });
+      duplicateButton.setEnabled(false);  // configure buttons for initial state: nothing selected
+      deleteButton.setEnabled(false);
       buttonBar.add(addButton);
       buttonBar.add(duplicateButton);
       buttonBar.add(deleteButton);

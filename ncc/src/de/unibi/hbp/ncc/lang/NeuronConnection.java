@@ -1,8 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.editor.EntityCreator;
-import de.unibi.hbp.ncc.editor.ModuleInstanceCreator;
-import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedNeuronConnection;
@@ -51,7 +49,8 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
       if (synapseType == null)
          synapseType = globalSynapseTypeNamespace.get("All Default");
       this.synapseType = new EditableNameProp<>("Synapse Type", SynapseType.class, this,
-                                                Objects.requireNonNull(synapseType), synapseTypeNamespace);
+                                                Objects.requireNonNull(synapseType), synapseTypeNamespace)
+      .addImpact(EditableProp.Impact.CELL_LABEL);
    }
 
    public NeuronConnection (SynapseType synapseType) {
@@ -69,7 +68,7 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
    @Override
    public String toString () {
       SynapseType type = synapseType.getValue();
-      return type.getDisplayName() + " (" + type.getSummary() + ")";
+      return type.getDisplayName() + "\n(" + type.getSummary() + ")";
    }  // TODO append .getSummary() for synapse type as well?
 
    // @Override

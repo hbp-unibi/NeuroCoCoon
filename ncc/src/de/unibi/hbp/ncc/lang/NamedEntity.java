@@ -9,8 +9,6 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class NamedEntity extends LanguageEntity
       implements DisplayNamed, PythonNamed, Serializable, Comparable<NamedEntity> {
@@ -41,7 +39,7 @@ public abstract class NamedEntity extends LanguageEntity
       this.nameProp = new StringProp(NAME_PROPERTY_NAME, this, name) {
          @Override
          public boolean isValid (String proposedValue) {
-            return isValidName(proposedValue) && canRenameTo(proposedValue);
+            return getNamespace().canRenameTo(NamedEntity.this, proposedValue);
          }
 
          @Override
@@ -58,21 +56,8 @@ public abstract class NamedEntity extends LanguageEntity
       this(namespace, null);
    }
 
-   private static final Pattern COPY_SUFFIX_REGEXP = Pattern.compile(" Copy( \\d+)?$");
-
    protected String getCopiedName () {
-      String copiedName = getName();
-      Matcher matcher = COPY_SUFFIX_REGEXP.matcher(copiedName);
-      if (matcher.find())
-         copiedName = copiedName.substring(0, matcher.start());
-      copiedName += " Copy";
-      if (namespace.containsAnyVariantOf(copiedName)) {
-         int counter = 2;
-         while (namespace.containsAnyVariantOf((copiedName + " " + counter)))
-            counter += 1;
-         copiedName += " " + counter;
-      }
-      return copiedName;
+      return namespace.getCopiedName(this);
    }
 
    protected abstract String getGeneratedNamesPrefix ();
@@ -92,29 +77,12 @@ public abstract class NamedEntity extends LanguageEntity
       return nameProp.getValue();
    }
 
-   // conservative ASCII identifiers with embedded individual spaces or underscores
-   // (no leading, trailing or multiple consecutive spaces or underscores allowed)
-   private static final Pattern IDENTIFIER_REGEXP = Pattern.compile("[A-Za-z]([_ ]?[A-Za-z0-9])*");
-
-   private static boolean isValidName (String name) {
-      return IDENTIFIER_REGEXP.matcher(name).matches();
+   void updateNameInternal (String futureName) {
+      nameProp.setValueInternal(futureName);
    }
 
-   public boolean canRenameTo (String name) {
-      return !namespace.containsAnyVariantOf(name) ||
-            Namespace.areNameVariants(getName(), name);
-      // allow renaming, if name does not change (after normalization), i.e. name "conflict" with the entity itself
-   }
-
-   public void renameTo (String name) {
-      if (!canRenameTo(name))
-         throw new LanguageException(this, "name " + name + " conflicts with an existing name");
-      if (name.equals(getName()))
-         return;  // a no-op
-      // TODO need an atomic way to rename something in the namespace (without temporarily removing it and adding it back) to avoid loss of combo box selections
-      namespace.remove(this);
-      nameProp.setValueInternal(name);
-      namespace.castAndAdd(this);
+   public void renameTo (String futureName) {
+      namespace.renameTo(this, futureName);
    }
 
    @Override
@@ -136,7 +104,7 @@ public abstract class NamedEntity extends LanguageEntity
 
    @Override
    public int compareTo (NamedEntity other) {
-      return this.getName().compareTo(other.getName());
+      return Namespace.getSmartNumericOrderComparator().compare(this.getName(), other.getName());
    }
 
    @Override

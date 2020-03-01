@@ -25,6 +25,12 @@ public class EditableNameProp<E extends NamedEntity> extends SimpleEditableProp<
    public void setValueFromString (String encodedValue) { setValue(targetNamespace.get(encodedValue)); }
 
    @Override
+   public EditableNameProp<E> addImpact (Impact impact) {  // to get the more precise co-variant return type
+      super.addImpact(impact);
+      return this;
+   }
+
+   @Override
    public Namespace<E> getTargetNamespace () { return targetNamespace; }
 
    @Override

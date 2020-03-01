@@ -12,6 +12,8 @@ public class DataPlot extends NamedEntity {
    private EditableNameProp<NeuronPopulation> population;
    private EditableEnumProp<DataSeries> series;
 
+   // TODO make this a visually represented entity with ProbeConnections that store the DataSeries selection
+
    public enum DataSeries { SPIKES, VOLTAGE; }  // TODO must implement DisplayNamed (and PythonNamed?)
 
    @Override

@@ -329,6 +329,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		}
 
 
+		// TODO turn this into an enum with display name and style string suffix support
 		private static List<String> EDGE_STYLES_CYCLE = List.of(
 				// default (not present) is equivalent to edgeStyle=orthogonalEdgeStyle
 				// leading semicolon depends on all our edges having a named style set based on their connector kind
@@ -374,6 +375,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					// Removes all existing control points
 					resetEdge(edge);
 					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge));
+					// TODO provide feedback about the new edge style in the status bar: by making the editor listen for this event
 				}
 				finally {
 					model.endUpdate();

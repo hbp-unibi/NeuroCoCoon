@@ -289,6 +289,7 @@ public class mxObjectCodec {
 	 * @param node XML node that contains the encoded object.
 	 */
 	protected void encodeObject (mxCodec enc, Object obj, Node node) {
+		System.err.println("encodeObject: " + obj);
 		System.err.println("encodeObject: " +
 								   obj.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(obj)) +
 								   ": " + obj);
@@ -313,7 +314,7 @@ public class mxObjectCodec {
 			Field[] fields = type.getDeclaredFields();
 
 			for (Field f: fields) {
-				if ((f.getModifiers() & Modifier.TRANSIENT) != Modifier.TRANSIENT) {
+				if ((f.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0) {
 					String fieldName = f.getName();
 					Object value = getFieldValue(obj, fieldName);
 					System.err.println("encodeFields: " + fieldName + " = " + value);

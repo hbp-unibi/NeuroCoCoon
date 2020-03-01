@@ -41,6 +41,9 @@ public class StandardPopulation extends NeuronPopulation {
    public StandardPopulation (String name) {
       this(getGlobalNamespace(), name);
    }
+   public StandardPopulation (Namespace<NeuronPopulation> namespace) {
+      this(namespace, null);
+   }
    public StandardPopulation () { this((String) null); }
 
    protected StandardPopulation (StandardPopulation orig) {

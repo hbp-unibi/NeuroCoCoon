@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Program extends LanguageEntity implements DisplayNamed, PythonNamed {
+   private final LanguageEntityCodec idRememberingCodec;
    private StringProp programName;
    private DoubleProp runTime, timeStep;
    private final Scope global;
@@ -32,10 +33,17 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
    }
 
    public Program () {
+      global = new Scope();
+      initialize();
+      idRememberingCodec = new LanguageEntityCodec(global);
+      mxCodecRegistry.register(idRememberingCodec);
+   }
+
+   private void initialize () {
+      // could reuse the property objects, but so we can share more code with the constructor
       programName = new StringProp("Program Name", this, "My Experiment");
       timeStep = new StrictlyPositiveDoubleProp("Time Step", this, 0.1).setUnit("ms");
       runTime = new StrictlyPositiveDoubleProp("Run Time", this, 5000.0).setUnit("ms");
-      global = new Scope();
       NeuronPopulation.setGlobalNamespace(global.getNeuronPopulations());
       final Namespace<SynapseType> synapseTypes = global.getSynapseTypes();
       NeuronConnection.setGlobalSynapseTypeNamespace(synapseTypes);
@@ -48,8 +56,16 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       SynapseType defProbSynapseType = new SynapseType(synapseTypes, "Prob Default", SynapseType.ConnectorKind.FIXED_PROBABILITY);
       defProbSynapseType.makePredefined();
       NetworkModule.setGlobalNamespace(global.getModuleInstances());
+   }
 
-      mxCodecRegistry.register(new LanguageEntityCodec());
+   public void clear () {
+      global.clear();
+      initialize();
+   }
+
+   // important to forget the temporarily assigned XML _refid attribute <--> LanguageEntity mapping
+   public void announceEncodeDecodeDone (boolean encodeDone) {
+      idRememberingCodec.announceEncodeDecodeDone(encodeDone);
    }
 
    public void setGraphComponent (mxGraphComponent graphComponent) {

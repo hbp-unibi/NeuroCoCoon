@@ -64,6 +64,10 @@ public class NeuronType extends NamedEntity {
    private DoubleProp eRevE, eRevI, tauSynE, tauSynI, vRest, vReset, vThresh, tauRefrac, tauM, cm, iOffset;
    private DoubleProp izhikevichA, izhikevichB, izhikevichC, izhikevichD;
 
+   protected static Namespace<NeuronType> getGlobalNamespace () {
+      return NeuronPopulation.getGlobalNamespace().getContainingScope().getNeuronTypes();
+   }
+
    public NeuronType (Namespace<NeuronType> namespace, String name, NeuronKind neuronKind,
                       double vRest, double vReset, double vThresh, double eRevE, double eRevI,
                       double tauSynE, double tauSynI, double tauRefrac, double tauM, double cm,
@@ -90,6 +94,9 @@ public class NeuronType extends NamedEntity {
       this.izhikevichD = new DoubleProp("d", this, izhikevichD).setUnit("mV/ms");
    }
 
+   @Override
+   protected String getGeneratedNamesPrefix () { return "Neuron Type"; }
+
    public NeuronType (Namespace<NeuronType> namespace, String name, NeuronKind neuronKind,
                       double vRest, double vReset, double vThresh, double eRevE, double eRevI,
                       double tauSynE, double tauSynI, double tauRefrac, double tauM, double cm,
@@ -107,10 +114,11 @@ public class NeuronType extends NamedEntity {
            0.0);
    }
 
-   @Override
-   protected String getGeneratedNamesPrefix () { return "Neuron Type"; }
-
+   public NeuronType (String name) {
+      this(getGlobalNamespace(), name);
+   }
    public NeuronType (Namespace<NeuronType> namespace) { this(namespace, null); }
+   public NeuronType () { this((String) null); }
 
    protected NeuronType (NeuronType orig) {
       this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronKind.getValue(),

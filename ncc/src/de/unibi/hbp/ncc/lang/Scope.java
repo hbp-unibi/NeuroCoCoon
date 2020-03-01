@@ -17,6 +17,14 @@ public class Scope {
       dataPlots = new Namespace<>(this, DataPlot.class, "Plot", "plt");
    }
 
+   public void clear () {
+      neuronPopulations.clear();
+      neuronTypes.clear();
+      synapseTypes.clear();
+      moduleInstances.clear();
+      dataPlots.clear();
+   }
+
    public Namespace<NeuronPopulation> getNeuronPopulations () {
       return neuronPopulations;
    }

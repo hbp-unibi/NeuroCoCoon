@@ -8,15 +8,12 @@ import com.mxgraph.analysis.mxGraphAnalysis;
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxSvgCanvas;
 import com.mxgraph.io.mxCodec;
-import com.mxgraph.io.mxGdCodec;
 import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.mxGraphOutline;
 import com.mxgraph.swing.util.mxGraphActions;
-import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxCellRenderer.CanvasFactory;
 import com.mxgraph.util.mxConstants;
@@ -28,32 +25,23 @@ import com.mxgraph.util.png.mxPngEncodeParam;
 import com.mxgraph.util.png.mxPngImageEncoder;
 import com.mxgraph.util.png.mxPngTextDecoder;
 import com.mxgraph.view.mxGraph;
+import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Paper;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,7 +50,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,19 +61,19 @@ public class EditorActions
 	 * @param e
 	 * @return Returns the graph for the given action event.
 	 */
-	public static BasicGraphEditor getEditor(ActionEvent e)
+	public static NeuroCoCoonEditor getEditor(ActionEvent e)
 	{
 		if (e.getSource() instanceof Component)
 		{
 			Component component = (Component) e.getSource();
 
 			while (component != null
-					&& !(component instanceof BasicGraphEditor))
+					&& !(component instanceof NeuroCoCoonEditor))
 			{
 				component = component.getParent();
 			}
 
-			return (BasicGraphEditor) component;
+			return (NeuroCoCoonEditor) component;
 		}
 
 		return null;
@@ -289,7 +276,7 @@ public class EditorActions
 		/**
 		 * Saves XML+PNG format.
 		 */
-		protected void saveXmlPng(BasicGraphEditor editor, String filename, Color bg) throws IOException {
+		protected void saveXmlPng(NeuroCoCoonEditor editor, String filename, Color bg) throws IOException {
 			mxGraphComponent graphComponent = editor.getGraphComponent();
 			mxGraph graph = graphComponent.getGraph();
 
@@ -300,6 +287,7 @@ public class EditorActions
 			// Creates the URL-encoded XML data
 			mxCodec codec = new mxCodec();
 			String xml = URLEncoder.encode(mxXmlUtils.getXml(codec.encode(graph.getModel())), "UTF-8");
+			editor.getProgram().announceEncodeDecodeDone(true);
 			mxPngEncodeParam param = mxPngEncodeParam.getDefaultEncodeParam(image);
 			param.setCompressedText(new String[] { "mxGraphModel", xml });
 
@@ -314,7 +302,7 @@ public class EditorActions
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			BasicGraphEditor editor = getEditor(e);
+			NeuroCoCoonEditor editor = getEditor(e);
 
 			if (editor != null) {
 				mxGraphComponent graphComponent = editor.getGraphComponent();
@@ -322,7 +310,7 @@ public class EditorActions
 				FileFilter selectedFilter = null;
 				DefaultFileFilter nccFilter =
 						new DefaultFileFilter(".ncc",
-											  "NeuroCoCoon Editor " + mxResources.get("file") + " (.ncc)");
+											  "NeuroCoCoon " + mxResources.get("file") + " (.ncc)");
 				DefaultFileFilter xmlPngFilter =
 						new DefaultFileFilter(".png",
 											  "PNG+XML " + mxResources.get("file") + " (.png)");
@@ -412,6 +400,7 @@ public class EditorActions
 					else if (ext.equalsIgnoreCase("ncc") || ext.equalsIgnoreCase("xml")) {
 						mxCodec codec = new mxCodec();
 						String xml = mxXmlUtils.getXml(codec.encode(graph.getModel()));
+						editor.getProgram().announceEncodeDecodeDone(true);
 
 						mxUtils.writeFile(xml, filename);
 
@@ -745,7 +734,7 @@ public class EditorActions
 	public static class NewAction extends AbstractAction {
 
 		public void actionPerformed (ActionEvent e) {
-			BasicGraphEditor editor = getEditor(e);
+			NeuroCoCoonEditor editor = getEditor(e);
 
 			if (editor != null) {
 				if (!editor.isModified() ||
@@ -756,6 +745,7 @@ public class EditorActions
 					mxCell root = new mxCell();
 					root.insert(new mxCell());
 					graph.getModel().setRoot(root);
+					editor.getProgram().clear();
 
 					editor.setModified(false);
 					editor.setCurrentFile(null);
@@ -778,7 +768,7 @@ public class EditorActions
 		/**
 		 * Reads XML+PNG format.
 		 */
-		protected void openXmlPng(BasicGraphEditor editor, File file) throws IOException {
+		protected void openXmlPng(NeuroCoCoonEditor editor, File file) throws IOException {
 			Map<String, String> text = mxPngTextDecoder.decodeCompressedText(new FileInputStream(file));
 
 			if (text != null) {
@@ -789,6 +779,7 @@ public class EditorActions
 					if (document != null) {
 						mxCodec codec = new mxCodec(document);
 						codec.decode(document.getDocumentElement(), editor.getGraphComponent().getGraph().getModel());
+						editor.getProgram().announceEncodeDecodeDone(false);
 						editor.setCurrentFile(file);
 						resetEditor(editor);
 
@@ -801,7 +792,7 @@ public class EditorActions
 		}
 
 		public void actionPerformed (ActionEvent e) {
-			BasicGraphEditor editor = getEditor(e);
+			NeuroCoCoonEditor editor = getEditor(e);
 
 			if (editor != null) {
 				if (!editor.isModified() ||
@@ -825,9 +816,9 @@ public class EditorActions
 						fc.addChoosableFileFilter(nccFilter);
 
 						fc.addChoosableFileFilter(new DefaultFileFilter(".ncc",
-								"NeuroCoCoon Editor " + mxResources.get("file") + " (.ncc)"));
+								"NeuroCoCoon " + mxResources.get("file") + " (.ncc)"));
 						fc.addChoosableFileFilter(new DefaultFileFilter(".png",
-								"PNG+XML  " + mxResources.get("file") + " (.png)"));
+								"PNG+XML " + mxResources.get("file") + " (.png)"));
 
 						fc.setFileFilter(nccFilter);
 
@@ -844,6 +835,7 @@ public class EditorActions
 									if (document != null) {
 										mxCodec codec = new mxCodec(document);
 										codec.decode(document.getDocumentElement(), graph.getModel());
+										editor.getProgram().announceEncodeDecodeDone(false);
 										editor.setCurrentFile(fc.getSelectedFile());
 
 										resetEditor(editor);
