@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.StringProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedNamedEntity;
@@ -83,6 +84,10 @@ public abstract class NamedEntity extends LanguageEntity
 
    public void renameTo (String futureName) {
       namespace.renameTo(this, futureName);
+   }
+
+   public boolean delete (mxIGraphModel graphModel) {
+      return namespace.remove(this, graphModel);
    }
 
    @Override

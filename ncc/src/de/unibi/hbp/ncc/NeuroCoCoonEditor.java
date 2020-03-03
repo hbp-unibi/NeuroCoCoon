@@ -46,9 +46,11 @@ import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import java.awt.Color;
+import java.awt.Component;
 import java.util.Collection;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor
@@ -57,10 +59,11 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	public static final String VERSION = "0.9.0";
 
 	private ProgramGraphComponent programGraphComponent;
+	private JTabbedPane rightHandTabs;
 	private DetailsEditor detailsEditor;
 	private MasterDetailsEditor<NeuronType> neuronTypeEditor;
 	private MasterDetailsEditor<SynapseType> synapseTypeEditor;
-	private MasterDetailsEditor<DataPlot> dataPlotEditor;
+	private int resultsTabIndex;
 
 	public NeuroCoCoonEditor ()
 	{
@@ -117,7 +120,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		basicPalette.addTemplate(PoissonSource.CREATOR);
 		basicPalette.addTemplate(StandardPopulation.CREATOR);
 		basicPalette.addEdgeTemplate(NeuronConnection.CREATOR);
-		// TODO add a generic connector edge template for drag&drop creation of synapses (web app?!)
 		modulesPalette.addTemplate(SynfireChain.CREATOR);
 		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
 		modulesPalette.addTemplate("Retina",
@@ -138,9 +140,13 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 								   100, 60, ModuleExample.CREATOR);
 	}
 
+	private final Component NO_RESULTS_PLACEHOLDER = new JLabel("No results.");
+	private static final String DEFAULT_RESULTS_TAB_TITLE = "Results";
+
 	@Override
 	protected void addInspectorTabs (JTabbedPane inspector) {
 		// System.err.println("NeuroCoCoonEditor.addInspectorTabs: enter");
+		rightHandTabs = inspector;
 		detailsEditor = new DetailsEditor();
 		inspector.addTab("Inspector", detailsEditor.getComponent());
 		Scope global = programGraphComponent.getProgramGraph().getProgram().getGlobalScope();
@@ -148,9 +154,22 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		inspector.addTab("Neurons", neuronTypeEditor.getComponent());
 		synapseTypeEditor = new MasterDetailsEditor<>(global.getSynapseTypes(), SynapseType::new, this);
 		inspector.addTab("Synapses", synapseTypeEditor.getComponent());
-		dataPlotEditor = new MasterDetailsEditor<>(global.getDataPlots(), DataPlot::new, this);
-		inspector.addTab("Plots", dataPlotEditor.getComponent());
+		// dataPlotEditor = new MasterDetailsEditor<>(global.getDataPlots(), DataPlot::new, this);
+		resultsTabIndex = inspector.getTabCount();
+		inspector.addTab(DEFAULT_RESULTS_TAB_TITLE, NO_RESULTS_PLACEHOLDER);
+		inspector.setEnabledAt(resultsTabIndex, false);
 		super.addInspectorTabs(inspector);
+	}
+
+	public void setResultsTab (String tabTitle, Component content, boolean activateTab) {
+		if (tabTitle == null) tabTitle = DEFAULT_RESULTS_TAB_TITLE;
+		boolean enableTab = content != null;
+		if (content == null) content = NO_RESULTS_PLACEHOLDER;
+		rightHandTabs.setTitleAt(resultsTabIndex, tabTitle);
+		rightHandTabs.setComponentAt(resultsTabIndex, content);
+		rightHandTabs.setEnabledAt(resultsTabIndex, enableTab);
+		if (activateTab && enableTab)
+			rightHandTabs.setSelectedIndex(resultsTabIndex);
 	}
 
 	public static class ProgramGraphComponent extends mxGraphComponent
@@ -387,18 +406,21 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		@Override
 		public Object[] removeCells (Object[] cells, boolean includeEdges) {
+			cells = super.removeCells(cells, includeEdges);
 			for (Object obj: cells) {
 				if (obj instanceof mxCell) {
 					mxCell cell = (mxCell) obj;
 					Object value = cell.getValue();
 					if (value instanceof NamedEntity) {
 						NamedEntity entityValue = (NamedEntity) value;
-						// TODO detach any language entities and remove named entities from their name spaces
-						// TODO also delete plots? referring to the removed population?
+						if (!entityValue.delete(getModel()))
+							throw new IllegalStateException("Could not delete referenced named entity " + entityValue);
 					}
+					if (value instanceof LanguageEntity)
+						((LanguageEntity) value).setOwningCell(null);
 				}
 			}
-			return super.removeCells(cells, includeEdges);
+			return cells;
 		}
 
 		// Ports are not used as terminals for edges, they are

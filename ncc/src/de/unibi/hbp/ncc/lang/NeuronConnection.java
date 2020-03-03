@@ -1,5 +1,7 @@
 package de.unibi.hbp.ncc.lang;
 
+import com.mxgraph.model.mxICell;
+import de.unibi.hbp.ncc.editor.EditorToolBar;
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -19,13 +21,13 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
    public static void setGlobalSynapseTypeNamespace (Namespace<SynapseType> ns) { globalSynapseTypeNamespace = ns; }
 
-   protected Object writeReplace() throws ObjectStreamException {
+   protected Object writeReplace () throws ObjectStreamException {
       return new SerializedNeuronConnection(synapseType.getValue());
    }
 
    // readObject method for the serialization proxy pattern
    // See Effective Java, Second Ed., Item 78.
-   private void readObject(java.io.ObjectInputStream stream) throws InvalidObjectException {
+   private void readObject (java.io.ObjectInputStream stream) throws InvalidObjectException {
       throw new InvalidObjectException("SerializedNeuronConnection required");
    }
 
@@ -50,7 +52,7 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
          synapseType = globalSynapseTypeNamespace.get("All Default");
       this.synapseType = new EditableNameProp<>("Synapse Type", SynapseType.class, this,
                                                 Objects.requireNonNull(synapseType), synapseTypeNamespace)
-      .addImpact(EditableProp.Impact.CELL_LABEL);
+            .addImpact(EditableProp.Impact.CELL_LABEL);
    }
 
    public NeuronConnection (SynapseType synapseType) {
@@ -78,6 +80,56 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
    public SynapseType getSynapseType () { return synapseType.getValue(); }
 
+   private Object getTerminalValue (boolean source) {
+      mxICell edgeCell = getOwningCell();
+      if (edgeCell != null) {
+         mxICell terminalCell = edgeCell.getTerminal(source);
+         if (terminalCell != null)
+            return terminalCell.getValue();
+      }
+      return null;
+   }
+
+   public LanguageEntity getSourceEntity () {
+      Object sourceValue = getTerminalValue(true);
+      return (sourceValue instanceof LanguageEntity) ? (LanguageEntity) sourceValue : null;
+   }
+
+   public LanguageEntity getTargetEntity () {
+      Object targetValue = getTerminalValue(false);
+      return (targetValue instanceof LanguageEntity) ? (LanguageEntity) targetValue : null;
+   }
+
+   public NamedEntity getSourceNamedEntity () {
+      Object sourceValue = getTerminalValue(true);
+      return (sourceValue instanceof NamedEntity) ? (NamedEntity) sourceValue : null;
+   }
+
+   public NamedEntity getTargetNamedEntity () {
+      Object targetValue = getTerminalValue(false);
+      return (targetValue instanceof NamedEntity) ? (NamedEntity) targetValue : null;
+   }
+
+   public NeuronPopulation getSourcePopulation () {
+      Object sourceValue = getTerminalValue(true);
+      return (sourceValue instanceof NeuronPopulation) ? (NeuronPopulation) sourceValue : null;
+   }
+
+   public NeuronPopulation getTargetPopulation () {
+      Object targetValue = getTerminalValue(false);
+      return (targetValue instanceof NeuronPopulation) ? (NeuronPopulation) targetValue : null;
+   }
+
+   public NetworkModule.Port getSourcePort () {
+      Object sourceValue = getTerminalValue(true);
+      return (sourceValue instanceof NetworkModule.Port) ? (NetworkModule.Port) sourceValue : null;
+   }
+
+   public NetworkModule.Port getTargetPort () {
+      Object targetValue = getTerminalValue(false);
+      return (targetValue instanceof NetworkModule.Port) ? (NetworkModule.Port) targetValue : null;
+   }
+
    @Override
    public String getCellStyle () {
       return synapseType.getValue().getCellStyle();
@@ -102,6 +154,7 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
       @Override
       public String getIconCaption () { return "Synapse"; }
 
+      // TODO can this be made to get the synapse type from the toolbar selection?
       @Override
       public String getCellStyle () { return "allToAll"; }
 

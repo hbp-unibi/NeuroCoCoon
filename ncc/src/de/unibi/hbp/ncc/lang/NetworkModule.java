@@ -5,6 +5,7 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
+import de.unibi.hbp.ncc.graph.EdgeCollector;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import java.io.Serializable;
@@ -61,6 +62,16 @@ public abstract class NetworkModule extends NamedEntity
 
       @Override
       public boolean isValidConnectionTarget () { return portDirection == Direction.IN; }
+
+      @Override
+      public Iterable<NeuronConnection> getOutgoingConnections () {
+         return EdgeCollector.getOutgoingConnections(getCell());
+      }
+
+      @Override
+      public Iterable<NeuronConnection> getIncomingConnections () {
+         return EdgeCollector.getIncomingConnections(getCell());
+      }
    }
 
    @Override
@@ -225,15 +236,15 @@ public abstract class NetworkModule extends NamedEntity
    @Override
    public void resizeExisting (mxGraph graph, mxCell existingCell) {
       // this is called as part of a graph model update transaction
-      final mxGeometry moduleGeo = existingCell.getGeometry();
-      boolean changeToWideLayout = moduleGeo.getWidth() >= 3 * moduleGeo.getHeight();
-      // System.err.println("resizeExisting: " + moduleGeo);
-      if (changeToWideLayout != useWideLayout) {
-         useWideLayout = changeToWideLayout;
+      // nothing to do: our port children have relative geometry
+   }
+
+   public void toggleLayoutOrientation (mxGraph graph, mxCell existingCell) {
+      // this must be called as part of a graph model update transaction
+         useWideLayout = !useWideLayout;
          graph.getModel().setStyle(existingCell, computeCellStyle());
          int layoutSteps = computeLayoutSteps();
          updatePorts(graph, existingCell, layoutSteps);
-      }
    }
 
    protected NetworkModule (Namespace<NetworkModule> namespace, String name, String resourceFileBaseName) {

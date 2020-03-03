@@ -7,6 +7,7 @@ define_neuronType(neuronType) ::= <<
 define_population(pop) ::= <<
 <pop.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>)
 >>
+
 define_spikeSource(src) ::= <<
 <src.pythonName> = sim.Population(<src.neuronCount>, sim.SpikeSourceArray(spike_times=<\\>
 <if(src.twoDimensional)>[
@@ -14,9 +15,29 @@ define_spikeSource(src) ::= <<
 <else>[<src.singleLevelTimes; separator=", ",wrap="\n    ">]<\\>
 <endif>))
 >>
+
 define_poissonSource(poi) ::= <<
 <poi.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>)
 >>
+
+define_connectorKind(cnk) ::= <<
+<if(!cnk.kindSpecificProps)><cnk.pythonName> = sim.<cnk.pyNNClassName>()<endif>
+>>
+
+define_outgoingConnections(pop) ::= <<
+<pop.outgoingConnections:define_oneConnection(); separator="\n">
+>>
+
+define_oneConnection(con) ::= <<
+sim.Projection(<con.sourceNamedEntity.pythonName>, <con.targetNamedEntity.pythonName>, <\\>
+<if(!con.synapseType.connectorKind.kindSpecificProps)><\\>
+<con.synapseType.connectorKind.pythonName>, <\\>
+<else><\\>
+sim.<con.synapseType.connectorKind.pyNNClassName>(<con.synapseType.connectorParameters:{it | <it.pythonName>=<it.value>}; separator=", ">), <\\>
+<endif><\\>
+sim.<con.synapseType.synapseKind.pyNNClassName>(weight=<con.synapseType.weight>, delay=<con.synapseType.delay>))
+>>
+
 program(prog, scope) ::= <<
 import numpy.random
 from pyNN.utility import get_simulator
@@ -32,6 +53,10 @@ sim.setup(timestep=<prog.timeStep>)
 <scope.standardPopulations:define_population(); separator="\n">
 <scope.spikeSources:define_spikeSource(); separator="\n">
 <scope.poissonSources:define_poissonSource(); separator="\n">
+
+<scope.connectorKinds:define_connectorKind(); separator="\n">
+
+<scope.neuronPopulations:define_outgoingConnections(); separator="\n">
 
 one_to_one = sim.OneToOneConnector()
 all_to_all = sim.AllToAllConnector()

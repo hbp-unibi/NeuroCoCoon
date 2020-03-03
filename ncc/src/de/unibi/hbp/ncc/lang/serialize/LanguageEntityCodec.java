@@ -5,11 +5,13 @@ import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxObjectCodec;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
+import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
 import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
+import de.unibi.hbp.ncc.lang.SynapseType;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
 import org.w3c.dom.Node;
@@ -36,6 +38,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
       mxCodecRegistry.addAlias("PoissonSource", myName);
       mxCodecRegistry.addAlias("StandardPopulation", myName);
       mxCodecRegistry.addAlias("NeuronType", myName);
+      mxCodecRegistry.addAlias("SynapseType", myName);
+      mxCodecRegistry.addAlias("NeuronConnection", myName);
    }
 
    public void announceEncodeDecodeDone (boolean encodeDone) {
@@ -81,6 +85,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
       if (ownRefId != null)
          propValues.put(REFERENCE_ID_PSEUDO_PROPERTY_NAME, ownRefId);
       if (entity.isPredefined()) {
+         assert entity instanceof NamedEntity : "predefined entities are resolved by name";
+         propValues.put(NamedEntity.NAME_PROPERTY_NAME, ((NamedEntity) entity).getName());
          propValues.put(PREDEFINED_MARKER_PSEUDO_PROPERTY_NAME, "yes");  // only existence matters, values is don't care
          return propValues;  // further details in other properties would be ignored anyway on load
       }
@@ -133,6 +139,13 @@ public class LanguageEntityCodec extends mxObjectCodec {
                break;
             case "NeuronType":
                entity = new NeuronType(entityName);
+               break;
+            case "SynapseType":
+               entity = new SynapseType(entityName);
+               break;
+            case "NeuronConnection":
+               assert entityName == null;
+               entity = new NeuronConnection();
                break;
             default:
                throw new IllegalArgumentException("normal <ncc> with unsupported class " + entityClassName);

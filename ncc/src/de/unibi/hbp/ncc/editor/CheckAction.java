@@ -18,11 +18,10 @@ public class CheckAction extends AbstractAction {
    @Override
    public void actionPerformed (ActionEvent e) {
       // JOptionPane.showMessageDialog(null, "RunAction Source: " + e.getSource());
-      BasicGraphEditor editor = EditorActions.getEditor(e);
-      if (editor instanceof NeuroCoCoonEditor) {
+      NeuroCoCoonEditor editor = EditorActions.getEditor(e);
+      if (editor!= null) {
          editor.status("Checking …");
-         NeuroCoCoonEditor neuroCoCoonEditor = (NeuroCoCoonEditor) editor;
-         Program program = neuroCoCoonEditor.getProgram();
+         Program program = editor.getProgram();
          StringBuilder pythonCode;
          pythonCode = program.generatePythonCode();
          ErrorCollector diagnostics = program.getLastDiagnostics();
@@ -40,13 +39,8 @@ public class CheckAction extends AbstractAction {
          else
             editor.status("There were errors.");
          if (diagnostics.hasAnyMessages()) {
-            JFrame frame = new JFrame("Diagnostics");
-            Component display = diagnostics.buildDisplayAndNavigationComponent();
-            frame.add(new JScrollPane(display));  // TODO should the scroll pane be added by the error collector?
-            frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+            Component display = diagnostics.buildDisplayAndNavigationComponent();  // TODO should the scroll pane be added by the error collector?
+            editor.setResultsTab("Diagnostics", new JScrollPane(display), true);
          }
       }
    }

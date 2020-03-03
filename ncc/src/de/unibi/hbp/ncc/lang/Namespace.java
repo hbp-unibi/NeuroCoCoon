@@ -251,6 +251,8 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
 
    private static final String PYTHON_USER_NAME_PREFIX = "_usr_";  // we disallow leading underscores
    private static final String PYTHON_GENERATED_NAME_PREFIX = "_gen_";  // we disallow leading underscores
+   // generated names have one leading prefix more than normal user names
+   private static final String PYTHON_STATIC_NAME_PREFIX = "_glob_";  // we disallow leading underscores
 
    String buildPythonName (String memberName) {
       assert members.containsKey(memberName);
@@ -267,6 +269,12 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
 
    public static String buildUnadornedPythonName (String name) {
       return normalizedName(name);
+   }
+
+   public static String buildStaticPythonName (String purposeDiscriminator, String name) {
+      if (purposeDiscriminator.isEmpty() || purposeDiscriminator.startsWith("_") || purposeDiscriminator.endsWith("_"))
+         throw new IllegalArgumentException("invalid Python name fragment " + purposeDiscriminator);
+      return PYTHON_STATIC_NAME_PREFIX + purposeDiscriminator + "_" + normalizedName(name);
    }
 
    private class NamespaceModel extends AbstractListModel<T> {

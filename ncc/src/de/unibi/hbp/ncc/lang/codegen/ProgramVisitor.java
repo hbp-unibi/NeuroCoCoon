@@ -28,9 +28,11 @@ public class ProgramVisitor implements CodeGenVisitor {
       this.global = program.getGlobalScope();
       this.graphModel = program.getGraphModel();
       templateGroup = new STGroupFile(Objects.requireNonNull(
-            getClass().getClassLoader()
-                  .getResource("de/unibi/hbp/ncc/resources/python.stg")));
+            getClass().getClassLoader().getResource("de/unibi/hbp/ncc/resources/python.stg")));
    }
+
+   // TODO provide global set of referenced entities and iterators limited to the referenced entities only
+   // TODO how much effort to spend on pruning referenced but unreachable from graph nodes entities?
 
    @Override
    public void check (ErrorCollector diagnostics) {
@@ -44,17 +46,24 @@ public class ProgramVisitor implements CodeGenVisitor {
 
 
          @Override
-         protected void visitNormalEdge (mxICell edge, mxICell source, mxICell target, LanguageEntity entity) {
+         protected void visitOutgoingEdge (mxICell edge, mxICell source, mxICell target, LanguageEntity entity) {
+            // visit each normal edge once only (just after the source vertex has been visited)
             NeuronConnection connection = (NeuronConnection) entity;
             SynapseType synapseType = connection.getSynapseType();
             if (synapseType.getWeight() == 0)
                diagnostics.recordWarning(connection, "Synapse with weight zero has no effect.");
             if (synapseType.getConnectorKind() == SynapseType.ConnectorKind.ONE_TO_ONE) {
-               Optional<Integer> sourceCount = AttributeUtils.getNeuronCount(source);
-               Optional<Integer> targetCount = AttributeUtils.getNeuronCount(target);
-               if (AttributeUtils.definitelyNotEqual(sourceCount, targetCount))
-                  diagnostics.recordError(entity, "Mismatch in neuron count: " +
+              Integer sourceCount = AttributeUtils.getNeuronCount(source);
+               Integer targetCount = AttributeUtils.getNeuronCount(target);
+               if (AttributeUtils.definitelyNotEqual(sourceCount, targetCount)) {
+                  LanguageEntity errorEntity = connection.getTargetEntity();
+                  if (errorEntity == null)
+                     errorEntity = connection.getSourceEntity();
+                  if (errorEntity == null)
+                     errorEntity = entity;
+                  diagnostics.recordError(errorEntity, "Mismatch in neuron count: " +
                         sourceCount + " != " + targetCount);
+               }
             }
          }
 

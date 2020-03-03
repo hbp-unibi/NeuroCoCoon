@@ -13,6 +13,10 @@ import javax.swing.UIManager;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
+import com.mxgraph.util.mxUtils;
+
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * @author Administrator
@@ -36,14 +40,14 @@ public class mxKeyboardHandler
 	protected void installKeyboardActions(mxGraphComponent graphComponent)
 	{
 		InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		SwingUtilities.replaceUIInputMap(graphComponent,
-				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, inputMap);
+		SwingUtilities.replaceUIInputMap(graphComponent, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, inputMap);
 
 		inputMap = getInputMap(JComponent.WHEN_FOCUSED);
-		SwingUtilities.replaceUIInputMap(graphComponent,
-				JComponent.WHEN_FOCUSED, inputMap);
+		SwingUtilities.replaceUIInputMap(graphComponent, JComponent.WHEN_FOCUSED, inputMap);
 		SwingUtilities.replaceUIActionMap(graphComponent, createActionMap());
 	}
+
+	private static final int MENU_SHORTCUT_DOWN_MASK = mxUtils.IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 
 	/**
 	 * Return JTree's input map.
@@ -60,29 +64,40 @@ public class mxKeyboardHandler
 		{
 			map = new InputMap();
 
-			map.put(KeyStroke.getKeyStroke("F2"), "edit");
-			map.put(KeyStroke.getKeyStroke("DELETE"), "delete");
-			map.put(KeyStroke.getKeyStroke("UP"), "selectParent");
-			map.put(KeyStroke.getKeyStroke("DOWN"), "selectChild");
-			map.put(KeyStroke.getKeyStroke("RIGHT"), "selectNext");
-			map.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious");
-			map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "enterGroup");
-			map.put(KeyStroke.getKeyStroke("PAGE_UP"), "exitGroup");
-			map.put(KeyStroke.getKeyStroke("HOME"), "home");
-			map.put(KeyStroke.getKeyStroke("ENTER"), "expand");
-			map.put(KeyStroke.getKeyStroke("BACK_SPACE"), "collapse");
-			map.put(KeyStroke.getKeyStroke("control A"), "selectAll");
-			map.put(KeyStroke.getKeyStroke("control D"), "selectNone");
-			map.put(KeyStroke.getKeyStroke("control X"), "cut");
-			map.put(KeyStroke.getKeyStroke("CUT"), "cut");
-			map.put(KeyStroke.getKeyStroke("control C"), "copy");
-			map.put(KeyStroke.getKeyStroke("COPY"), "copy");
-			map.put(KeyStroke.getKeyStroke("control V"), "paste");
-			map.put(KeyStroke.getKeyStroke("PASTE"), "paste");
-			map.put(KeyStroke.getKeyStroke("control G"), "group");
-			map.put(KeyStroke.getKeyStroke("control U"), "ungroup");
-			map.put(KeyStroke.getKeyStroke("control ADD"), "zoomIn");
-			map.put(KeyStroke.getKeyStroke("control SUBTRACT"), "zoomOut");
+			// map.put(KeyStroke.getKeyStroke("F2"), "edit");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "delete");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "selectParent");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0), "selectParent");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "selectChild");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0), "selectChild");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "selectNext");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0), "selectNext");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "selectPrevious");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0), "selectPrevious");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "enterGroup");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "exitGroup");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0), "home");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, MENU_SHORTCUT_DOWN_MASK), "expand");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, MENU_SHORTCUT_DOWN_MASK), "expand");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, MENU_SHORTCUT_DOWN_MASK), "collapse");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, MENU_SHORTCUT_DOWN_MASK), "collapse");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, MENU_SHORTCUT_DOWN_MASK), "selectAll");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, MENU_SHORTCUT_DOWN_MASK), "selectNone");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, MENU_SHORTCUT_DOWN_MASK), "cut");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, 0), "cut");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, MENU_SHORTCUT_DOWN_MASK), "copy");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0), "copy");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, MENU_SHORTCUT_DOWN_MASK), "paste");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0), "paste");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_DOWN_MASK), "group");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, MENU_SHORTCUT_DOWN_MASK), "ungroup");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, MENU_SHORTCUT_DOWN_MASK), "zoomIn");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar('+'), MENU_SHORTCUT_DOWN_MASK), "zoomIn");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, MENU_SHORTCUT_DOWN_MASK), "zoomOut");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar('-'), MENU_SHORTCUT_DOWN_MASK), "zoomOut");
+
+			// TODO add undo/redo
 		}
 
 		return map;
@@ -95,7 +110,7 @@ public class mxKeyboardHandler
 	{
 		ActionMap map = (ActionMap) UIManager.get("ScrollPane.actionMap");
 
-		map.put("edit", mxGraphActions.getEditAction());
+		// map.put("edit", mxGraphActions.getEditAction());
 		map.put("delete", mxGraphActions.getDeleteAction());
 		map.put("home", mxGraphActions.getHomeAction());
 		map.put("enterGroup", mxGraphActions.getEnterGroupAction());

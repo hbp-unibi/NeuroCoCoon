@@ -23,6 +23,12 @@ public class DoubleProp extends SimpleEditableProp<Double> {
    }
 
    @Override
+   public DoubleProp setPythonName (String pythonName) {  // to get the more precise co-variant return type
+      super.setPythonName(pythonName);
+      return this;
+   }
+
+   @Override
    public DoubleProp addImpact (Impact impact) {  // to get the more precise co-variant return type
       super.addImpact(impact);
       return this;

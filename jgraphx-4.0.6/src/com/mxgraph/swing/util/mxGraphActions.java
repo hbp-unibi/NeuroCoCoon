@@ -14,54 +14,28 @@ public class mxGraphActions
 {
 
 	static final Action deleteAction = new DeleteAction("delete");
-
 	static final Action editAction = new EditAction("edit");
-
 	static final Action groupAction = new GroupAction("group");
-
 	static final Action ungroupAction = new UngroupAction("ungroup");
-
-	static final Action removeFromParentAction = new RemoveFromParentAction(
-			"removeFromParent");
-
-	static final Action updateGroupBoundsAction = new UpdateGroupBoundsAction(
-			"updateGroupBounds");
-
+	static final Action removeFromParentAction = new RemoveFromParentAction("removeFromParent");
+	static final Action updateGroupBoundsAction = new UpdateGroupBoundsAction("updateGroupBounds");
 	static final Action selectAllAction = new SelectAction("selectAll");
-
 	static final Action selectVerticesAction = new SelectAction("vertices");
-
 	static final Action selectEdgesAction = new SelectAction("edges");
-
 	static final Action selectNoneAction = new SelectAction("selectNone");
-
 	static final Action selectNextAction = new SelectAction("selectNext");
-
-	static final Action selectPreviousAction = new SelectAction(
-			"selectPrevious");
-
+	static final Action selectPreviousAction = new SelectAction("selectPrevious");
 	static final Action selectParentAction = new SelectAction("selectParent");
-
 	static final Action selectChildAction = new SelectAction("selectChild");
-
 	static final Action collapseAction = new FoldAction("collapse");
-
 	static final Action expandAction = new FoldAction("expand");
-
 	static final Action enterGroupAction = new DrillAction("enterGroup");
-
 	static final Action exitGroupAction = new DrillAction("exitGroup");
-
 	static final Action homeAction = new DrillAction("home");
-
 	static final Action zoomActualAction = new ZoomAction("actual");
-
 	static final Action zoomInAction = new ZoomAction("zoomIn");
-
 	static final Action zoomOutAction = new ZoomAction("zoomOut");
-
 	static final Action toBackAction = new LayerAction("toBack");
-
 	static final Action toFrontAction = new LayerAction("toFront");
 
 	/**
@@ -248,10 +222,7 @@ public class mxGraphActions
 	 * 
 	 * @return the zoom in action
 	 */
-	public static Action getZoomInAction()
-	{
-		return zoomInAction;
-	}
+	public static Action getZoomInAction() { return zoomInAction; }
 
 	/**
 	 * 

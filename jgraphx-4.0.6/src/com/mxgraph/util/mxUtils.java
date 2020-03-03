@@ -66,12 +66,12 @@ public class mxUtils
 	/**
 	 * True if the machine is a Mac.
 	 */
-	public static boolean IS_MAC = System.getProperty("os.name").toLowerCase().contains("mac");
+	public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().contains("mac");
 
 	/**
 	 * True if the machine is running a linux kernel.
 	 */
-	public static boolean IS_LINUX = System.getProperty("os.name").toLowerCase().contains("linux");
+	public static final boolean IS_LINUX = System.getProperty("os.name").toLowerCase().contains("linux");
 
 	/**
 	 * Static Graphics used for Font Metrics.
@@ -84,8 +84,7 @@ public class mxUtils
 	{
 		try
 		{
-			fontGraphics = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
-					.getGraphics();
+			fontGraphics = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
 		}
 		catch (Exception e)
 		{

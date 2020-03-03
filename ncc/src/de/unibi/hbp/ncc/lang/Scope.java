@@ -2,6 +2,8 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.lang.utils.Iterators;
 
+import java.util.Arrays;
+
 public class Scope {
    private Namespace<NeuronPopulation> neuronPopulations;
    private Namespace<NeuronType> neuronTypes;
@@ -37,6 +39,8 @@ public class Scope {
    public Namespace<NetworkModule> getModuleInstances () { return moduleInstances; }
    public Namespace<DataPlot> getDataPlots () { return dataPlots; }
 
+   // helpers used by code generation
+
    public Iterable<StandardPopulation> getStandardPopulations () {
       return Iterators.partialMap(neuronPopulations,
                                   pop -> pop instanceof StandardPopulation ? (StandardPopulation) pop : null);
@@ -50,5 +54,9 @@ public class Scope {
    public Iterable<PoissonSource> getPoissonSources () {
       return Iterators.partialMap(neuronPopulations,
                                   pop -> pop instanceof PoissonSource ? (PoissonSource) pop : null);
+   }
+
+   public Iterable<SynapseType.ConnectorKind> getConnectorKinds () {
+      return Arrays.asList(SynapseType.ConnectorKind.values());
    }
 }

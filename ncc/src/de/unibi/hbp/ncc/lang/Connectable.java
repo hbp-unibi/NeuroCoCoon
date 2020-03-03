@@ -6,4 +6,9 @@ public interface Connectable {
    boolean isValidConnectionSource ();
 
    boolean isValidConnectionTarget ();
+
+   Iterable<NeuronConnection> getOutgoingConnections ();
+   Iterable<NeuronConnection> getIncomingConnections ();
+   default boolean hasOutgoingConnections () { return getOutgoingConnections().iterator().hasNext(); }
+   default boolean hasIncomingConnections () { return getIncomingConnections().iterator().hasNext(); }
 }

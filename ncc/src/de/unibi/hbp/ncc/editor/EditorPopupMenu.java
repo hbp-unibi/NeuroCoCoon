@@ -2,7 +2,6 @@ package de.unibi.hbp.ncc.editor;
 
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxResources;
-import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
 
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
@@ -17,7 +16,7 @@ public class EditorPopupMenu extends JPopupMenu
 	{
 		boolean selected = !editor.getGraphComponent().getGraph().isSelectionEmpty();
 
-		add(editor.bind(mxResources.get("undo"), new HistoryAction(true),
+		add(editor.bind(mxResources.get("undo"), new EditorActions.HistoryAction(true),
 						"/de/unibi/hbp/ncc/editor/images/undo.gif"));
 
 		addSeparator();
@@ -50,9 +49,12 @@ public class EditorPopupMenu extends JPopupMenu
 
 		addSeparator();
 
-//		add(editor.bind(mxResources.get("edit"), mxGraphActions.getEditAction())).setEnabled(selected);
-
+		add(editor.bind(mxResources.get("flipModule"), new EditorActions.FlipModuleAction())).setEnabled(selected);
+		// TODO enabled should check for a NetworkModule entity as the value of the/a selected cell
 		addSeparator();
+
+//		add(editor.bind(mxResources.get("edit"), mxGraphActions.getEditAction())).setEnabled(selected);
+//		addSeparator();
 
 		add(editor.bind(mxResources.get("selectVertices"), mxGraphActions.getSelectVerticesAction()));
 		add(editor.bind(mxResources.get("selectEdges"), mxGraphActions.getSelectEdgesAction()));

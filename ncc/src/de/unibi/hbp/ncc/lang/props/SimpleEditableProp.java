@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 
 public abstract class SimpleEditableProp<T> implements EditableProp<T> {
-   private String propName, unit;
+   private String propName, unit, pythonName;
    private Class<T> valueClass;
    private EnumSet<Impact> impactSet;
    private LanguageEntity owner;
@@ -25,6 +25,12 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
    public SimpleEditableProp<T> setUnit (String unit) {
       assert this.unit == null : "may only be set once at creation time";
       this.unit = Objects.requireNonNull(unit);
+      return this;
+   }
+
+   public SimpleEditableProp<T> setPythonName (String pythonName) {
+      assert this.pythonName == null : "may only be set once at creation time";
+      this.pythonName = Objects.requireNonNull(pythonName);
       return this;
    }
 
@@ -62,6 +68,11 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
          return propName + " (" + unit + ")";
       else
          return propName;
+   }
+
+   @Override
+   public String getPythonName () {
+      return pythonName != null ? pythonName : EditableProp.super.getPythonName();
    }
 
    @Override

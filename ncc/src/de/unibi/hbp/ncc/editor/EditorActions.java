@@ -26,6 +26,7 @@ import com.mxgraph.util.png.mxPngImageEncoder;
 import com.mxgraph.util.png.mxPngTextDecoder;
 import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
+import de.unibi.hbp.ncc.lang.NetworkModule;
 import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
@@ -54,50 +55,35 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class EditorActions
-{
-	/**
-	 * 
-	 * @param e
-	 * @return Returns the graph for the given action event.
-	 */
-	public static NeuroCoCoonEditor getEditor(ActionEvent e)
-	{
-		if (e.getSource() instanceof Component)
-		{
+public class EditorActions {
+
+	public static NeuroCoCoonEditor getEditor (ActionEvent e) {
+		if (e.getSource() instanceof Component) {
 			Component component = (Component) e.getSource();
 
-			while (component != null
-					&& !(component instanceof NeuroCoCoonEditor))
-			{
+			while (component != null && !(component instanceof NeuroCoCoonEditor))
 				component = component.getParent();
-			}
 
 			return (NeuroCoCoonEditor) component;
 		}
-
 		return null;
 	}
 
 	@SuppressWarnings("serial")
-	public static class ToggleRulersItem extends JCheckBoxMenuItem
-	{
+	public static class ToggleRulersItem extends JCheckBoxMenuItem {
 
-		public ToggleRulersItem(final BasicGraphEditor editor, String name)
-		{
+		public ToggleRulersItem (final BasicGraphEditor editor, String name) {
 			super(name);
 			setSelected(editor.getGraphComponent().getColumnHeader() != null);
 
 			addActionListener(e -> {
 				mxGraphComponent graphComponent = editor.getGraphComponent();
 
-				if (graphComponent.getColumnHeader() != null)
-				{
+				if (graphComponent.getColumnHeader() != null) {
 					graphComponent.setColumnHeader(null);
 					graphComponent.setRowHeader(null);
 				}
-				else
-				{
+				else {
 					graphComponent.setColumnHeaderView(new EditorRuler(graphComponent, EditorRuler.ORIENTATION_HORIZONTAL));
 					graphComponent.setRowHeaderView(new EditorRuler(graphComponent, EditorRuler.ORIENTATION_VERTICAL));
 				}
@@ -106,11 +92,9 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class ToggleGridItem extends JCheckBoxMenuItem
-	{
+	public static class ToggleGridItem extends JCheckBoxMenuItem {
 
-		public ToggleGridItem(final BasicGraphEditor editor, String name)
-		{
+		public ToggleGridItem (final BasicGraphEditor editor, String name) {
 			super(name);
 			setSelected(editor.getGraphComponent().getGraph().isGridEnabled());
 
@@ -128,11 +112,9 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class ToggleOutlineItem extends JCheckBoxMenuItem
-	{
+	public static class ToggleOutlineItem extends JCheckBoxMenuItem {
 
-		public ToggleOutlineItem(final BasicGraphEditor editor, String name)
-		{
+		public ToggleOutlineItem (final BasicGraphEditor editor, String name) {
 			super(name);
 			setSelected(editor.getGraphOutline().isVisible());
 
@@ -141,21 +123,14 @@ public class EditorActions
 				outline.setVisible(!outline.isVisible());
 				outline.revalidate();
 
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						if (outline.getParent() instanceof JSplitPane)
-						{
-							if (outline.isVisible())
-							{
-								((JSplitPane) outline.getParent()).setDividerLocation(editor.getHeight() - 300);
-								((JSplitPane) outline.getParent()).setDividerSize(6);
-							}
-							else
-							{
-								((JSplitPane) outline.getParent()).setDividerSize(0);
-							}
+				SwingUtilities.invokeLater(() -> {
+					if (outline.getParent() instanceof JSplitPane) {
+						if (outline.isVisible()) {
+							((JSplitPane) outline.getParent()).setDividerLocation(editor.getHeight() - 300);
+							((JSplitPane) outline.getParent()).setDividerSize(6);
+						}
+						else {
+							((JSplitPane) outline.getParent()).setDividerSize(0);
 						}
 					}
 				});
@@ -164,11 +139,9 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class ExitAction extends AbstractAction
-	{
+	public static class ExitAction extends AbstractAction {
 
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed (ActionEvent e) {
 			BasicGraphEditor editor = getEditor(e);
 
 			if (editor != null)
@@ -177,20 +150,17 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class GridStyleAction extends AbstractAction
-	{
+	public static class GridStyleAction extends AbstractAction {
 
 		protected int style;
 
-		public GridStyleAction(int style)
+		public GridStyleAction (int style)
 		{
 			this.style = style;
 		}
 
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getSource() instanceof mxGraphComponent)
-			{
+		public void actionPerformed (ActionEvent e) {
+			if (e.getSource() instanceof mxGraphComponent) {
 				mxGraphComponent graphComponent = (mxGraphComponent) e.getSource();
 				graphComponent.setGridStyle(style);
 				graphComponent.repaint();
@@ -199,21 +169,15 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class GridColorAction extends AbstractAction
-	{
+	public static class GridColorAction extends AbstractAction {
 
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getSource() instanceof mxGraphComponent)
-			{
-				mxGraphComponent graphComponent = (mxGraphComponent) e
-						.getSource();
+		public void actionPerformed (ActionEvent e) {
+			if (e.getSource() instanceof mxGraphComponent) {
+				mxGraphComponent graphComponent = (mxGraphComponent) e.getSource();
 				Color newColor = JColorChooser.showDialog(graphComponent,
-						mxResources.get("gridColor"),
-						graphComponent.getGridColor());
+						mxResources.get("gridColor"), graphComponent.getGridColor());
 
-				if (newColor != null)
-				{
+				if (newColor != null) {
 					graphComponent.setGridColor(newColor);
 					graphComponent.repaint();
 				}
@@ -222,41 +186,32 @@ public class EditorActions
 	}
 
 	@SuppressWarnings("serial")
-	public static class ScaleAction extends AbstractAction
-	{
+	public static class ScaleAction extends AbstractAction {
 
 		protected double scale;
 
-		public ScaleAction(double scale)
+		public ScaleAction (double scale)
 		{
 			this.scale = scale;
 		}
 
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getSource() instanceof mxGraphComponent)
-			{
-				mxGraphComponent graphComponent = (mxGraphComponent) e
-						.getSource();
+		public void actionPerformed (ActionEvent e) {
+			if (e.getSource() instanceof mxGraphComponent) {
+				mxGraphComponent graphComponent = (mxGraphComponent) e.getSource();
 				double scale = this.scale;
 
-				if (scale == 0)
-				{
+				if (scale == 0) {
 					String value = (String) JOptionPane.showInputDialog(
 							graphComponent, mxResources.get("value"),
 							mxResources.get("scale") + " (%)",
 							JOptionPane.PLAIN_MESSAGE, null, null, "");
 
 					if (value != null)
-					{
 						scale = Double.parseDouble(value.replace("%", "")) / 100;
-					}
 				}
 
 				if (scale > 0)
-				{
 					graphComponent.zoomTo(scale, graphComponent.isCenterZoom());
-				}
 			}
 		}
 	}
@@ -268,7 +223,7 @@ public class EditorActions
 
 		protected String lastDir = null;
 
-		public SaveAction(boolean showDialog)
+		public SaveAction (boolean showDialog)
 		{
 			this.showDialog = showDialog;
 		}
@@ -276,7 +231,7 @@ public class EditorActions
 		/**
 		 * Saves XML+PNG format.
 		 */
-		protected void saveXmlPng(NeuroCoCoonEditor editor, String filename, Color bg) throws IOException {
+		protected void saveXmlPng (NeuroCoCoonEditor editor, String filename, Color bg) throws IOException {
 			mxGraphComponent graphComponent = editor.getGraphComponent();
 			mxGraph graph = graphComponent.getGraph();
 
@@ -301,7 +256,7 @@ public class EditorActions
 			}
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed (ActionEvent e) {
 			NeuroCoCoonEditor editor = getEditor(e);
 
 			if (editor != null) {
@@ -705,28 +660,54 @@ public class EditorActions
 
 	// TODO turn this into a toggle wide/narrow layout action for network modules
 	@SuppressWarnings("serial")
-	public static class WarningAction extends AbstractAction
-	{
+	public static class WarningAction extends AbstractAction {
 
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getSource() instanceof mxGraphComponent)
-			{
+		public void actionPerformed (ActionEvent e) {
+			if (e.getSource() instanceof mxGraphComponent) {
 				mxGraphComponent graphComponent = (mxGraphComponent) e.getSource();
 				Object[] cells = graphComponent.getGraph().getSelectionCells();
 
-				if (cells != null && cells.length > 0)
-				{
+				if (cells != null && cells.length > 0) {
 					String warning = JOptionPane.showInputDialog(mxResources.get("enterWarningMessage"));
 
 					for (Object cell: cells)
 						graphComponent.setCellWarning(cell, warning);
 				}
 				else
-				{
 					JOptionPane.showMessageDialog(graphComponent, mxResources.get("noCellSelected"));
+			}
+		}
+	}
+
+	public static class FlipModuleAction extends AbstractAction {
+
+		public void actionPerformed (ActionEvent e) {
+
+			mxGraph graph = mxGraphActions.getGraph(e);
+
+			if (graph != null && !graph.isSelectionEmpty()) {
+				Object[] cells = graph.getSelectionCells();
+				if (cells != null && cells.length > 0) {
+					graph.getModel().beginUpdate();
+					try {
+						for (Object obj: cells) {
+							if (obj instanceof mxCell) {
+								mxCell cell = (mxCell) obj;
+								Object value = cell.getValue();
+								if (value instanceof NetworkModule) {
+									NetworkModule module = (NetworkModule) value;
+									module.toggleLayoutOrientation(graph, cell);
+								}
+							}
+						}
+					}
+					finally {
+						graph.getModel().endUpdate();
+					}
 				}
 			}
+			else
+				JOptionPane.showMessageDialog((Component) e.getSource(), mxResources.get("noCellSelected"));
 		}
 	}
 

@@ -1,9 +1,12 @@
 package de.unibi.hbp.ncc.lang;
 
+import com.mxgraph.model.mxICell;
+import de.unibi.hbp.ncc.graph.EdgeCollector;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class NeuronPopulation extends NamedEntity
@@ -34,11 +37,18 @@ public abstract class NeuronPopulation extends NamedEntity
 
    public int getNeuronCount () { return neuronCount.getValue(); }
 
-   // TODO use this in graph edge creation checks
-   // TODO disallow dangling edges in graph
    @Override
    public boolean isValidConnectionSource () { return true; }
 
    @Override
    public boolean isValidConnectionTarget () { return false; }
+
+   public Iterable<NeuronConnection> getOutgoingConnections () {
+      return EdgeCollector.getOutgoingConnections(getOwningCell());
+   }
+
+   @Override
+   public Iterable<NeuronConnection> getIncomingConnections () {
+      return EdgeCollector.getIncomingConnections(getOwningCell());
+   }
 }
