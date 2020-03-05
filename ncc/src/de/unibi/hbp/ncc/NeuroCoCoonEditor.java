@@ -12,6 +12,7 @@ import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
@@ -27,7 +28,7 @@ import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
 import de.unibi.hbp.ncc.editor.props.Notificator;
 import de.unibi.hbp.ncc.lang.Connectable;
-import de.unibi.hbp.ncc.lang.DataPlot;
+import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
@@ -111,6 +112,11 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					}
 				}
 			}
+		});
+
+		graph.addListener(mxEvent.FLIP_EDGE, (sender, evt) -> {
+			String styleName = (String) evt.getProperty("style");
+			status("Edge style changed to " + styleName);
 		});
 
 		// Adds some template cells for dropping into the graph
@@ -348,53 +354,67 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		}
 
 
-		// TODO turn this into an enum with display name and style string suffix support
-		private static List<String> EDGE_STYLES_CYCLE = List.of(
-				// default (not present) is equivalent to edgeStyle=orthogonalEdgeStyle
-				// leading semicolon depends on all our edges having a named style set based on their connector kind
-				";edgeStyle=elbowEdgeStyle;elbow=vertical",
-				";edgeStyle=elbowEdgeStyle;elbow=horizontal",
-				";edgeStyle=entityRelationEdgeStyle",
-				";edgeStyle=topToBottomEdgeStyle",
-				";edgeStyle=sideToSideEdgeStyle"
-				// ";edgeStyle=segmentEdgeStyle",  // segment edges seem to allow additional control points,
-				// but how to edit them is unclear and toggling to some other edge style seems to leave garbage control points behind
-				// ";edgeStyle=loopEdgeStyle"  // this is applied automatically for loops?
-		);
+		private enum EdgeStyles implements DisplayNamed {
+			DEFAULT("Orthogonal", ""),
+			ELBOW_VERTICAL("Elbow, vertical", ";edgeStyle=elbowEdgeStyle;elbow=vertical"),
+			ELBOW_HORIZONTAL("Elbow, horizontal", ";edgeStyle=elbowEdgeStyle;elbow=horizontal"),
+			RELATION("Relation", ";edgeStyle=entityRelationEdgeStyle"),
+			TOP_TO_BOTTOM("Top-to-bottom", ";edgeStyle=topToBottomEdgeStyle"),
+			SIDE_TO_SIDE("Side-to-side", ";edgeStyle=sideToSideEdgeStyle");
+			// ";edgeStyle=segmentEdgeStyle",  // segment edges seem to allow additional control points,
+			// but how to edit them is unclear and toggling to some other edge style seems to leave garbage control points behind
+			// ";edgeStyle=loopEdgeStyle"  // this is applied automatically for loops?
+
+			private String displayName, edgeStyle;
+
+			EdgeStyles (String displayName, String edgeStyle) {
+				this.displayName = displayName;
+				this.edgeStyle = edgeStyle;
+			}
+
+			static EdgeStyles getNextStyle (String cellStyle) {
+				int startPos = cellStyle.indexOf(";edgeStyle");
+				String oldEdgeStyle;
+				if (startPos < 0) // DEFAULT
+					oldEdgeStyle = "";
+				else
+					oldEdgeStyle = cellStyle.substring(startPos);
+				boolean exitNextRound = false;
+				for (EdgeStyles style: values())
+					if (exitNextRound)
+						return style;
+					else if (style.edgeStyle.equals(oldEdgeStyle))
+						exitNextRound = true;
+				if (exitNextRound)  // last style in list --> default (first style)
+					return DEFAULT;
+				throw new IllegalStateException("unknown edge style in " + cellStyle);
+			}
+
+			String updateCellStyle (String cellStyle) {
+				int startPos = cellStyle.indexOf(";edgeStyle");
+				if (startPos >= 0)
+					return cellStyle.substring(0, startPos) + edgeStyle;
+				else
+					return cellStyle + edgeStyle;
+			}
+
+			@Override
+			public String getDisplayName () { return displayName; }
+		}
 
 		@Override
 		public Object flipEdge (Object edge) {
 			if (edge != null) {
 				model.beginUpdate();
-				try
-				{
-					String edgeStyle = model.getStyle(edge);
-					// System.err.println("flipEdge: old = " + edgeStyle);
-
-					int presetIndex = -1, listIndex = 0;
-					for (String preset: EDGE_STYLES_CYCLE)
-						if (edgeStyle.contains(preset)) {
-							presetIndex = listIndex;
-							break;
-						}
-						else
-							listIndex += 1;
-
-					if (presetIndex < 0)
-						edgeStyle = edgeStyle + EDGE_STYLES_CYCLE.get(0);
-					else {
-						String nextPreset = presetIndex + 1 < EDGE_STYLES_CYCLE.size()
-								? EDGE_STYLES_CYCLE.get(presetIndex + 1)
-								: "";
-						edgeStyle = edgeStyle.replace(EDGE_STYLES_CYCLE.get(presetIndex), nextPreset);
-					}
-
-					// System.err.println("flipEdge: new = " + edgeStyle);
-					model.setStyle(edge, edgeStyle);
+				try {
+					String cellStyle = model.getStyle(edge);
+					EdgeStyles nextStyle = EdgeStyles.getNextStyle(cellStyle);
+					// System.err.println("flipEdge: current = " + cellStyle);
+					// System.err.println("flipEdge: next = " + nextStyle);
+					model.setStyle(edge, nextStyle.updateCellStyle(cellStyle));
 					// Removes all existing control points
 					resetEdge(edge);
-					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge));
-					// TODO provide feedback about the new edge style in the status bar: by making the editor listen for this event
+					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge, "style", nextStyle.getDisplayName()));
 				}
 				finally {
 					model.endUpdate();

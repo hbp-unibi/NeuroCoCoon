@@ -23,15 +23,20 @@ import java.util.Objects;
 
 public class ErrorCollector implements STErrorListener {
 
-   // TODO see WarningAction on how to add markers to cells
    public enum Severity implements DisplayNamed {
       NOTE("Note"), INFO("Info"),
       WARNING("Warning"), ERROR("Error"),
       FATAL("Fatal");
 
       private String displayName;
+      private ImageIcon icon;
 
-      Severity (String displayName) { this.displayName = displayName; }
+      Severity (String displayName) {
+         this.displayName = displayName;
+         this.icon = new ImageIcon(BasicGraphEditor.class.getResource("images/" + displayName.toLowerCase() + ".png"));
+      }
+
+      public ImageIcon getIcon () { return icon; }
 
       @Override
       public String getDisplayName () { return displayName; }
@@ -68,7 +73,7 @@ public class ErrorCollector implements STErrorListener {
    public void reset () {
       entries.clear();
       anyWarnings = anyErrors = false;
-      graphComponent.clearCellOverlays(); // does NOT visit edges and clear their warning overlays
+      graphComponent.clearCellOverlays(); // seems to visit edges, too (and clear their warning overlays)
 /*
       AbstractCellsVisitor.simpleVisitGraph(graphComponent.getGraph().getModel(),
                                             (cell, entity) -> graphComponent.removeCellOverlays(cell));
@@ -77,8 +82,7 @@ public class ErrorCollector implements STErrorListener {
 
    public void setMinimumLevel (Severity minimumLevel) { this.minimumLevel = minimumLevel; }
 
-   private static final ImageIcon WARNING_ICON =
-         new ImageIcon(BasicGraphEditor.class.getResource("images/warning.png"));
+   // TODO fatal icon
 
    public void record (LanguageEntity responsible, Severity severity, String message) {
       if (minimumLevel.compareTo(severity) > 0)  // ignore everything below the threshold level
@@ -87,10 +91,7 @@ public class ErrorCollector implements STErrorListener {
       if (responsible != null) {
          mxICell cell = responsible.getOwningCell();
          if (cell != null && Severity.WARNING.compareTo(severity) <= 0) {  // no visual markers for NOTEs and INFOs
-            if (severity == Severity.WARNING)
-               graphComponent.setCellWarning(cell, message, WARNING_ICON);
-            else
-               graphComponent.setCellWarning(cell, message);  // use the default mxGraph icon (also called WARNING)
+            graphComponent.setCellWarning(cell, message, severity.getIcon());
          }
          // TODO collect multiple messages per cell or at least let the most severe (and recent) message win?
       }

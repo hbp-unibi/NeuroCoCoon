@@ -55,15 +55,9 @@ public class ProgramVisitor implements CodeGenVisitor {
             if (synapseType.getConnectorKind() == SynapseType.ConnectorKind.ONE_TO_ONE) {
               Integer sourceCount = AttributeUtils.getNeuronCount(source);
                Integer targetCount = AttributeUtils.getNeuronCount(target);
-               if (AttributeUtils.definitelyNotEqual(sourceCount, targetCount)) {
-                  LanguageEntity errorEntity = connection.getTargetEntity();
-                  if (errorEntity == null)
-                     errorEntity = connection.getSourceEntity();
-                  if (errorEntity == null)
-                     errorEntity = entity;
-                  diagnostics.recordError(errorEntity, "Mismatch in neuron count: " +
+               if (AttributeUtils.definitelyNotEqual(sourceCount, targetCount))
+                  diagnostics.recordError(entity, "Mismatch in neuron count: " +
                         sourceCount + " != " + targetCount);
-               }
             }
          }
 

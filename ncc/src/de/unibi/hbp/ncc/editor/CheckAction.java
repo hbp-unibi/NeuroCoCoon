@@ -27,6 +27,7 @@ public class CheckAction extends AbstractAction {
          ErrorCollector diagnostics = program.getLastDiagnostics();
          if (pythonCode != null) {
             editor.status(diagnostics.hasAnyWarnings() ? "There were warnings." : "Success!");
+            // FIXME code should not be shown by default when everything works reasonably well
             JFrame frame = new JFrame("Python Code");
             JTextArea textArea = new JTextArea(pythonCode.toString(), 25, 80);
             textArea.setEditable(false);
@@ -40,7 +41,7 @@ public class CheckAction extends AbstractAction {
             editor.status("There were errors.");
          if (diagnostics.hasAnyMessages()) {
             Component display = diagnostics.buildDisplayAndNavigationComponent();  // TODO should the scroll pane be added by the error collector?
-            editor.setResultsTab("Diagnostics", new JScrollPane(display), true);
+            editor.setResultsTab("Problems", new JScrollPane(display), true);
          }
       }
    }

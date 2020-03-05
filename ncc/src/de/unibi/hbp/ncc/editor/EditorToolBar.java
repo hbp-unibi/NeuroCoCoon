@@ -151,8 +151,8 @@ public class EditorToolBar extends JToolBar
 				new JComboBox<>(new ComboBoxModelAdapter<>(synapseTypes.getListModel()));
 		synapseTypeCombo.setEditable(false);
 		synapseTypeCombo.setMinimumSize(new Dimension(120, 0));
-		synapseTypeCombo.setPreferredSize(new Dimension(120, 0));
-		synapseTypeCombo.setMaximumSize(new Dimension(120, 100));
+		synapseTypeCombo.setPreferredSize(new Dimension(180, 0));
+		synapseTypeCombo.setMaximumSize(new Dimension(240, 100));
 		currentSynapseType = synapseTypeCombo.getModel().getElementAt(0);
 		synapseTypeCombo.setSelectedItem(currentSynapseType);
 		synapseTypeCombo.addActionListener(e -> {
