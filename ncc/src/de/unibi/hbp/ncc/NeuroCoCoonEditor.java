@@ -4,7 +4,6 @@ package de.unibi.hbp.ncc;
 
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
@@ -12,12 +11,10 @@ import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphSelectionModel;
-import com.sun.tools.javac.util.List;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
@@ -27,7 +24,9 @@ import de.unibi.hbp.ncc.editor.TooltipProvider;
 import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
 import de.unibi.hbp.ncc.editor.props.Notificator;
+import de.unibi.hbp.ncc.lang.AnyConnection;
 import de.unibi.hbp.ncc.lang.Connectable;
+import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
@@ -35,6 +34,7 @@ import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
+import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.Program;
 import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
@@ -115,8 +115,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		});
 
 		graph.addListener(mxEvent.FLIP_EDGE, (sender, evt) -> {
-			String styleName = (String) evt.getProperty("style");
-			status("Edge style changed to " + styleName);
+			ProgramGraph.EdgeStyles style = (ProgramGraph.EdgeStyles) evt.getProperty("style");
+			status("Edge style changed to " + style.getDisplayName());
 		});
 
 		// Adds some template cells for dropping into the graph
@@ -126,6 +126,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		basicPalette.addTemplate(PoissonSource.CREATOR);
 		basicPalette.addTemplate(StandardPopulation.CREATOR);
 		basicPalette.addEdgeTemplate(NeuronConnection.CREATOR);
+		basicPalette.addTemplate(DataPlot.CREATOR);
+		basicPalette.addEdgeTemplate(ProbeConnection.CREATOR);
 		modulesPalette.addTemplate(SynfireChain.CREATOR);
 		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
 		modulesPalette.addTemplate("Retina",
@@ -251,8 +253,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	/**
 	 * A graph that creates new edges from a given template edge.
 	 */
-	public static class ProgramGraph extends mxGraph
-	{
+	public static class ProgramGraph extends mxGraph {
 		private final Program program;
 		private EditorToolBar toolBar;
 
@@ -260,8 +261,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		 * Custom graph that defines the alternate edge style to be used when
 		 * the middle control point of edges is double clicked (flipped).
 		 */
-		public ProgramGraph (Program program)
-		{
+		public ProgramGraph (Program program) {
 			this.program = program;
 			setGridEnabled(false);
 			setAllowDanglingEdges(true);  // otherwise drag&drop of edge template effectively not be used
@@ -414,7 +414,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					model.setStyle(edge, nextStyle.updateCellStyle(cellStyle));
 					// Removes all existing control points
 					resetEdge(edge);
-					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge, "style", nextStyle.getDisplayName()));
+					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge, "style", nextStyle));
 				}
 				finally {
 					model.endUpdate();
@@ -443,15 +443,16 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			return cells;
 		}
 
+/* We want our network module ports to appear as terminals at edges!
+   Thus, they are NOT "ports" in the mxGraph sense.
 		// Ports are not used as terminals for edges, they are
 		// only used to compute the graphical connection point
 		@Override
-		public boolean isPort(Object cell)
-		{
+		public boolean isPort(Object cell) {
 			mxGeometry geo = getCellGeometry(cell);
 			return (geo != null) && geo.isRelative();
 		}
-
+*/
 		// can we get a red border when dragging to invalid target nodes?
 		// not easily, com.mxgraph.swing.handler.mxCellMarker.getCell override in mxConnectionHandler.java
 		// deliberately skips the red highlight, for validation errors with empty message strings
@@ -460,8 +461,10 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		public boolean isValidSource (Object cell) {
 			if (cell instanceof mxICell) {
 				Object value = ((mxICell) cell).getValue();
-				if (value instanceof Connectable)
-					return ((Connectable) value).isValidConnectionSource() && super.isValidSource(cell);
+				if (value instanceof Connectable) {
+					Connectable con = (Connectable) value;
+					return (con.isValidSynapseSource() || con.isValidProbeSource()) && super.isValidSource(cell);
+				}
 			}
 			return super.isValidSource(cell);
 		}
@@ -470,10 +473,35 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		public boolean isValidTarget (Object cell) {
 			if (cell instanceof mxICell) {
 				Object value = ((mxICell) cell).getValue();
-				if (value instanceof Connectable)
-					return ((Connectable) value).isValidConnectionTarget() && super.isValidSource(cell);
+				if (value instanceof Connectable) {
+					Connectable con = (Connectable) value;
+					return (con.isValidSynapseTarget() || con.isValidProbeTarget()) && super.isValidSource(cell);
+				}
 			}
 			return super.isValidSource(cell);  // only the isValidSource method implements the general (direction-agnostic) checks
+		}
+
+		@Override
+		public boolean isValidConnection (Object edge, Object source, Object target) {
+			if (super.isValidConnection(edge, source, target)) {
+				if (edge instanceof mxICell && source instanceof mxICell && target instanceof mxICell) {
+					Object edgeValue = ((mxICell) edge).getValue();
+					Object sourceValue = ((mxICell) source).getValue();
+					Object targetValue = ((mxICell) target).getValue();
+					if (edgeValue instanceof AnyConnection &&
+							sourceValue instanceof Connectable && targetValue instanceof Connectable) {
+						Connectable sourceCon = (Connectable) sourceValue;
+						Connectable targetCon = (Connectable) targetValue;
+						if (edgeValue instanceof ProbeConnection)
+							return sourceCon.isValidProbeSource() && targetCon.isValidProbeTarget();
+						else
+							return sourceCon.isValidSynapseSource() && targetCon.isValidSynapseTarget();
+					}
+				}
+				return true;
+			}
+			else
+				return false;
 		}
 
 		@Override
@@ -494,10 +522,24 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		public Object createEdge(Object parent, String id, Object value,
 								 Object source, Object target, String style) {
 
+			if (source instanceof mxICell) {
+				Object sourceValue = ((mxICell) source).getValue();
+				if (sourceValue instanceof Connectable) {
+					Connectable sourceCon = (Connectable) sourceValue;
+					if (sourceCon.isValidProbeSource() && !sourceCon.isValidSynapseSource()) {
+						ProbeConnection probeConnection = new ProbeConnection();
+						mxCell edge = (mxCell) super.createEdge(parent, id, probeConnection, source, target,
+																ProbeConnection.CREATOR.getCellStyle());
+						probeConnection.setOwningCell(edge);
+						return edge;
+					}
+				}
+			}
 			SynapseType synapseType = toolBar.getCurrentSynapseType();
-
-			mxCell edge = (mxCell) super.createEdge(parent, id, value, source, target, synapseType.getCellStyle());
-			edge.setValue(new NeuronConnection(synapseType));
+			NeuronConnection neuronConnection = new NeuronConnection(synapseType);
+			mxCell edge = (mxCell) super.createEdge(parent, id, neuronConnection, source, target,
+													synapseType.getCellStyle());
+			neuronConnection.setOwningCell(edge);
 			return edge;
 		}
 

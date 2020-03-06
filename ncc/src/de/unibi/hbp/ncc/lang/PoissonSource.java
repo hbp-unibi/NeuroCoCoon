@@ -6,6 +6,8 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveDoubleProp;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 public class PoissonSource extends NeuronPopulation {
@@ -43,6 +45,12 @@ public class PoissonSource extends NeuronPopulation {
            orig.rate.getValue(), orig.start.getValue(), orig.duration.getValue());
    }
 
+   private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES =
+         EnumSet.noneOf(ProbeConnection.DataSeries.class);
+
+   @Override
+   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
+
    public static final EntityCreator<PoissonSource> CREATOR = new PoissonSource.Creator();
 
    private static class Creator implements EntityCreator<PoissonSource> {
@@ -74,4 +82,7 @@ public class PoissonSource extends NeuronPopulation {
       return new PoissonSource(this);
    }
 
+   public double getRate () { return rate.getValue(); }
+   public double getDuration () { return duration.getValue(); }
+   public double getStart () { return start.getValue(); }
 }

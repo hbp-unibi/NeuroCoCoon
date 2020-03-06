@@ -4,7 +4,6 @@ import com.mxgraph.analysis.mxAnalysisGraph;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.editor.EditorActions.*;
@@ -12,10 +11,7 @@ import de.unibi.hbp.ncc.editor.EditorActions.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class EditorMenuBar extends JMenuBar
 {
@@ -272,6 +268,7 @@ public class EditorMenuBar extends JMenuBar
 
 		menu.addSeparator();
 
+		menu.add(editor.bind(mxResources.get("flipModule"), new FlipModuleAction()));
 		menu.add(editor.bind(mxResources.get("autosize"), new AutosizeAction()));
 
 	}

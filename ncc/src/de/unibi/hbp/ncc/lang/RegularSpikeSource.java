@@ -7,6 +7,8 @@ import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveDoubleProp;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 public class RegularSpikeSource extends NeuronPopulation {
@@ -45,6 +47,12 @@ public class RegularSpikeSource extends NeuronPopulation {
       this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronCountProp().getValue(),
            orig.interval.getValue(), orig.perNeuronOffset.getValue(), orig.start.getValue(), orig.duration.getValue());
    }
+
+   private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES =
+         EnumSet.of(ProbeConnection.DataSeries.SPIKES);
+
+   @Override
+   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
 
    public static final EntityCreator<RegularSpikeSource> CREATOR = new RegularSpikeSource.Creator();
 

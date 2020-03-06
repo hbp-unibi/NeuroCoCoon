@@ -125,6 +125,7 @@ public abstract class NamedEntity extends LanguageEntity
       return getDisplayName();
    }
 
+   @Override
    public String getPythonName () {
       return namespace.buildPythonName(this.getName());
    }
@@ -133,4 +134,7 @@ public abstract class NamedEntity extends LanguageEntity
       return namespace.buildDerivedPythonName(purposeDiscriminator, this.getName());
    }
 
+   public String getUnadornedPythonName () {
+      return Namespace.buildUnadornedPythonName(this.getName());
+   }
 }

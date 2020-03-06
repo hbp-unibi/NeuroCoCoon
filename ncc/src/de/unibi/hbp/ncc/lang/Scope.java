@@ -3,6 +3,8 @@ package de.unibi.hbp.ncc.lang;
 import de.unibi.hbp.ncc.lang.utils.Iterators;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Scope {
    private Namespace<NeuronPopulation> neuronPopulations;
@@ -58,5 +60,12 @@ public class Scope {
 
    public Iterable<SynapseType.ConnectorKind> getConnectorKinds () {
       return Arrays.asList(SynapseType.ConnectorKind.values());
+   }
+
+   public Iterable<NetworkModule> getOneModuleInstancePerUsedClass () {
+      Map<String, NetworkModule> representativePerClass = new TreeMap<>();
+      for (NetworkModule moduleInstance: moduleInstances)
+         representativePerClass.putIfAbsent(moduleInstance.getClass().getName(), moduleInstance);
+      return representativePerClass.values();
    }
 }

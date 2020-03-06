@@ -1,12 +1,10 @@
 package de.unibi.hbp.ncc.lang;
 
-import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.graph.EdgeCollector;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class NeuronPopulation extends NamedEntity
@@ -38,17 +36,22 @@ public abstract class NeuronPopulation extends NamedEntity
    public int getNeuronCount () { return neuronCount.getValue(); }
 
    @Override
-   public boolean isValidConnectionSource () { return true; }
+   public boolean isValidSynapseSource () { return true; }
 
    @Override
-   public boolean isValidConnectionTarget () { return false; }
+   public boolean isValidProbeTarget () { return !validDataSeries().isEmpty(); }
 
-   public Iterable<NeuronConnection> getOutgoingConnections () {
-      return EdgeCollector.getOutgoingConnections(getOwningCell());
+   public Iterable<NeuronConnection> getOutgoingSynapses () {
+      return EdgeCollector.getOutgoingSynapses(getOwningCell());
    }
 
    @Override
-   public Iterable<NeuronConnection> getIncomingConnections () {
-      return EdgeCollector.getIncomingConnections(getOwningCell());
+   public Iterable<NeuronConnection> getIncomingSynapses () {
+      return EdgeCollector.getIncomingSynapses(getOwningCell());
+   }
+
+   @Override
+   public Iterable<ProbeConnection> getIncomingProbes () {
+      return EdgeCollector.getIncomingProbes(getOwningCell());
    }
 }

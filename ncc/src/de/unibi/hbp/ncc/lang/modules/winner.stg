@@ -1,0 +1,51 @@
+define_winner_builder() ::= <<
+def build_winner_take_all(num_pops, num_neurons, neuron_kind, neuron_params, weight_noise, weight_inh, weight_exc,
+    rate_noise, prob_noise, prob_inh, prob_exc, syn_delay):
+    """ Create a Winner-Take-All network. Return a list of all populations
+
+    num_pops -- number of populations
+    num_neurons -- number of neurons per population
+    weight -- weight of the poisson noise to neurons
+    weight_inh -- cross inhibition weight
+    weight_exc -- self excitation
+    """
+    global runtime
+    population_list = []
+
+    # Create populations and excitatory connections
+    for pop_id in range(0, num_pops):
+        pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="pop" + str(pop_id))
+
+        # Individual noise to every neuron
+        input = sim.Population(num_neurons, sim.SpikeSourcePoisson,
+                     {'duration': runtime, 'rate': rate_noise }, label="input")
+        proj = sim.Projection(input, pop, sim.FixedProbabilityConnector(prob_noise),
+                    sim.StaticSynapse(weight=weight_noise, delay=syn_delay)
+
+        # Self-excitatory connection
+        proj = sim.Projection(pop, pop, sim.FixedProbabilityConnector(prob_exc),
+                    sim.StaticSynapse(weight=weight_exc, delay=syn_delay))
+
+        pop.record(["spikes"])
+        population_list.append(pop)
+
+
+    # Create cross-inhibition
+    for pop_id_src in range(0, num_pops):
+        for pop_id_tar in range(0, num_pops):
+            if pop_id_src == pop_id_tar:
+                # Pop does not inhibit itself
+                continue
+            proj = sim.Projection(population_list[pop_id_src], population_list[pop_id_tar],
+                    sim.FixedProbabilityConnector(prob_inh),
+                    sim.StaticSynapse(weight=weight_inh, delay=syn_delay), receptor_type="inhibitory")
+    return { 'in': population_list, 'out': population_list }  # return list of input ports and output ports
+>>
+
+build_winner_instance(winner) ::= <<
+build_winner_take_all(<winner.numberOfPopulations>, <winner.numberOfNeuronsPerPopulation>, <\\>
+sim.<winner.neuronType.neuronKind.pythonName>, <winner.neuronType.parametersPythonName>, <\\>
+<winner.noiseWeight>, <winner.inhibitionWeight>, <winner.excitationWeight>, <\\>
+<winner.noiseRate>, <winner.noiseProbability>, <winner.inhibitionProbability>, <winner.excitationProbability>, <\\>
+<winner.synapseDelay>)
+>>

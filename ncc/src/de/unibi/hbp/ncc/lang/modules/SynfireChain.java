@@ -6,6 +6,7 @@ import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
+import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -13,7 +14,9 @@ import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 public class SynfireChain extends NetworkModule {
@@ -35,7 +38,7 @@ public class SynfireChain extends NetworkModule {
    }
 
    @Override
-   protected String getGeneratedNamesPrefix () { return "Snyfire Chain"; }
+   protected String getGeneratedNamesPrefix () { return "Synfire Chain"; }
 
    private static final String DEFAULT_NEURON_TYPE_NAME = "Chain Default";
 
@@ -56,16 +59,17 @@ public class SynfireChain extends NetworkModule {
       this.synapseDelay = new NonNegativeDoubleProp("Synapse Delay", this, synapseDelay).setUnit("ms");
    }
 
-   public SynfireChain (Namespace<NetworkModule> namespace) {
-      this(namespace, null, null,
+   public SynfireChain (Namespace<NetworkModule> namespace, String name) {
+      this(namespace, name, null,
            3, 5,
            0.03, 0.015,
            1.0);
    }
 
-   public SynfireChain () {
-      this(getGlobalNamespace());
+   public SynfireChain (String name) {
+      this(getGlobalNamespace(), name);
    }
+   public SynfireChain () { this((String) null); }
 
    protected SynfireChain (SynfireChain orig) {
       this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
@@ -108,6 +112,12 @@ public class SynfireChain extends NetworkModule {
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }
 
+   private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES = EnumSet.of(
+         ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE);
+
+   @Override
+   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
+
    @Override
    public LanguageEntity duplicate () {
       return new SynfireChain(this);
@@ -127,4 +137,11 @@ public class SynfireChain extends NetworkModule {
       @Override
       public String getIconCaption () { return "Chain"; }
    }
+
+   public int getNumberOfPopulations () { return numberOfPopulations.getValue(); }
+   public int getNumberOfNeuronsPerPopulation () { return numberOfNeurons.getValue(); }
+   public NeuronType getNeuronType () { return neuronType.getValue(); }
+   public double getInhibitionWeight () { return inhibitionWeight.getValue(); }
+   public double getExcitationWeight () { return excitationWeight.getValue(); }
+   public double getSynapseDelay () { return synapseDelay.getValue(); }
 }

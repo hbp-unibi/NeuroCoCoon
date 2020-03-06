@@ -164,6 +164,9 @@ public class SynapseType extends NamedEntity {
    public double getWeight () { return weight.getValue(); }
    public double getDelay () { return delay.getValue(); }
 
+   public boolean isInhibitory () { return weight.getValue() < 0; }
+   public double getAbsoluteWeight () { return Math.abs(weight.getValue()); }
+
    public SynapseKind getSynapseKind () { return synapseKind.getValue(); }
 
    public Iterable<ReadOnlyProp<?>> getConnectorParameters () {

@@ -6,31 +6,46 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 public class NeuronType extends NamedEntity {
 
    public enum NeuronKind implements DisplayNamed, PythonNamed {
-      IF_COND_EXP("IF Cond Exp", "IF_cond_exp", true),
-      IF_COND_ALPHA("IF Cond Alpha", "IF_cond_alpha", true),
-      IZHIKEVICH("Izhikevich", "Izhikevich", false),
-      IF_CURR_EXP("IF Cond Exp", "IF_curr_exp", false),
-      IF_CURR_ALPHA("IF Cond Alpha", "IF_curr_alpha", false);
+      IF_COND_EXP("IF Cond Exp", "IF_cond_exp", true,
+                  EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE,
+                             ProbeConnection.DataSeries.GSYN_EXC, ProbeConnection.DataSeries.GSYN_INH)),
+      IF_COND_ALPHA("IF Cond Alpha", "IF_cond_alpha", true,
+                    EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE,
+                               ProbeConnection.DataSeries.GSYN_EXC, ProbeConnection.DataSeries.GSYN_INH)),
+      IZHIKEVICH("Izhikevich", "Izhikevich", false,
+                 EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE,
+                            ProbeConnection.DataSeries.IZHIKEVICH_U)),
+      IF_CURR_EXP("IF Cond Exp", "IF_curr_exp", false,
+                  EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE)),
+      IF_CURR_ALPHA("IF Cond Alpha", "IF_curr_alpha", false,
+                    EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE));
 
-      private String displayName, pythonName;
-      private boolean conductanceBased;
+      private final String displayName, pythonName;
+      private final boolean conductanceBased;
+      private final EnumSet<ProbeConnection.DataSeries> supportedSeries;
 
-      NeuronKind (String displayName, String pythonName, boolean conductanceBased) {
+      NeuronKind (String displayName, String pythonName, boolean conductanceBased,
+                  EnumSet<ProbeConnection.DataSeries> supportedSeries) {
          this.displayName = displayName;
          this.pythonName = pythonName;
          this.conductanceBased = conductanceBased;
+         this.supportedSeries = supportedSeries;
       }
 
       @Override
       public String getDisplayName () { return displayName; }
 
 
-      public boolean isConductanceBased () { return conductanceBased; }
+      boolean isConductanceBased () { return conductanceBased; }
+
+      Collection<ProbeConnection.DataSeries> getSupportedDataSeries () { return supportedSeries; }
 
       void addKindSpecificProps (List<? super EditableProp<?>> list, NeuronType type) {
          if (this == IZHIKEVICH) {
@@ -56,6 +71,7 @@ public class NeuronType extends NamedEntity {
 
       @Override
       public String getPythonName () { return pythonName; }
+
    }
 
    private final Namespace<NeuronType> moreSpecificNamespace;
@@ -150,6 +166,10 @@ public class NeuronType extends NamedEntity {
    public String getParametersPythonName () { return getDerivedPythonName("npm"); }
 
    public NeuronKind getNeuronKind () { return neuronKind.getValue(); }
+
+   public Collection<ProbeConnection.DataSeries> getSupportedDataSeries () {
+      return getNeuronKind().getSupportedDataSeries();
+   }
 
    public Iterable<ReadOnlyProp<?>> getNeuronParameters () {
       List<ReadOnlyProp<?>> result = new ArrayList<>();

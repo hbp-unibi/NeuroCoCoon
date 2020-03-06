@@ -1,11 +1,19 @@
+define_builder(modinst) ::= <<
+<(modinst.defineBuilderTemplateName)()>
+>>
+
 define_neuronType(neuronType) ::= <<
 <neuronType.parametersPythonName> = {
     <neuronType.neuronParameters:{it | '<it.pythonName>': <it.value>}; separator=",\n">
 }
 >>
 
+define_module_instance(modinst) ::= <<
+<modinst.pythonName> = <(modinst.buildInstanceTemplateName)(modinst)>
+>>
+
 define_population(pop) ::= <<
-<pop.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>)
+<pop.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>, label="<pop.name>")
 >>
 
 define_spikeSource(src) ::= <<
@@ -13,35 +21,92 @@ define_spikeSource(src) ::= <<
 <if(src.twoDimensional)>[
     <src.twoLevelTimes:{it | [<it; separator=", ",wrap="\n    ">]}; separator=",\n">]<\\>
 <else>[<src.singleLevelTimes; separator=", ",wrap="\n    ">]<\\>
-<endif>))
+<endif>), label="<src.name>")
 >>
 
 define_poissonSource(poi) ::= <<
-<poi.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>)
+<poi.pythonName> = sim.Population(<pop.neuronCount>,<\\>
+sim.SpikeSourcePoisson(rate=<poi.rate>, start=<poi.start>, duration=<poi.duration>), label="<poi.name>")
 >>
 
 define_connectorKind(cnk) ::= <<
 <if(!cnk.kindSpecificProps)><cnk.pythonName> = sim.<cnk.pyNNClassName>()<endif>
 >>
 
-define_outgoingConnections(pop) ::= <<
-<pop.outgoingConnections:define_oneConnection(); separator="\n">
+define_outgoingSynapses(connectable) ::= <<
+<connectable.outgoingSynapses:define_oneSynapse(); separator="\n">
 >>
 
-define_oneConnection(con) ::= <<
-sim.Projection(<con.sourceNamedEntity.pythonName>, <con.targetNamedEntity.pythonName>, <\\>
+port_population(port) ::= <<
+<port.owningModule.pythonName>['<port.directionAsString>'][<port.index>]
+>>
+
+define_oneSynapse(con) ::= <<
+sim.Projection(<\\>
+<if(con.sourceNamedEntity)><con.sourceNamedEntity.pythonName><else><port_population(con.sourceModulePort)><endif>, <\\>
+<if(con.targetNamedEntity)><con.targetNamedEntity.pythonName><else><port_population(con.targetModulePort)><endif>, <\\>
 <if(!con.synapseType.connectorKind.kindSpecificProps)><\\>
 <con.synapseType.connectorKind.pythonName>, <\\>
 <else><\\>
 sim.<con.synapseType.connectorKind.pyNNClassName>(<con.synapseType.connectorParameters:{it | <it.pythonName>=<it.value>}; separator=", ">), <\\>
 <endif><\\>
-sim.<con.synapseType.synapseKind.pyNNClassName>(weight=<con.synapseType.weight>, delay=<con.synapseType.delay>))
+sim.<con.synapseType.synapseKind.pyNNClassName>(weight=<con.synapseType.absoluteWeight>, delay=<con.synapseType.delay>)<\\>
+<if(con.synapseType.inhibitory)>, receptor_type="inhibitory"<endif><\\>
+)
 >>
 
-program(prog, scope) ::= <<
+define_moduleOutputSynapses(modinst) ::= <<
+<modinst.outputPorts:define_outgoingSynapses()>
+>>
+
+probe_target(probe) ::= <<
+<if(probe.targetNamedEntity)><probe.targetNamedEntity.pythonName><else><port_population(probe.targetModulePort)><endif>
+>>
+
+instrument_oneProbeTarget(probe) ::= <<
+<probe_target(probe)>.record(['<probe.dataSeries.pythonName>'])
+<! TODO do we need to consolidate multiple probe edges between two nodes into one record call with multiple arguments !>
+>>
+
+instrument_probeTargets(plot) ::= <<
+<plot.outgoingProbes:instrument_oneProbeTarget()>
+>>
+
+probe_target_gid(probe) ::= <<
+<if(probe.targetNamedEntity)><probe.targetNamedEntity.unadornedPythonName><else><port_gid(probe.targetModulePort)><endif>
+>>
+
+port_gid(port) ::= <<
+<port.owningModule.unadornedPythonName>_<port.directionAsString>_<port.unadornedPythonName>
+>>
+
+create_panel(probe) ::= <<
+    Panel(
+        <probe_target(probe)>.get_data().segments[0].spiketrains,
+        xlabel="Time (ms)", xticks=True,
+        gid='<probe_target_gid(probe)>',
+        line_properties= [{'color': 'b'}, ],
+    ),
+>>
+
+create_plot(plot, target) ::= <<
+fig = Figure(
+<plot.outgoingProbes:create_panel(); separator="\n">
+  title="<plot.name>",
+  annotations="Simulated with <target.displayName>"
+)
+fix_legends(fig)
+fig.save("<plot.outputFileName>")
+fig.fig.clear()
+>>
+
+program(prog, scope, target) ::= <<
 import numpy.random
 from pyNN.utility import get_simulator
 from pyNN.utility.plotting import Figure, Panel
+
+<scope.oneModuleInstancePerUsedClass:define_builder(); separator="\n\n\n">
+
 
 <scope.neuronTypes:define_neuronType(); separator="\n"><! TODO output referenced neuron types only !>
 
@@ -54,34 +119,15 @@ sim.setup(timestep=<prog.timeStep>)
 <scope.spikeSources:define_spikeSource(); separator="\n">
 <scope.poissonSources:define_poissonSource(); separator="\n">
 
+<scope.moduleInstances:define_module_instance(); separator="\n">
+
+<scope.dataPlots:instrument_probeTargets(); separator="\n">
+
 <scope.connectorKinds:define_connectorKind(); separator="\n">
 
-<scope.neuronPopulations:define_outgoingConnections(); separator="\n">
+<scope.neuronPopulations:define_outgoingSynapses(); separator="\n">
 
-one_to_one = sim.OneToOneConnector()
-all_to_all = sim.AllToAllConnector()
-
-_usr_ana_pop_1 = sim.Population(1, sim.IF_cond_exp, neuron_params)
-_usr_ana_pop_1 = sim.Population(1, sim.IF_cond_exp, neuron_params)
-_usr_ana_source_x = sim.Population(1, sim.SpikeSourceArray(spike_times=[50, 150]))
-_usr_ana_source_y = sim.Population(1, sim.SpikeSourceArray(spike_times=[100, 150]))
-_usr_ana_output = sim.Population(1, sim.IF_cond_exp, neuron_params)
-
-one_to_one = sim.OneToOneConnector()
-all_to_all = sim.AllToAllConnector()
-
-sim.Projection(_usr_ana_source_x, _usr_ana_pop_1, one_to_one, sim.StaticSynapse(weight=_usr_cnst_full))
-sim.Projection(_usr_ana_source_y, _usr_ana_pop_2, one_to_one, sim.StaticSynapse(weight=_usr_cnst_half))
-sim.Projection(_usr_ana_source_x, _usr_ana_pop_2, one_to_one, sim.StaticSynapse(weight=_usr_cnst_half))
-sim.Projection(_usr_ana_source_y, _usr_ana_pop_1, one_to_one, sim.StaticSynapse(weight=_usr_cnst_full))
-sim.Projection(_usr_ana_pop_1, _usr_ana_output, one_to_one, sim.StaticSynapse(weight=_usr_cnst_full))
-sim.Projection(_usr_ana_pop_2, _usr_ana_output, one_to_one, sim.StaticSynapse(weight=_usr_cnst_inh_twice))
-
-_usr_ana_source_x.record('spikes')
-_usr_ana_source_y.record('spikes')
-_usr_ana_output.record('spikes')
-_usr_ana_pop_1.record('v')
-_usr_ana_pop_2.record('v')
+<scope.moduleInstances:define_moduleOutputSynapses(); separator="\n">
 
 sim.run(runtime)
 
@@ -95,51 +141,7 @@ def fix_legends(pynn_fig):
             panel.legend(gids[0].split(', '))
 
 
-fig = Figure(
-    Panel(
-        _usr_ana_source_x.get_data().segments[0].spiketrains,
-        xlabel="Time (ms)", xticks=True,
-        gid='source_x',
-        line_properties= [{'color': 'b'}, ],
-    ),
-    Panel(
-        _usr_ana_source_y.get_data().segments[0].spiketrains,
-        xlabel="Time (ms)", xticks=True,
-        gid='source_y',
-        line_properties= [{'color': 'b'}, ],
-    ),
-    Panel(
-        _usr_ana_output.get_data().segments[0].spiketrains,
-        xlabel="Time (ms)", xticks=True,
-        gid='output',
-        line_properties= [{'color': 'b'}, ],
-    ),
-  title="XOR -- behavior",
-  annotations="Simulated with %s" % options.simulator.upper()
-)
-fix_legends(fig)
-fig.save("XOR_behavior.png")
-fig.fig.clear()
-
-fig = Figure(
-    Panel(
-        _usr_ana_pop_1.get_data().segments[0].filter(name='v')[0],
-        xlabel="Time (ms)", xticks=True,
-        data_labels=['pop_1'],
-        line_properties= [{'color': 'b'}, ],
-    ),
-    Panel(
-        _usr_ana_pop_2.get_data().segments[0].filter(name='v')[0],
-        xlabel="Time (ms)", xticks=True,
-        data_labels=['pop_2'],
-        line_properties= [{'color': 'b'}, ],
-    ),
-  title="XOR -- hidden",
-  annotations="Simulated with %s" % options.simulator.upper()
-)
-fix_legends(fig)
-fig.save("XOR_hidden.png")
-fig.fig.clear()
+<scope.dataPlots:create_plot(target); separator="\n">
 
 
 if options.image_viewer != '-':

@@ -9,17 +9,13 @@ import java.util.Optional;
 final class AttributeUtils {
    private AttributeUtils () { }
 
-   static NetworkModule getParentModule (NetworkModule.Port port) {
-      return (NetworkModule) port.getCell().getParent().getValue();
-   }
-
    static Integer getNeuronCount (mxICell cell) {
       Object value = cell.getValue();
       if (value instanceof NeuronPopulation)
          return ((NeuronPopulation) value).getNeuronCount();
       else if (value instanceof NetworkModule.Port) {
          NetworkModule.Port port = (NetworkModule.Port) value;
-         NetworkModule module = getParentModule(port);
+         NetworkModule module = port.getOwningModule();
          return module.getPortDimension(port);
       }
       else

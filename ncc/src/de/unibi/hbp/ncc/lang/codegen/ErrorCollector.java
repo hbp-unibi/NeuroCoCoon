@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -82,8 +83,6 @@ public class ErrorCollector implements STErrorListener {
 
    public void setMinimumLevel (Severity minimumLevel) { this.minimumLevel = minimumLevel; }
 
-   // TODO fatal icon
-
    public void record (LanguageEntity responsible, Severity severity, String message) {
       if (minimumLevel.compareTo(severity) > 0)  // ignore everything below the threshold level
          return;
@@ -150,12 +149,15 @@ public class ErrorCollector implements STErrorListener {
 
    public boolean hasAnyWarnings () { return anyWarnings | anyErrors; }
 
-   public Component buildDisplayAndNavigationComponent () {
+   private static final int ICON_CELL_SIZE = 26;  // icon itself is 24x24
+
+   public Component buildDisplayAndNavigationComponent (mxGraphComponent graphComponent) {
       TableColumnModel columnModel = new DefaultTableColumnModel();
       columnModel.setColumnSelectionAllowed(false);
-      TableColumn severityColumn = new TableColumn(0, 45);
-      severityColumn.setHeaderValue("Level");
-      severityColumn.setMaxWidth(45);
+      TableColumn severityColumn = new TableColumn(0, ICON_CELL_SIZE);
+      // severityColumn.setHeaderValue("Level");
+      severityColumn.setMaxWidth(ICON_CELL_SIZE);
+      severityColumn.setCellRenderer(new IconCellRenderer());
       columnModel.addColumn(severityColumn);
       TableColumn entityColumn = new TableColumn(1);
       entityColumn.setHeaderValue("Affected");
@@ -167,10 +169,31 @@ public class ErrorCollector implements STErrorListener {
       errorTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       errorTable.setRowSelectionAllowed(true);
       errorTable.setGridColor(Color.LIGHT_GRAY);
+      errorTable.setRowHeight(ICON_CELL_SIZE);
       errorTable.setShowGrid(true);
       errorTable.setFillsViewportHeight(true);
+      errorTable.getSelectionModel().addListSelectionListener(
+            e -> {
+               int selectedRow = errorTable.getSelectedRow();
+               if (selectedRow >= 0) {
+                  LanguageEntity responsible = (LanguageEntity) errorTable.getValueAt(selectedRow, 1);
+                  if (responsible != null) {
+                     mxICell cell = responsible.getOwningCell();
+                     if (cell != null)
+                        graphComponent.scrollCellToVisible(cell);
+                  }
+               }
+            }
+      );
       // FIXME implement click navigation to graph node
       return errorTable;
+   }
+
+   private static class IconCellRenderer extends DefaultTableCellRenderer {
+      @Override
+      protected void setValue (Object value) {
+         setIcon(((Severity) value).getIcon());
+      }
    }
 
    private class ErrorTableModel extends AbstractTableModel {

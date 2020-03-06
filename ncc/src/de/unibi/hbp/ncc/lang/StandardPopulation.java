@@ -4,6 +4,8 @@ import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,6 +53,11 @@ public class StandardPopulation extends NeuronPopulation {
            orig.getNeuronCountProp().getValue());
    }
 
+   @Override
+   public Collection<ProbeConnection.DataSeries> validDataSeries () {
+      return neuronType.getValue().getSupportedDataSeries();
+   }
+
    public static final EntityCreator<StandardPopulation> CREATOR = new StandardPopulation.Creator();
 
    private static class Creator implements EntityCreator<StandardPopulation> {
@@ -82,7 +89,7 @@ public class StandardPopulation extends NeuronPopulation {
       return new StandardPopulation(this);
    }
 
-   public boolean isValidConnectionTarget () { return true; }
+   public boolean isValidSynapseTarget () { return true; }
 
    public NeuronType getNeuronType () { return neuronType.getValue(); }
 

@@ -31,7 +31,8 @@ public class NmpiClient {
    private static final String JOB_SERVICE = JOB_SERVICE_ROOT + "/api/v2/";
 
    public enum Platform implements DisplayNamed {
-      BRAINSCALES("BrainScaleS"), NEST("NEST"), SPIKEY("Spikey"), SPINNAKER("SpiNNaker");
+      BRAINSCALES("BrainScaleS"), NEST("NEST"),
+      SPIKEY("Spikey"), SPINNAKER("SpiNNaker"), SOURCE_CODE("Source only");
 
       private String pynnName;
 
@@ -46,6 +47,9 @@ public class NmpiClient {
 
       @Override
       public String getDisplayName () { return pynnName; }  // maybe make this distinct from the PyNN API name
+
+      public boolean requiresWebApp () { return this != NEST && this != SOURCE_CODE; }
+      public boolean conflictsWithWebApp () { return this == NEST; }
    }
 
    private String authToken;

@@ -12,6 +12,7 @@ import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
 import de.unibi.hbp.ncc.lang.SynapseType;
+import de.unibi.hbp.ncc.lang.modules.SynfireChain;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
 import org.w3c.dom.Node;
@@ -40,6 +41,9 @@ public class LanguageEntityCodec extends mxObjectCodec {
       mxCodecRegistry.addAlias("NeuronType", myName);
       mxCodecRegistry.addAlias("SynapseType", myName);
       mxCodecRegistry.addAlias("NeuronConnection", myName);
+
+      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
+      mxCodecRegistry.addAlias("SynfireChain", myName);
    }
 
    public void announceEncodeDecodeDone (boolean encodeDone) {
@@ -78,7 +82,7 @@ public class LanguageEntityCodec extends mxObjectCodec {
    @Override
    public Object beforeEncode (mxCodec enc, Object obj, Node node) {
       LanguageEntity entity = (LanguageEntity) obj;
-      // FIXME what to about predefined entities? store them with a special pseudo attribute and remap them to the existing entity based on their name on decode
+      // what to about predefined entities? store them with a special pseudo attribute and remap them to the existing entity based on their name on decode
       Map<String, Object> propValues = new LinkedHashMap<>();  // preserve order of properties in XML
       propValues.put(CLASS_NAME_PSEUDO_PROPERTY_NAME, entity.getClass().getSimpleName());
       String ownRefId = getExistingRefId(entity);
@@ -146,6 +150,9 @@ public class LanguageEntityCodec extends mxObjectCodec {
             case "NeuronConnection":
                assert entityName == null;
                entity = new NeuronConnection();
+               break;
+            case "SynfireChain":
+               entity = new SynfireChain(entityName);
                break;
             default:
                throw new IllegalArgumentException("normal <ncc> with unsupported class " + entityClassName);

@@ -29,6 +29,7 @@
 	<add as="spikeSource" extend="defaultVertex">
 		<add as="shape" value="triangle"/>
 		<add as="perimeter" value="trianglePerimeter"/>
+		<add as="direction" value="east"/>
 		<add as="fillColor" value="#ddffdd"/>
 		<add as="strokeColor" value="#bbddbb"/>
 		<add as="align" value="left"/>
@@ -38,6 +39,13 @@
 		<add as="perimeter" value="rhombusPerimeter"/>
 		<add as="fillColor" value="#ddff88"/>
 		<add as="strokeColor" value="#bbdd77"/>
+	</add>
+	<add as="dataPlot" extend="defaultVertex">
+		<add as="shape" value="cylinder"/>
+		<!-- <add as="shape" value="ellipse"/> -->
+		<add as="perimeter" value="ellipsePerimeter"/>
+		<add as="fillColor" value="#ddffff"/>
+		<add as="strokeColor" value="#bbdddd"/>
 	</add>
 	<add as="module" extend="defaultVertex">
 		<add as="foldable" value="0"/>
@@ -78,16 +86,19 @@
 		<add as="direction" value="east"/>
 		<add as="labelPosition" value="right"/>
 		<add as="align" value="left"/>
+		<add as="portConstraint" value="west"/>
 	</add>
 	<add as="portRight" extend="portAny">
 		<add as="direction" value="east"/>
 		<add as="labelPosition" value="left"/>
 		<add as="align" value="right"/>
+		<add as="portConstraint" value="east"/>
 	</add>
 	<add as="portTop" extend="portAny">
 		<add as="direction" value="south"/>
 		<add as="verticalLabelPosition" value="bottom"/>
 		<add as="verticalAlign" value="top"/>
+		<add as="portConstraint" value="north"/>
 	</add>
 	<add as="portBottom" extend="portAny">
 		<add as="direction" value="south"/>
@@ -95,11 +106,12 @@
 		<add as="verticalAlign" value="bottom"/>
 		<!-- <add as="spacingTop" value="0"/> does not matter for display -->
 		<add as="spacingBottom" value="-4"/> <!-- looks visually correct, quite tight for letters with descenders -->
+		<add as="portConstraint" value="south"/>
 	</add>
 	<add as="straight" extend="defaultEdge">
 		<add as="shape" value="connector"/>
 		<add as="endArrow" value="classic"/>
-		<add as="edgeStyle" value="none"/>
+		<!-- <add as="edgeStyle" value="none"/> -->
 	</add>
 	<add as="allToAll" extends="straight">
 		<add as="strokeWidth" value="4"/>
@@ -114,6 +126,13 @@
 	<add as="weightZero" extends="straight">
 		<add as="strokeWidth" value="2"/>
 		<add as="strokeColor" value="#ff3333"/>
+	</add>
+	<add as="dataProbe" extends="straight">
+		<add as="strokeWidth" value="1"/>
+		<add as="strokeColor" value="#333399"/>
+		<add as="endArrow" value="diamond"/>
+		<add as="dashed" value="1"/>
+		<add as="dashPattern" value="2 4"/>
 	</add>
 	<add as="label">
 		<add as="shape" value="label"/>

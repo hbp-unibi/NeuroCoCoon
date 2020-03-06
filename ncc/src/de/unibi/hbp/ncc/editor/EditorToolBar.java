@@ -161,7 +161,7 @@ public class EditorToolBar extends JToolBar
 				currentSynapseType = (SynapseType) selected;
 			// TODO should we change all currently selected edges to this type? and update this combobox to the type of a selected edge?
 		});
-		add(new JLabel("Synapses:"));
+		add(new JLabel("Synapse Type:"));
 		add(synapseTypeCombo);
 		addSeparator();
 

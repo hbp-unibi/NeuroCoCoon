@@ -4942,7 +4942,7 @@ public class mxGraph extends mxEventSource
 			return "";
 
 		// Checks if the connection is generally allowed
-		if (!isValidConnection(source, target))
+		if (!isValidConnection(edge, source, target))
 			return "";
 
 		if (source != null && target != null) {
@@ -6377,7 +6377,8 @@ public class mxGraph extends mxEventSource
 	 * @return Returns true if the the connection between the given terminals
 	 * is valid.
 	 */
-	public boolean isValidConnection (Object source, Object target) {
+	public boolean isValidConnection (Object edge, Object source, Object target) {
+//		System.err.println("isValidConnection: " + edge);
 		return isValidSource(source) && isValidTarget(target)
 				&& (isAllowLoops() || source != target);
 	}

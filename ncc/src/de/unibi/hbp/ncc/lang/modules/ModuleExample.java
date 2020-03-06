@@ -5,8 +5,11 @@ import de.unibi.hbp.ncc.editor.ModuleInstanceCreator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.NetworkModule;
+import de.unibi.hbp.ncc.lang.ProbeConnection;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 public class ModuleExample extends NetworkModule {
@@ -50,6 +53,12 @@ public class ModuleExample extends NetworkModule {
       else
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }
+
+   private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES = EnumSet.of(
+         ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE);
+
+   @Override
+   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
 
    public static final EntityCreator<ModuleExample> CREATOR = new Creator();
 

@@ -47,6 +47,7 @@ public abstract class NetworkModule extends NamedEntity
 
       public String getName () { return portName; }
       public Direction getDirection () { return portDirection; }
+      public String getDirectionAsString () { return portDirection.name().toLowerCase(); }
       public int getIndex () { return portIndex; }
       void setIndex (int portIndex) { this.portIndex = portIndex; }
 
@@ -58,20 +59,37 @@ public abstract class NetworkModule extends NamedEntity
       public String toString () { return portName; }
 
       @Override
-      public boolean isValidConnectionSource () { return portDirection == Direction.OUT; }
+      public boolean isValidSynapseSource () { return portDirection == Direction.OUT; }
 
       @Override
-      public boolean isValidConnectionTarget () { return portDirection == Direction.IN; }
+      public boolean isValidSynapseTarget () { return portDirection == Direction.IN; }
 
       @Override
-      public Iterable<NeuronConnection> getOutgoingConnections () {
-         return EdgeCollector.getOutgoingConnections(getCell());
+      public Iterable<NeuronConnection> getOutgoingSynapses () {
+         return EdgeCollector.getOutgoingSynapses(getCell());
       }
 
       @Override
-      public Iterable<NeuronConnection> getIncomingConnections () {
-         return EdgeCollector.getIncomingConnections(getCell());
+      public Iterable<NeuronConnection> getIncomingSynapses () {
+         return EdgeCollector.getIncomingSynapses(getCell());
       }
+
+      @Override
+      public boolean isValidProbeTarget () { return portDirection == Direction.OUT; }
+
+      @Override
+      public Iterable<ProbeConnection> getIncomingProbes () {
+         return EdgeCollector.getIncomingProbes(getCell());
+      }
+
+      // code generation needs to access the module owning a port
+      // but port must be serializable without referencing the module instance
+      // TODO use non-default serialization instead?
+      public NetworkModule getOwningModule () {
+         return (NetworkModule) portCell.getParent().getValue();
+      }
+
+      public String getUnadornedPythonName () { return Namespace.buildUnadornedPythonName(portName); }
    }
 
    @Override
@@ -232,7 +250,6 @@ public abstract class NetworkModule extends NamedEntity
       updatePorts(graph, existingCell, layoutSteps);
    }
 
-   // TODO provide a (context) menu command to toggle the narrow/wide layout?
    @Override
    public void resizeExisting (mxGraph graph, mxCell existingCell) {
       // this is called as part of a graph model update transaction
@@ -290,4 +307,12 @@ public abstract class NetworkModule extends NamedEntity
       return getPortIsOptional(port.getDirection(), port.getIndex());
    }
 
+   public Iterable<Port> getInputPorts () { return inputPorts; }
+   public Iterable<Port> getOutputPorts () { return outputPorts; }
+   // TODO add an empty module-specific checking method to be invoked from ProgramVisitor.check
+
+   public String getTemplateGroupFileName () { return resourceFileBaseName + ".stg"; }
+
+   public String getDefineBuilderTemplateName () { return "define_" + resourceFileBaseName + "_builder"; }
+   public String getBuildInstanceTemplateName () { return "build_" + resourceFileBaseName + "_instance"; }
 }

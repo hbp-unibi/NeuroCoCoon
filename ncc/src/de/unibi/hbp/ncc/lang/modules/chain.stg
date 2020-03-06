@@ -1,0 +1,39 @@
+define_chain_builder() ::= <<
+def build_synfire_chain(num_pops, num_neurons, neuron_kind, neuron_params, weight_inh, weight_exc, syn_delay):
+    """ Creates a synfire chain
+    num_pops -- number of populations
+    num_neurons -- number of neurons
+    weight_inh -- inhibitory backwards connection
+    weight_exh -- excitatory forward and self connection
+    """
+    population_list = []
+    # Create Populations + self connection
+    for pop_id in range(0, num_pops):
+        pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="pop_" + str(pop_id + 1))
+        sim.Projection(pop, pop, sim.AllToAllConnector(), sim.StaticSynapse(weight=weight_exc, delay=syn_delay))
+        pop.record(["spikes"])
+        population_list.append(pop)
+
+    # Forward excitation
+    for pop_id in range(0, num_pops-1):
+        sim.Projection(population_list[pop_id], population_list[pop_id + 1], sim.AllToAllConnector(),
+                    sim.StaticSynapse(weight=weight_exc, delay=syn_delay))
+    sim.Projection(population_list[num_pops - 1] , population_list[0], sim.AllToAllConnector(),
+                    sim.StaticSynapse(weight=weight_exc, delay=syn_delay))
+
+    # Backward inhibition
+    for pop_id in range(1, num_pops):
+        sim.Projection(population_list[pop_id], population_list[pop_id - 1], sim.AllToAllConnector(),
+                    sim.StaticSynapse(weight=weight_inh, delay=syn_delay), receptor_type="inhibitory")
+    sim.Projection(population_list[0] , population_list[num_pops - 1], sim.AllToAllConnector(),
+                    sim.StaticSynapse(weight=weight_inh, delay=syn_delay), receptor_type="inhibitory")
+
+
+    return { 'in': population_list[0:1], 'out': population_list }  # return list of input ports and output ports
+>>
+
+build_chain_instance(chain) ::= <<
+build_synfire_chain(<chain.numberOfPopulations>, <chain.numberOfNeuronsPerPopulation>, <\\>
+sim.<chain.neuronType.neuronKind.pythonName>, <chain.neuronType.parametersPythonName>, <\\>
+<chain.inhibitionWeight>, <chain.excitationWeight>, <chain.synapseDelay>)
+>>

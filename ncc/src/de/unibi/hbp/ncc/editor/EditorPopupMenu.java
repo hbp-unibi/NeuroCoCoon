@@ -43,14 +43,15 @@ public class EditorPopupMenu extends JPopupMenu
 		EditorMenuBar.populateFormatMenu(menu, editor);
 		 */
 		// Creates the shape menu
-		JMenu menu = (JMenu) add(new JMenu(mxResources.get("shape")));
+		// JMenu menu = (JMenu) add(new JMenu(mxResources.get("shape")));
 
-		EditorMenuBar.populateShapeMenu(menu, editor);
+		// EditorMenuBar.populateShapeMenu(menu, editor);
 
-		addSeparator();
+		// addSeparator();
 
 		add(editor.bind(mxResources.get("flipModule"), new EditorActions.FlipModuleAction())).setEnabled(selected);
 		// TODO enabled should check for a NetworkModule entity as the value of the/a selected cell
+		add(editor.bind(mxResources.get("autosize"), new EditorActions.AutosizeAction())).setEnabled(selected);
 		addSeparator();
 
 //		add(editor.bind(mxResources.get("edit"), mxGraphActions.getEditAction())).setEnabled(selected);

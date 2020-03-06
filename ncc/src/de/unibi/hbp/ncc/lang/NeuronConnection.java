@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class NeuronConnection extends LanguageEntity implements Serializable {
+public class NeuronConnection extends AnyConnection implements Serializable {
    private Namespace<SynapseType> synapseTypeNamespace;
    private EditableNameProp<SynapseType> synapseType;
 
@@ -52,7 +52,8 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
          synapseType = globalSynapseTypeNamespace.get("All Default");
       this.synapseType = new EditableNameProp<>("Synapse Type", SynapseType.class, this,
                                                 Objects.requireNonNull(synapseType), synapseTypeNamespace)
-            .addImpact(EditableProp.Impact.CELL_LABEL);
+            .addImpact(EditableProp.Impact.CELL_LABEL)
+            .addImpact(EditableProp.Impact.CELL_STYLE);
    }
 
    public NeuronConnection (SynapseType synapseType) {
@@ -73,62 +74,12 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
       return type.getDisplayName() + "\n(" + type.getSummary() + ")";
    }  // TODO append .getSummary() for synapse type as well?
 
-   // @Override
+   @Override
    public NeuronConnection duplicate () {
       return new NeuronConnection(this);
    }
 
    public SynapseType getSynapseType () { return synapseType.getValue(); }
-
-   private Object getTerminalValue (boolean source) {
-      mxICell edgeCell = getOwningCell();
-      if (edgeCell != null) {
-         mxICell terminalCell = edgeCell.getTerminal(source);
-         if (terminalCell != null)
-            return terminalCell.getValue();
-      }
-      return null;
-   }
-
-   public LanguageEntity getSourceEntity () {
-      Object sourceValue = getTerminalValue(true);
-      return (sourceValue instanceof LanguageEntity) ? (LanguageEntity) sourceValue : null;
-   }
-
-   public LanguageEntity getTargetEntity () {
-      Object targetValue = getTerminalValue(false);
-      return (targetValue instanceof LanguageEntity) ? (LanguageEntity) targetValue : null;
-   }
-
-   public NamedEntity getSourceNamedEntity () {
-      Object sourceValue = getTerminalValue(true);
-      return (sourceValue instanceof NamedEntity) ? (NamedEntity) sourceValue : null;
-   }
-
-   public NamedEntity getTargetNamedEntity () {
-      Object targetValue = getTerminalValue(false);
-      return (targetValue instanceof NamedEntity) ? (NamedEntity) targetValue : null;
-   }
-
-   public NeuronPopulation getSourcePopulation () {
-      Object sourceValue = getTerminalValue(true);
-      return (sourceValue instanceof NeuronPopulation) ? (NeuronPopulation) sourceValue : null;
-   }
-
-   public NeuronPopulation getTargetPopulation () {
-      Object targetValue = getTerminalValue(false);
-      return (targetValue instanceof NeuronPopulation) ? (NeuronPopulation) targetValue : null;
-   }
-
-   public NetworkModule.Port getSourcePort () {
-      Object sourceValue = getTerminalValue(true);
-      return (sourceValue instanceof NetworkModule.Port) ? (NetworkModule.Port) sourceValue : null;
-   }
-
-   public NetworkModule.Port getTargetPort () {
-      Object targetValue = getTerminalValue(false);
-      return (targetValue instanceof NetworkModule.Port) ? (NetworkModule.Port) targetValue : null;
-   }
 
    @Override
    public String getCellStyle () {
@@ -144,9 +95,7 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
       }
 
       @Override
-      public String toString () {  // used by drag&drop tooltips
-         return "All:All Connection";
-      }
+      public String toString () { return "Synapse Connection"; }  // used by drag&drop tooltips
 
       @Override
       public String getResourceFileBaseName () { return "synapse"; }
@@ -163,6 +112,5 @@ public class NeuronConnection extends LanguageEntity implements Serializable {
 
       @Override
       public int getInitialCellWidth () { return 60; }
-
    }
 }
