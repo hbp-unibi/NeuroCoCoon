@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -197,6 +198,12 @@ public class mxCodecRegistry
 		return null;
 	}
 
+	private static Function<Object, String> classNameRemapper;
+
+	public static void setClassNameRemapper (Function<Object, String> classNameRemapper) {
+		mxCodecRegistry.classNameRemapper = classNameRemapper;
+	}
+
 	/**
 	 * Returns the name that identifies the codec associated
 	 * with the given instance.
@@ -209,6 +216,21 @@ public class mxCodecRegistry
 	 * @return Returns a string that identifies the codec.
 	 */
 	public static String getName (Object instance) {
+		if (instance instanceof Object[] || instance instanceof Collection<?> || instance instanceof Map<?, ?>)
+			return "Array";
+		String remappedClassName;
+		if (classNameRemapper != null && (remappedClassName = classNameRemapper.apply(instance)) != null)
+			return remappedClassName;
+		Class<?> type = instance.getClass();
+		if (packages.contains(type.getPackage().getName())) {
+			return type.getSimpleName();
+		}
+		else {
+			return type.getName();
+		}
+	}
+
+	public static String getName_OldAndUnused (Object instance) {
 		Class<?> type = instance.getClass();
 
 		if (type.isArray() || Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {

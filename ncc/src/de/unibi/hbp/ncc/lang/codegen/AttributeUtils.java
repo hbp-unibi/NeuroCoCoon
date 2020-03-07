@@ -4,8 +4,6 @@ import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronPopulation;
 
-import java.util.Optional;
-
 final class AttributeUtils {
    private AttributeUtils () { }
 

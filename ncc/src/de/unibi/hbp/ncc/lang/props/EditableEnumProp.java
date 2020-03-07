@@ -10,7 +10,6 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import java.awt.Component;
-import java.util.EnumSet;
 
 public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
    private E[] allEnumValues;
@@ -40,11 +39,14 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
                                                      boolean cellHasFocus) {
          // System.err.println("Enum Combo Cell Renderer: " + value + " ?" + (value instanceof DisplayNamed));
          return super.getListCellRendererComponent(list,
-                                                   value instanceof DisplayNamed ? ((DisplayNamed) value).getDisplayName() : value,
+                                                   value instanceof DisplayNamed
+                                                         ? ((DisplayNamed) value).getDisplayName()
+                                                         : value,
                                                    index, isSelected, cellHasFocus);
       }
    }
 
+   // TODO support an optional filter to reduce the set of available values (or to disable the other values)
    @Override
    public TableCellEditor getTableCellEditor (JTable table) {
       JComboBox<E> comboBox = new JComboBox<>(allEnumValues);
@@ -53,5 +55,20 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
       // FIXME combobox does NOT commit changes on itemChanged (but only on focus lost and maybe ENTER?)
+
+/*
+      DefaultCellEditor editor = new DefaultCellEditor(comboBox);
+      comboBox.addItemListener(new ItemListener() {
+         @Override
+         public void itemStateChanged (ItemEvent e) {
+            System.err.println("itemStateChanged: " + e.getItem() + ", " + e.getStateChange());
+            System.err.println("comboBox: " + comboBox.getSelectedItem());
+            System.err.println("cellEditorListeners: " + Arrays.toString(editor.getCellEditorListeners()));
+            // comboBox.actionPerformed(new ActionEvent(editor, 0, ""));
+            editor.stopCellEditing();  // this is provided inside the internal delegate, but not installed
+         }
+      });
+      return editor;
+*/
    }
 }

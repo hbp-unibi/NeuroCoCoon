@@ -72,6 +72,12 @@ public abstract class NamedEntity extends LanguageEntity
       return this;
    }
 
+   @Override
+   public void makePredefined () {
+      super.makePredefined();
+      this.namespace.markedAsPredefined(this);
+   }
+
    public EditableProp<String> getNameProp () { return nameProp; }
 
    public String getName () {

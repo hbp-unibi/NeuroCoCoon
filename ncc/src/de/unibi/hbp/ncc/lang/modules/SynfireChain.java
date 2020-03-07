@@ -8,19 +8,16 @@ import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
-import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-public class SynfireChain extends NetworkModule {
-   private final EditableNameProp<NeuronType> neuronType;
+public class SynfireChain extends SingleNeuronTypeModule {
    private final IntegerProp numberOfPopulations, numberOfNeurons;
    private final DoubleProp inhibitionWeight, excitationWeight;
    private final DoubleProp synapseDelay;
@@ -28,7 +25,6 @@ public class SynfireChain extends NetworkModule {
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
-      list.add(neuronType);
       list.add(numberOfPopulations);
       list.add(numberOfNeurons);
       list.add(inhibitionWeight);
@@ -46,17 +42,20 @@ public class SynfireChain extends NetworkModule {
                         int numberOfPopulations, int numberOfNeurons,
                         double inhibitionWeight, double excitationWeight,
                         double synapseDelay) {
-      super(namespace, name, CREATOR.getResourceFileBaseName());
-      Namespace<NeuronType> neuronTypes = namespace.getContainingScope().getNeuronTypes();
-      if (neuronType == null)
-         neuronType = ensureDefaultType(neuronTypes, DEFAULT_NEURON_TYPE_NAME);
-      this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this, neuronType, neuronTypes);
+      super(namespace, name, CREATOR.getResourceFileBaseName(), neuronType, DEFAULT_NEURON_TYPE_NAME);
       this.numberOfPopulations = new StrictlyPositiveIntegerProp("Length of Chain", this, numberOfPopulations)
             .addImpact(EditableProp.Impact.CELL_STRUCTURE);
       this.numberOfNeurons = new StrictlyPositiveIntegerProp("Neurons per Population", this, numberOfNeurons);
       this.inhibitionWeight = new NonNegativeDoubleProp("Inhibitory Weight", this, inhibitionWeight);
       this.excitationWeight = new NonNegativeDoubleProp("Excitatory Weight", this, excitationWeight);
       this.synapseDelay = new NonNegativeDoubleProp("Synapse Delay", this, synapseDelay).setUnit("ms");
+   }
+
+   @Override
+   protected NeuronType createDefaultNeuronType (Namespace<NeuronType> neuronTypes, String typeName) {
+      return new NeuronType(neuronTypes, typeName, NeuronType.NeuronKind.IF_COND_EXP,
+                            -70.0, -80.0, -60.0, 0.0, -100.0,
+                            3.0, 3.0, 1.0, 10.0, 0.2, 0.0);
    }
 
    public SynfireChain (Namespace<NetworkModule> namespace, String name) {
@@ -72,7 +71,7 @@ public class SynfireChain extends NetworkModule {
    public SynfireChain () { this((String) null); }
 
    protected SynfireChain (SynfireChain orig) {
-      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronType(),
            orig.numberOfPopulations.getValue(), orig.numberOfNeurons.getValue(),
            orig.inhibitionWeight.getValue(), orig.excitationWeight.getValue(),
            orig.synapseDelay.getValue());
@@ -116,9 +115,6 @@ public class SynfireChain extends NetworkModule {
          ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE);
 
    @Override
-   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
-
-   @Override
    public LanguageEntity duplicate () {
       return new SynfireChain(this);
    }
@@ -140,7 +136,6 @@ public class SynfireChain extends NetworkModule {
 
    public int getNumberOfPopulations () { return numberOfPopulations.getValue(); }
    public int getNumberOfNeuronsPerPopulation () { return numberOfNeurons.getValue(); }
-   public NeuronType getNeuronType () { return neuronType.getValue(); }
    public double getInhibitionWeight () { return inhibitionWeight.getValue(); }
    public double getExcitationWeight () { return excitationWeight.getValue(); }
    public double getSynapseDelay () { return synapseDelay.getValue(); }

@@ -163,8 +163,8 @@ public class EditorPalette extends JPanel
 		int width = creator.getInitialCellWidth(),
 				height = creator.getInitialCellHeight();
 		mxGeometry geometry = new mxGeometry(0, 0, width, height);
-		geometry.setTerminalPoint(new mxPoint(0, height), true);
-		geometry.setTerminalPoint(new mxPoint(width, 0), false);
+		geometry.setTerminalPoint(new mxPoint(0, 0), true);
+		geometry.setTerminalPoint(new mxPoint(width, height), false);
 		geometry.setRelative(true);
 
 		mxCell cell = new mxCell(creator, geometry, creator.getCellStyle());

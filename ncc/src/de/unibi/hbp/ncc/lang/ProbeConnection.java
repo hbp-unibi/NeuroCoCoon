@@ -3,6 +3,8 @@ package de.unibi.hbp.ncc.lang;
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.IntegerProp;
+import de.unibi.hbp.ncc.lang.props.NonNegativeIntegerProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedProbeConnection;
 
 import java.io.InvalidObjectException;
@@ -11,6 +13,7 @@ import java.util.List;
 
 public class ProbeConnection extends AnyConnection {
    private EditableEnumProp<DataSeries> dataSeries;
+   private IntegerProp firstNeuronIndex, neuronCount;  // count == 0 means unlimited
 
    public enum DataSeries implements DisplayNamed, PythonNamed {
       SPIKES("Spikes", "spikes"),
@@ -34,38 +37,54 @@ public class ProbeConnection extends AnyConnection {
    }
 
    protected Object writeReplace () throws ObjectStreamException {
-      return new SerializedProbeConnection(dataSeries.getValue());
+      return new SerializedProbeConnection(dataSeries.getValue(), firstNeuronIndex.getValue(), neuronCount.getValue());
    }
 
    // readObject method for the serialization proxy pattern
    // See Effective Java, Second Ed., Item 78.
    private void readObject (java.io.ObjectInputStream stream) throws InvalidObjectException {
-      throw new InvalidObjectException("SerializedNeuronConnection required");
+      throw new InvalidObjectException("SerializedProbeConnection required");
    }
 
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
       list.add(dataSeries);
+      list.add(firstNeuronIndex);
+      list.add(neuronCount);
       return list;
    }
 
-   public ProbeConnection (DataSeries dataSeries) {
+   public ProbeConnection (DataSeries dataSeries, int firstNeuonIndex, int neuronCount) {
       this.dataSeries = new EditableEnumProp<>("Data Series", DataSeries.class, this, dataSeries)
             .addImpact(EditableProp.Impact.CELL_LABEL);
+      // TODO can the JComboBox be limited to data series supported by the current target of the probe?
+      this.firstNeuronIndex = new NonNegativeIntegerProp("First Neuron #", this, firstNeuonIndex);
+      this.neuronCount = new NonNegativeIntegerProp("Neuron Count", this, neuronCount);
    }
 
    public ProbeConnection () {
-      this(DataSeries.SPIKES);
+      this(DataSeries.SPIKES, 0, 0);
    }
 
    protected ProbeConnection (ProbeConnection orig) {
-      this(orig.dataSeries.getValue());
+      this(orig.dataSeries.getValue(), orig.firstNeuronIndex.getValue(), orig.neuronCount.getValue());
    }
 
    @Override
    public String toString () {
-      return "Probe " + dataSeries.getValue().getDisplayName();
+      StringBuilder sb = new StringBuilder("Probe ").append(dataSeries.getValue().getDisplayName());
+      int startIndex = firstNeuronIndex.getValue();
+      int count = neuronCount.getValue();
+      if (startIndex != 0 || count != 0) {
+         sb.append('[').append(startIndex).append(':');
+         if (count > 0)
+            sb.append(startIndex + count);
+         else
+            sb.append("end");
+         sb.append(']');
+      }
+      return sb.toString();
    }
 
    @Override
@@ -97,4 +116,11 @@ public class ProbeConnection extends AnyConnection {
    }
 
    public DataSeries getDataSeries () { return dataSeries.getValue(); }
+
+   public int getFirstNeuronIndex () { return firstNeuronIndex.getValue(); }
+   public int getNeuronCount () { return neuronCount.getValue(); }
+   public boolean isExcerpt () { return firstNeuronIndex.getValue() != 0 || neuronCount.getValue() != 0; }
+   public boolean isEndLimited () { return neuronCount.getValue() != 0; }
+   // exclusive end index, as needed by Python
+   public int getNeuronEndIndex () { return firstNeuronIndex.getValue() + neuronCount.getValue(); }
 }

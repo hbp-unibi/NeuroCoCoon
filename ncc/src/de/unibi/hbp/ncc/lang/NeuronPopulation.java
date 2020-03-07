@@ -5,6 +5,7 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
+import java.util.Collection;
 import java.util.List;
 
 public abstract class NeuronPopulation extends NamedEntity
@@ -39,7 +40,7 @@ public abstract class NeuronPopulation extends NamedEntity
    public boolean isValidSynapseSource () { return true; }
 
    @Override
-   public boolean isValidProbeTarget () { return !validDataSeries().isEmpty(); }
+   public boolean isValidProbeTarget () { return !getSupportedDataSeries().isEmpty(); }
 
    public Iterable<NeuronConnection> getOutgoingSynapses () {
       return EdgeCollector.getOutgoingSynapses(getOwningCell());
@@ -53,5 +54,10 @@ public abstract class NeuronPopulation extends NamedEntity
    @Override
    public Iterable<ProbeConnection> getIncomingProbes () {
       return EdgeCollector.getIncomingProbes(getOwningCell());
+   }
+
+   @Override
+   public Collection<ProbeConnection.DataSeries> getRequiredDataSeries () {
+      return EdgeCollector.getRequiredDataSeries(this);
    }
 }

@@ -34,7 +34,7 @@ public class PoissonSource extends NeuronPopulation {
    }
 
    public PoissonSource (Namespace<NeuronPopulation> namespace, String name) {
-      this(namespace, name, 1, 1.0, 0.0, 1.0e9);
+      this(namespace, name, 1, 1.0, 100.0, 10000.0);
    }
 
    public PoissonSource (String name) { this(getGlobalNamespace(), name); }
@@ -46,10 +46,10 @@ public class PoissonSource extends NeuronPopulation {
    }
 
    private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES =
-         EnumSet.noneOf(ProbeConnection.DataSeries.class);
+         EnumSet.of(ProbeConnection.DataSeries.SPIKES);
 
    @Override
-   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
+   public Collection<ProbeConnection.DataSeries> getSupportedDataSeries () { return SUPPORTED_DATA_SERIES; }
 
    public static final EntityCreator<PoissonSource> CREATOR = new PoissonSource.Creator();
 

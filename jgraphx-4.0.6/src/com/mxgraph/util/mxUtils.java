@@ -1761,29 +1761,26 @@ public class mxUtils
 	 * @return Returns a string representing the file contents.
 	 * @throws IOException
 	 */
-	public static String readFile(String filename) throws IOException
-	{
+	public static String readFile(String filename) throws IOException {
 		return readInputStream(new FileInputStream(filename));
 	}
 
 	/**
-	 * Reads the given filename into a string.
+	 * Reads the given stream into a string.
 	 * 
-	 * @param filename
-	 *            Name of the file to be read.
+	 * @param stream
+	 *            stream to be read.
 	 * @return Returns a string representing the file contents.
 	 * @throws IOException
 	 */
 	public static String readInputStream(InputStream stream) throws IOException
 	{
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(stream));
-		StringBuffer result = new StringBuffer();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		StringBuilder result = new StringBuilder();
 		String tmp = reader.readLine();
 
-		while (tmp != null)
-		{
-			result.append(tmp + "\n");
+		while (tmp != null) {
+			result.append(tmp).append('\n');
 			tmp = reader.readLine();
 		}
 

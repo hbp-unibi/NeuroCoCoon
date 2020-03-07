@@ -18,7 +18,6 @@ import org.stringtemplate.v4.STWriter;
 
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 
 public class ProgramVisitor implements CodeGenVisitor {
    private final Program program;
@@ -75,6 +74,7 @@ public class ProgramVisitor implements CodeGenVisitor {
             }
             else if (entity instanceof ProbeConnection) {
                // TODO check that the target provides the data series on the connection
+               // TODO check if first neuron index and neuron count are within range for the target
             }
             else
                throw new IllegalArgumentException("unexpected entity at edge: " + entity);

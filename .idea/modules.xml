@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/web/Collaboratory App.iml" filepath="$PROJECT_DIR$/web/Collaboratory App.iml" />
+      <module fileurl="file://$PROJECT_DIR$/experiments/experiments.iml" filepath="$PROJECT_DIR$/experiments/experiments.iml" />
       <module fileurl="file://$PROJECT_DIR$/jgraphx-4.0.6/jgraphx-4_0_6.iml" filepath="$PROJECT_DIR$/jgraphx-4.0.6/jgraphx-4_0_6.iml" />
       <module fileurl="file://$PROJECT_DIR$/jgraphx-examples/jgraphx-examples.iml" filepath="$PROJECT_DIR$/jgraphx-examples/jgraphx-examples.iml" />
       <module fileurl="file://$PROJECT_DIR$/ncc/ncc.iml" filepath="$PROJECT_DIR$/ncc/ncc.iml" />

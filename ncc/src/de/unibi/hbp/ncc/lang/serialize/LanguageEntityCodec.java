@@ -3,16 +3,19 @@ package de.unibi.hbp.ncc.lang.serialize;
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxObjectCodec;
+import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.PoissonSource;
+import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
 import de.unibi.hbp.ncc.lang.SynapseType;
 import de.unibi.hbp.ncc.lang.modules.SynfireChain;
+import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
 import org.w3c.dom.Node;
@@ -33,17 +36,29 @@ public class LanguageEntityCodec extends mxObjectCodec {
       rememberedRefIds = new HashMap<>();
       String myName = getName();
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
+      mxCodecRegistry.setClassNameRemapper(LanguageEntityCodec::remapAllLanguageEntitySubclasses);
+      mxCodecRegistry.addAlias("LanguageEntity", myName);
+      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
       // this list must be kep in sync with that cases of the switch in afterDecode
       // TODO use reflection to gather all concrete subclasses of LanguageEntity?
+      /*
       mxCodecRegistry.addAlias("RegularSpikeSource", myName);
       mxCodecRegistry.addAlias("PoissonSource", myName);
       mxCodecRegistry.addAlias("StandardPopulation", myName);
       mxCodecRegistry.addAlias("NeuronType", myName);
       mxCodecRegistry.addAlias("SynapseType", myName);
       mxCodecRegistry.addAlias("NeuronConnection", myName);
+      mxCodecRegistry.addAlias("DataPlot", myName);
+      mxCodecRegistry.addAlias("ProbeConnection", myName);
 
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
       mxCodecRegistry.addAlias("SynfireChain", myName);
+      mxCodecRegistry.addAlias("WinnerTakeAll", myName);
+      */
+   }
+
+   private static String remapAllLanguageEntitySubclasses (Object instance) {
+      return instance instanceof LanguageEntity ? "LanguageEntity" : null;
    }
 
    public void announceEncodeDecodeDone (boolean encodeDone) {
@@ -51,6 +66,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
          rememberedEntities.clear();
       else
          rememberedRefIds.clear();
+      // after loading the LanguageEntities need to be re-attached to their owning cells
+      // this is handled by the ModulePortCodec() which needs to traverse the full graph model anyway
    }
 
    @Override
@@ -151,8 +168,18 @@ public class LanguageEntityCodec extends mxObjectCodec {
                assert entityName == null;
                entity = new NeuronConnection();
                break;
+            case "DataPlot":
+               entity = new DataPlot(entityName);
+               break;
+            case "ProbeConnection":
+               assert entityName == null;
+               entity = new ProbeConnection();
+               break;
             case "SynfireChain":
                entity = new SynfireChain(entityName);
+               break;
+            case "WinnerTakeAll":
+               entity = new WinnerTakeAll(entityName);
                break;
             default:
                throw new IllegalArgumentException("normal <ncc> with unsupported class " + entityClassName);

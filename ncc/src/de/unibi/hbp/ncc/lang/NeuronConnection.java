@@ -2,6 +2,7 @@ package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
+import de.unibi.hbp.ncc.editor.EntityConfigurator;
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -88,10 +89,17 @@ public class NeuronConnection extends AnyConnection implements Serializable {
 
    public static final EntityCreator<NeuronConnection> CREATOR = new Creator();
 
-   private static class Creator implements EntityCreator<NeuronConnection> {
+   private static class Creator implements EntityCreator<NeuronConnection>, EntityConfigurator {
       @Override
       public NeuronConnection create () {
          return new NeuronConnection();
+      }
+
+      @Override
+      public void configureEntityAndCell (LanguageEntity entity, mxICell owningCell, EditorToolBar globalState) {
+         NeuronConnection connection = (NeuronConnection) entity;
+         connection.synapseType.setValue(globalState.getCurrentSynapseType());
+         owningCell.setStyle(connection.getCellStyle());
       }
 
       @Override

@@ -9,8 +9,8 @@ public interface Connectable {
    default Iterable<NeuronConnection> getOutgoingSynapses () { return Iterators.emptyIterable(); }
    default Iterable<NeuronConnection> getIncomingSynapses () { return Iterators.emptyIterable(); }
 
-   default boolean hasOutgoingSynapses () { return getOutgoingSynapses().iterator().hasNext(); }
-   default boolean hasIncomingSynapses () { return getIncomingSynapses().iterator().hasNext(); }
+   default boolean hasAnyOutgoingSynapses () { return getOutgoingSynapses().iterator().hasNext(); }
+   default boolean hasAnyIncomingSynapses () { return getIncomingSynapses().iterator().hasNext(); }
 
    default boolean isValidProbeSource () { return false; }
    default boolean isValidProbeTarget () { return false; };
@@ -18,6 +18,6 @@ public interface Connectable {
    default Iterable<ProbeConnection> getOutgoingProbes () { return Iterators.emptyIterable(); }
    default Iterable<ProbeConnection> getIncomingProbes () { return Iterators.emptyIterable(); }
 
-   default boolean hasOutgoingProbes () { return getOutgoingProbes().iterator().hasNext(); }
-   default boolean hasIncomingProbes () { return getIncomingProbes().iterator().hasNext(); }
+   default boolean hasAnyOutgoingProbes () { return getOutgoingProbes().iterator().hasNext(); }
+   default boolean hasAnyIncomingProbes () { return getIncomingProbes().iterator().hasNext(); }
 }

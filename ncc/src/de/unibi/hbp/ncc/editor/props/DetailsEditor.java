@@ -1,6 +1,5 @@
 package de.unibi.hbp.ncc.editor.props;
 
-import com.mxgraph.swing.mxGraphComponent;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -14,6 +13,8 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
@@ -28,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,18 +49,17 @@ public class DetailsEditor {
       // no header text
       markerColumn.setMaxWidth(30);
       tableColumnModel.addColumn(markerColumn);
-      TableColumn labelColumn = new TableColumn(1, 150);
+      TableColumn labelColumn = new TableColumn(1, 100);
       labelColumn.setHeaderValue("Property");
       labelColumn.setCellRenderer(new PropNameCellRenderer(tableModel));
       tableColumnModel.addColumn(labelColumn);
-      TableColumn valueColumn = new TableColumn(2);
+      TableColumn valueColumn = new TableColumn(2, 150);
       valueColumn.setHeaderValue("Value");
       valueColumn.setCellRenderer(new PropValueCellRenderer());
       valueColumn.setCellEditor(new PropValueCellEditor(tableModel));
       tableColumnModel.addColumn(valueColumn);
       table = new JTable(tableModel, tableColumnModel);
       // replace action for ENTER, since next row would be selected automatically
-      // FIXME TAB and SHIFT-TAB and SHIFT-ENTER work, but ENTER alone is somehow consumed?
       ActionMap actions = table.getActionMap();
       actions.put(SMART_NAV_NEXT, new SmartNavigationAction(+1));
       actions.put(SMART_NAV_PREV, new SmartNavigationAction(-1));
@@ -144,14 +145,16 @@ public class DetailsEditor {
       @Override
       public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus,
                                                       int row, int column) {
-         // System.err.println("Prop Value Cell Renderer: " + value + " ?" + (value instanceof DisplayNamed));
+         // System.err.println("Prop Value Cell Renderer: " + value + ", class=" + value.getClass().getName());
+         setHorizontalAlignment(value instanceof Number ? RIGHT : LEFT);
          return super.getTableCellRendererComponent(table,
                                                     value instanceof DisplayNamed ? ((DisplayNamed) value).getDisplayName() : value,
                                                     isSelected, hasFocus, row, column);
       }
    }
 
-   static class PropValueCellEditor extends AbstractCellEditor implements TableCellEditor {
+   static class PropValueCellEditor extends AbstractCellEditor
+         implements TableCellEditor, CellEditorListener {
       private PropsTableModel tableModel;
       private TableCellEditor editor;
 
@@ -161,18 +164,68 @@ public class DetailsEditor {
 
       @Override
       public Object getCellEditorValue () {
-         if (editor != null) {
-            return editor.getCellEditorValue();
-         }
-         return null;
+         return editor != null ? editor.getCellEditorValue() : null;
+      }
+
+      @Override
+      public boolean isCellEditable (EventObject e) {
+//         System.err.println("PropValueCellEditor.isCellEditable");
+         return true;
+         // do NOT delegate this to the (old) editor: might require a double-click,
+         // even if the not yet installed new editor would not
+         // the result is that editing starts with a single click always, which is even desirable
+         // return editor != null ? editor.isCellEditable(e) : super.isCellEditable(e);
+      }
+
+      @Override
+      public boolean shouldSelectCell (EventObject e) {
+//         System.err.println("PropValueCellEditor.shouldSelectCell");
+         return true;
+         // do NOT delegate this to the (old) editor: new editor is not installed yet
+         // return editor != null ? editor.shouldSelectCell(e) : super.shouldSelectCell(e);
+      }
+
+      @Override
+      public boolean stopCellEditing () {
+//         System.err.println("PropValueCellEditor.stopCellEditing");
+         return editor != null ? editor.stopCellEditing() : super.stopCellEditing();
+         // TODO seems to be called twice in many situations: caused by focusLost listener?
+      }
+
+      @Override
+      public void cancelCellEditing () {
+//         System.err.println("PropValueCellEditor.cancelCellEditing");
+         if (editor != null)
+            editor.cancelCellEditing();
+         else
+            super.cancelCellEditing();
+      }
+
+      @Override
+      public void editingStopped (ChangeEvent e) {
+//         System.err.println("PropValueCellEditor.editingStopped");
+         fireEditingStopped();  // propagate event from auxiliary editor to our listeners
+      }
+
+      @Override
+      public void editingCanceled (ChangeEvent e) {
+//         System.err.println("PropValueCellEditor.editingCanceled");
+         fireEditingCanceled();  // propagate event from auxiliary editor to our listeners
       }
 
       @Override
       public Component getTableCellEditorComponent (JTable table, Object value, boolean isSelected, int row, int column) {
+//         System.err.println("PropValueCellEditor.getTableCellEditorComponent: old editor = " + editor);
          EditableProp<?> prop = tableModel.getEditablePropForRow(row);
+         if (editor != null)
+            editor.removeCellEditorListener(this);
          editor = prop.getTableCellEditor(table);
+         editor.addCellEditorListener(this);
+//         System.err.println("PropValueCellEditor.getTableCellEditorComponent: new editor = " + editor);
          return editor.getTableCellEditorComponent(table, value, isSelected, row, column);
       }
+
+      // should we listen for setCellEditor(null) property change in the JTable and de-register as  a listener earlier?
    }
 
    static class PropsTableModel extends AbstractTableModel
@@ -237,6 +290,7 @@ public class DetailsEditor {
       public int getColumnCount () {
          return 3;
       }
+
       @Override
       public ReadOnlyProp<?> getPropForRow (int rowIndex) {
          if (rowIndex < readOnlyProps.size())

@@ -2,13 +2,11 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.graph.EdgeCollector;
-import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
-import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
-import de.unibi.hbp.ncc.lang.utils.Iterators;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 public class DataPlot extends NamedEntity implements Connectable {
    private final Namespace<DataPlot> moreSpecificNamespace;
@@ -88,4 +86,37 @@ public class DataPlot extends NamedEntity implements Connectable {
    }
 
    public String getOutputFileName () { return Namespace.buildUnadornedPythonName(getName()) + ".png"; }
+
+   private static class ProbeComparator implements Comparator<ProbeConnection> {
+
+      private static String getTargetEntityName (ProbeConnection con) {
+         NamedEntity target = con.getTargetNamedEntity();
+         if (target != null)
+            return target.getName();
+         NetworkModule.Port targetPort = con.getTargetModulePort();
+         if (targetPort != null)
+            return targetPort.getOwningModule().getName() + "." + targetPort.getName();
+         // could also sandwich in direction, but only output ports are allowed as targets
+         return "";  // sorts to the front and avoids separate treatment of null values
+      }
+
+      @Override
+      public int compare (ProbeConnection conA, ProbeConnection conB) {
+         String nameA = getTargetEntityName(conA);
+         String nameB = getTargetEntityName(conB);
+         if (nameA.equals(nameB))
+            return conA.getDataSeries().compareTo(conB.getDataSeries());
+         else
+            return Namespace.getSmartNumericOrderComparator().compare(nameA, nameB);
+      }
+   }
+
+   private static final ProbeComparator orderByTargetAndSeries = new ProbeComparator();
+
+   public Collection<ProbeConnection> getOutgoingProbesSorted () {  // for code generation, determines order of panels in figure
+      List<ProbeConnection> probes = EdgeCollector.getOutgoingProbes(getOwningCell());
+      probes.sort(orderByTargetAndSeries);
+      return probes;
+
+   }
 }

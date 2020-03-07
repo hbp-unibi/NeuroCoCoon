@@ -2,6 +2,7 @@ package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
@@ -10,11 +11,12 @@ import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 public abstract class NetworkModule extends NamedEntity
-      implements GraphCellConfigurator, PlotDataSource {
+      implements GraphCellConfigurator {
    protected final Namespace<NetworkModule> moreSpecificNamespace;
 
    private String resourceFileBaseName;  // TODO store file basename (shared between icon and ST4 template file)
@@ -29,7 +31,7 @@ public abstract class NetworkModule extends NamedEntity
    protected static Namespace<NetworkModule> getGlobalNamespace () { return globalNamespace; }
 
 
-   public static class Port implements Serializable, Connectable {
+   public static class Port implements Serializable, Connectable, PlotDataSource {
       // TODO should Port extend LanguageEntity (and use the owning cell?) or even NamedEntity with one namespace per module instance?
 
       public enum Direction {IN, OUT}
@@ -37,7 +39,7 @@ public abstract class NetworkModule extends NamedEntity
       private String portName;
       private Direction portDirection;
       private int portIndex;
-      private mxCell portCell;
+      private mxICell portCell;
 
       public Port (String portName, int portIndex, Direction portDirection) {
          this.portName = portName;
@@ -51,8 +53,8 @@ public abstract class NetworkModule extends NamedEntity
       public int getIndex () { return portIndex; }
       void setIndex (int portIndex) { this.portIndex = portIndex; }
 
-      public mxCell getCell () { return portCell; }
-      void setCell (mxCell portCell) { this.portCell = Objects.requireNonNull(portCell); }
+      public mxICell getCell () { return portCell; }
+      void setCell (mxICell portCell) { this.portCell = Objects.requireNonNull(portCell); }
       void clearCell () { this.portCell = null; }
 
       @Override
@@ -89,6 +91,16 @@ public abstract class NetworkModule extends NamedEntity
          return (NetworkModule) portCell.getParent().getValue();
       }
 
+      @Override
+      public Collection<ProbeConnection.DataSeries> getSupportedDataSeries () {
+         return getOwningModule().getPortDataSeries(portDirection, portIndex);
+      }
+
+      @Override
+      public Collection<ProbeConnection.DataSeries> getRequiredDataSeries () {
+         return EdgeCollector.getRequiredDataSeries(this);
+      }
+
       public String getUnadornedPythonName () { return Namespace.buildUnadornedPythonName(portName); }
    }
 
@@ -103,6 +115,14 @@ public abstract class NetworkModule extends NamedEntity
          if (name.equals(port.getName()))
             return port;
       return null;
+   }
+
+   public Port adoptCellForPort (mxICell cell, boolean isInput, String portName) {
+      Port port = findPortByName(isInput ? inputPorts : outputPorts, portName);
+      assert port != null : "encoded port could not be resolved";
+      port.setCell(cell);
+      cell.setValue(port);
+      return port;
    }
 
    private Port findPortByName (String name) {
@@ -136,12 +156,12 @@ public abstract class NetworkModule extends NamedEntity
 
    private void updatePort (mxGraph graph, mxCell moduleCell, Port port, mxGeometry portGeo, String style) {
       portGeo.setRelative(true);
-      mxCell portCell = port.getCell();
+      mxICell portCell = port.getCell();
       if (portCell == null) {
-         portCell = new mxCell(port, portGeo, style);
-         portCell.setVertex(true);
-         graph.addCell(portCell, moduleCell);
-         port.setCell(portCell);
+         mxCell cell = new mxCell(port, portGeo, style);
+         cell.setVertex(true);
+         graph.addCell(cell, moduleCell);
+         port.setCell(cell);
       }
       else {
          final mxIGraphModel graphModel = graph.getModel();
@@ -177,7 +197,7 @@ public abstract class NetworkModule extends NamedEntity
       if (ports == null)
          return;
       for (Port port: ports) {
-         mxCell portCell = port.getCell();
+         mxICell portCell = port.getCell();
          if (portCell != null)
             graph.getModel().remove(portCell);
          port.clearCell();
@@ -214,8 +234,7 @@ public abstract class NetworkModule extends NamedEntity
       inputPorts = buildPortList(Port.Direction.IN, null);
       outputPorts = buildPortList(Port.Direction.OUT, null);
       // newly placed modules always start with the non-wide/vertical port layout
-      useWideLayout = false; // moduleGeo.getWidth() >= 3 * moduleGeo.getHeight();
-      // modulePlaceholder.setStyle(useWideLayout ? "moduleWide" : "module");  // module is the style of the palette cells
+      useWideLayout = false;
       int layoutSteps = computeLayoutSteps();
       mxGeometry previousModuleGeo = modulePlaceholder.getGeometry();
       mxGeometry moduleGeo = new mxGeometry(previousModuleGeo.getX(), previousModuleGeo.getY(),
@@ -264,21 +283,18 @@ public abstract class NetworkModule extends NamedEntity
          updatePorts(graph, existingCell, layoutSteps);
    }
 
+   public void reviveAfterLoading (mxICell moduleCell) {
+      assert inputPorts == null && outputPorts == null;
+      inputPorts = buildPortList(Port.Direction.IN, null);
+      outputPorts = buildPortList(Port.Direction.OUT, null);
+      String cellStyle = moduleCell.getStyle();
+      useWideLayout = cellStyle != null && cellStyle.startsWith("moduleWide");
+   }
+
    protected NetworkModule (Namespace<NetworkModule> namespace, String name, String resourceFileBaseName) {
       super(namespace, name);
       moreSpecificNamespace = namespace;
       this.resourceFileBaseName = Objects.requireNonNull(resourceFileBaseName);
-   }
-
-   protected static NeuronType ensureDefaultType (Namespace<NeuronType> neuronTypes, String typeName) {
-      NeuronType neuronType = neuronTypes.get(typeName);
-      if (neuronType == null) {
-         neuronType = new NeuronType(neuronTypes, typeName,
-                                     NeuronType.NeuronKind.IF_COND_EXP,
-                                     -70.0, -80.0, -60.0, 0.0, -100.0,
-                                     3.0, 3.0, 1.0, 10.0, 0.2, 0.0);
-      }
-      return neuronType;
    }
 
    protected List<String> getPortNames (List<String> cache, int count, String prefix) {
@@ -294,6 +310,11 @@ public abstract class NetworkModule extends NamedEntity
 
    protected abstract int getPortDimension (Port.Direction direction, int portIndex);
    // TODO need to provide a cardinality (neuron count) per port as well
+
+   // TODO provide a PlotDataSource info per port as well
+   protected abstract Collection<ProbeConnection.DataSeries> getPortDataSeries (Port.Direction direction, int portIndex);
+
+   protected abstract boolean getPortIsConductanceBased (Port.Direction direction, int portIndex);
 
    protected boolean getPortIsOptional (Port.Direction direction, int portIndex) {
       return false;

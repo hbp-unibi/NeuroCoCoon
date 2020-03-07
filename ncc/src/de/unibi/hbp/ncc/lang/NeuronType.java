@@ -22,9 +22,9 @@ public class NeuronType extends NamedEntity {
       IZHIKEVICH("Izhikevich", "Izhikevich", false,
                  EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE,
                             ProbeConnection.DataSeries.IZHIKEVICH_U)),
-      IF_CURR_EXP("IF Cond Exp", "IF_curr_exp", false,
+      IF_CURR_EXP("IF Curr Exp", "IF_curr_exp", false,
                   EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE)),
-      IF_CURR_ALPHA("IF Cond Alpha", "IF_curr_alpha", false,
+      IF_CURR_ALPHA("IF Curr Alpha", "IF_curr_alpha", false,
                     EnumSet.of(ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE));
 
       private final String displayName, pythonName;
@@ -166,6 +166,8 @@ public class NeuronType extends NamedEntity {
    public String getParametersPythonName () { return getDerivedPythonName("npm"); }
 
    public NeuronKind getNeuronKind () { return neuronKind.getValue(); }
+
+   public boolean isConductanceBased () { return getNeuronKind().isConductanceBased(); }
 
    public Collection<ProbeConnection.DataSeries> getSupportedDataSeries () {
       return getNeuronKind().getSupportedDataSeries();

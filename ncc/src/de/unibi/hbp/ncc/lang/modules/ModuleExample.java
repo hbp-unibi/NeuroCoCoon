@@ -9,7 +9,7 @@ import de.unibi.hbp.ncc.lang.ProbeConnection;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.List;
 
 public class ModuleExample extends NetworkModule {
@@ -54,11 +54,15 @@ public class ModuleExample extends NetworkModule {
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }
 
-   private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES = EnumSet.of(
-         ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE);
+   @Override
+   protected Collection<ProbeConnection.DataSeries> getPortDataSeries (Port.Direction direction, int portIndex) {
+      return Collections.emptySet();
+   }
 
    @Override
-   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
+   protected boolean getPortIsConductanceBased (Port.Direction direction, int portIndex) {
+      return false;
+   }
 
    public static final EntityCreator<ModuleExample> CREATOR = new Creator();
 

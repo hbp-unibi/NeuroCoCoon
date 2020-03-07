@@ -20,6 +20,7 @@ import de.unibi.hbp.ncc.lang.SynapseType;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,6 +28,8 @@ import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class EditorToolBar extends JToolBar
 {
@@ -34,10 +37,11 @@ public class EditorToolBar extends JToolBar
 
 	private boolean ignoreZoomChange = false;
 
-	private Action checkAction;
-	private JLabel jobStatusDisplay;
+	private final Action checkAction;
+	private final JLabel jobStatusDisplay;
 	private NmpiClient.Platform currentPlatform;
 	private SynapseType currentSynapseType;
+	private JComboBox<SynapseType> synapseTypeComboBox;
 
 	private static final String IMAGE_PATH = "images/"; // "/de/unibi/hbp/ncc/editor/images/";  // "../images/";
 
@@ -161,18 +165,20 @@ public class EditorToolBar extends JToolBar
 				currentSynapseType = (SynapseType) selected;
 			// TODO should we change all currently selected edges to this type? and update this combobox to the type of a selected edge?
 		});
-		add(new JLabel("Synapse Type:"));
+		synapseTypeComboBox = synapseTypeCombo;
+		add(new JLabel("New Synapses:"));
 		add(synapseTypeCombo);
 		addSeparator();
 
 		checkAction = editor.bind("Check", new CheckAction(), IMAGE_PATH + "check.png");
 		add(checkAction);
-		add(editor.bind("Run", new RunAction(), IMAGE_PATH + "run.png"));
+		RunAction runAction = new RunAction();
+		add(editor.bind("Run", runAction, IMAGE_PATH + "run.png"));
 		final JComboBox<NmpiClient.Platform> platformCombo = new JComboBox<>(NmpiClient.Platform.values());
 		platformCombo.setEditable(false);
-		platformCombo.setMinimumSize(new Dimension(120, 0));
-		platformCombo.setPreferredSize(new Dimension(120, 0));
-		platformCombo.setMaximumSize(new Dimension(120, 100));
+		platformCombo.setMinimumSize(new Dimension(100, 0));
+		platformCombo.setPreferredSize(new Dimension(140, 0));
+		platformCombo.setMaximumSize(new Dimension(140, 100));
 		currentPlatform = JavaScriptBridge.isWebPlatform() ? NmpiClient.Platform.SPINNAKER : NmpiClient.Platform.NEST;
 		platformCombo.setSelectedItem(currentPlatform);
 		platformCombo.addActionListener(e -> {
@@ -234,8 +240,17 @@ cb.setRenderer(new DefaultListCellRenderer() {
 
 		final JLabel jobStatus = new JLabel();
 		jobStatusDisplay = jobStatus;
-		setJobStatus(StatusLevel.PLACEHOLDER, "No Job");
+		setJobStatusInToolBar(StatusLevel.PLACEHOLDER, "No Job");
 		jobStatus.setForeground(Color.GRAY);
+		jobStatus.addMouseListener(
+				new MouseAdapter() {
+					@Override
+					public void mouseClicked (MouseEvent e) {
+						if (!runAction.showLastOutput())
+							getToolkit().beep();
+					}
+				}
+		);
 		add(jobStatus);
 	}
 
@@ -243,8 +258,14 @@ cb.setRenderer(new DefaultListCellRenderer() {
 
 	public SynapseType getCurrentSynapseType () { return currentSynapseType; }
 
-	enum StatusLevel {
-		PLACEHOLDER(Color.GRAY), NEUTRAL(Color.BLACK), GOOD(Color.GREEN.darker()), BAD(Color.RED.darker());
+	public void setCurrentSynapseType (SynapseType synapseType) {
+		currentSynapseType = synapseType;
+		synapseTypeComboBox.setSelectedItem(synapseType);
+	}
+
+	public enum StatusLevel {
+		PLACEHOLDER(Color.GRAY), NEUTRAL(Color.BLACK),
+		GOOD(new Color(0x008800)), BAD(new Color(0x880000));
 
 		private Color textColor;
 
@@ -253,16 +274,19 @@ cb.setRenderer(new DefaultListCellRenderer() {
 		Color getTextColor () { return textColor; }
 	}
 
-	public void setJobStatus (StatusLevel level, String statusText) {
+	public void setJobStatusInToolBar (StatusLevel level, String statusText) {
 		jobStatusDisplay.setText(statusText);
 		jobStatusDisplay.setForeground(level.getTextColor());
 	}
 
-	public void setJobStatus (String statusText) {
-		setJobStatus(StatusLevel.NEUTRAL, statusText);
+	private static ImageIcon loadIcon (String fileName) {
+		return new ImageIcon(EditorToolBar.class.getResource(IMAGE_PATH + fileName));
 	}
 
+	private final static ImageIcon CHECK_MARK_ICON = loadIcon("check.png");
+	private final static ImageIcon PROBLEM_ICON = loadIcon("problem.png");
+
 	public void setProblemStatus (boolean anyProblems) {
-		checkAction.putValue(Action.SMALL_ICON, IMAGE_PATH + (anyProblems ? "problem.png" : "check.png"));
+		checkAction.putValue(Action.SMALL_ICON, anyProblems ? PROBLEM_ICON : CHECK_MARK_ICON);
 	}
 }

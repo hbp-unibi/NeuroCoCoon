@@ -1,20 +1,23 @@
 package de.unibi.hbp.ncc.graph;
 
 import com.mxgraph.model.mxICell;
+import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
 import de.unibi.hbp.ncc.lang.ProbeConnection;
-import de.unibi.hbp.ncc.lang.utils.Iterators;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 public final class EdgeCollector {
 
    private EdgeCollector () {}
 
-   private static Iterable<NeuronConnection> getSynapsesAt (mxICell vertex, boolean vertexIsSource) {
+   private static List<NeuronConnection> getSynapsesAt (mxICell vertex, boolean vertexIsSource) {
       if (vertex == null)
-         return Iterators.emptyIterable();
+         return Collections.emptyList();
       int edgeCount = vertex.getEdgeCount();
       List<NeuronConnection> result = new ArrayList<>(edgeCount);  // over estimates (all vs. incoming/outgoing edges only)
       for (int edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++) {
@@ -28,17 +31,17 @@ public final class EdgeCollector {
       return result;
    }
 
-   public static Iterable<NeuronConnection> getIncomingSynapses (mxICell vertex) {
+   public static List<NeuronConnection> getIncomingSynapses (mxICell vertex) {
       return getSynapsesAt(vertex, false);
    }
 
-   public static Iterable<NeuronConnection> getOutgoingSynapses (mxICell vertex) {
+   public static List<NeuronConnection> getOutgoingSynapses (mxICell vertex) {
       return getSynapsesAt(vertex, true);
    }
 
-   private static Iterable<ProbeConnection> getProbesAt (mxICell vertex, boolean vertexIsSource) {
+   private static List<ProbeConnection> getProbesAt (mxICell vertex, boolean vertexIsSource) {
       if (vertex == null)
-         return Iterators.emptyIterable();
+         return Collections.emptyList();
       int edgeCount = vertex.getEdgeCount();
       List<ProbeConnection> result = new ArrayList<>(edgeCount);  // over estimates (all vs. incoming/outgoing edges only)
       for (int edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++) {
@@ -52,12 +55,19 @@ public final class EdgeCollector {
       return result;
    }
 
-   public static Iterable<ProbeConnection> getIncomingProbes (mxICell vertex) {
+   public static List<ProbeConnection> getIncomingProbes (mxICell vertex) {
       return getProbesAt(vertex, false);
    }
 
-   public static Iterable<ProbeConnection> getOutgoingProbes (mxICell vertex) {
+   public static List<ProbeConnection> getOutgoingProbes (mxICell vertex) {
       return getProbesAt(vertex, true);
+   }
+
+   public static Collection<ProbeConnection.DataSeries> getRequiredDataSeries (Connectable connectable) {
+      EnumSet<ProbeConnection.DataSeries> union = EnumSet.noneOf(ProbeConnection.DataSeries.class);
+      for (ProbeConnection probe: connectable.getIncomingProbes())
+         union.add(probe.getDataSeries());
+      return union;
    }
 
    // TODO do we need support for AnyConnection edge collectors?

@@ -29,7 +29,7 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
    private Class<T> memberClazz;
    private Map<String, T> members;
    private Set<String> normalizedMemberNames;
-   private T mostRecentlyAdded;
+   private T mostRecentlyAdded, firstPredefined;
    private String memberDescription;  // for error messages
    private Map<String, Integer> nameGenerators;
    private String pythonDiscriminator;
@@ -78,6 +78,7 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
       this.members.clear();
       this.normalizedMemberNames.clear();
       this.nameGenerators.clear();
+      mostRecentlyAdded = firstPredefined = null;
       if (listModel != null)
          listModel.clear();
    }
@@ -119,6 +120,7 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
          throw new LanguageException(oldValue, "predefined member " + memberName + " must not be removed");
       if (oldValue.equals(mostRecentlyAdded))
          mostRecentlyAdded = null;
+      // firstPredefined does NOT need a similar check, because predefined members cannot be removed
       if (listModel != null)
          listModel.removeElement(oldValue);
    }
@@ -165,12 +167,23 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
       return members.isEmpty();
    }
 
+   void markedAsPredefined (NamedEntity member) {
+      if (!this.equals(member.getNamespace()))
+         throw new IllegalArgumentException("member not part of this namespace: " + member);
+      if (!member.isPredefined())
+         throw new IllegalStateException("member is not marked as predefined: " + member);
+      if (firstPredefined == null)
+         firstPredefined = memberClazz.cast(member);
+   }
+
    // this is only used for namespaces without predefined entities, otherwise we should support
    // marking one of the predefined entities as a universal default entity explicitly
    public T getFallbackDefault () {
       if (members.isEmpty())
          throw new IllegalStateException("empty namespace");
-      if (mostRecentlyAdded != null)
+      if (firstPredefined != null)
+         return firstPredefined;
+      else if (mostRecentlyAdded != null)
          return mostRecentlyAdded;
       else
          return members.values().iterator().next();

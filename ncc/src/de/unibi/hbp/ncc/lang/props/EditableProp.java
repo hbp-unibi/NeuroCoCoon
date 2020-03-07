@@ -2,7 +2,6 @@ package de.unibi.hbp.ncc.lang.props;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
-import java.util.EnumSet;
 
 public interface EditableProp<T> extends ReadOnlyProp<T> {
 

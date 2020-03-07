@@ -726,7 +726,7 @@ public class EditorActions {
 					mxCell root = new mxCell();
 					root.insert(new mxCell());
 					graph.getModel().setRoot(root);
-					editor.getProgram().clear();
+					editor.getProgram().clear(editor.getEditorToolBar());
 
 					editor.setModified(false);
 					editor.setCurrentFile(null);

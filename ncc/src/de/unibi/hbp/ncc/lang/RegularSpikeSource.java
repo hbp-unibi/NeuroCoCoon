@@ -37,7 +37,7 @@ public class RegularSpikeSource extends NeuronPopulation {
    }
 
    public RegularSpikeSource (Namespace<NeuronPopulation> namespace, String name) {
-      this(namespace, name, 1, 100.0, 0.0, 0.0, 5000.0);
+      this(namespace, name, 1, 100.0, 0.0, 100.0, 5000.0);
    }
 
    public RegularSpikeSource (String name) { this(getGlobalNamespace(), name); }
@@ -52,7 +52,7 @@ public class RegularSpikeSource extends NeuronPopulation {
          EnumSet.of(ProbeConnection.DataSeries.SPIKES);
 
    @Override
-   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
+   public Collection<ProbeConnection.DataSeries> getSupportedDataSeries () { return SUPPORTED_DATA_SERIES; }
 
    public static final EntityCreator<RegularSpikeSource> CREATOR = new RegularSpikeSource.Creator();
 

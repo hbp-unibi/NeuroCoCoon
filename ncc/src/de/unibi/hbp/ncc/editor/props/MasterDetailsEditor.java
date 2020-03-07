@@ -5,7 +5,6 @@ import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -20,11 +19,9 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.function.Function;
 
@@ -47,7 +44,6 @@ public class MasterDetailsEditor<E extends NamedEntity> {
       columnModel.addColumn(markerColumn);
       TableColumn nameColumn = new TableColumn(1);
       nameColumn.setHeaderValue("Name");
-      nameColumn.setCellEditor(new NameCellEditor());
       columnModel.addColumn(nameColumn);
       MasterTableModel masterModel = new MasterTableModel();
       masterTable = new JTable(masterModel, columnModel);
@@ -187,24 +183,6 @@ public class MasterDetailsEditor<E extends NamedEntity> {
       public boolean isCellEditable (int rowIndex, int columnIndex) {
          return columnIndex == 1 &&
                !listModel.getElementAt(rowIndex).isPredefined();
-      }
-   }
-
-   class NameCellEditor extends AbstractCellEditor implements TableCellEditor {
-      private TableCellEditor editor;
-
-      @Override
-      public Object getCellEditorValue () {
-         if (editor != null) {
-            return editor.getCellEditorValue();
-         }
-         return null;
-      }
-
-      @Override
-      public Component getTableCellEditorComponent (JTable table, Object value, boolean isSelected, int row, int column) {
-         editor = getNamePropForRow(row).getTableCellEditor(table);
-         return editor.getTableCellEditorComponent(table, value, isSelected, row, column);
       }
    }
 

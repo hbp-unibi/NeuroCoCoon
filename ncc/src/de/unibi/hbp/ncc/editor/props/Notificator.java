@@ -9,7 +9,6 @@ import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 public class Notificator {

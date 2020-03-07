@@ -25,7 +25,7 @@ define_spikeSource(src) ::= <<
 >>
 
 define_poissonSource(poi) ::= <<
-<poi.pythonName> = sim.Population(<pop.neuronCount>,<\\>
+<poi.pythonName> = sim.Population(<poi.neuronCount>,<\\>
 sim.SpikeSourcePoisson(rate=<poi.rate>, start=<poi.start>, duration=<poi.duration>), label="<poi.name>")
 >>
 
@@ -63,13 +63,21 @@ probe_target(probe) ::= <<
 <if(probe.targetNamedEntity)><probe.targetNamedEntity.pythonName><else><port_population(probe.targetModulePort)><endif>
 >>
 
-instrument_oneProbeTarget(probe) ::= <<
-<probe_target(probe)>.record(['<probe.dataSeries.pythonName>'])
+instrument_oneProbeTarget(target, targetName) ::= <<
+<targetName>.record([<target.requiredDataSeries:{it | '<it.pythonName>'}; separator=", ">])
 <! TODO do we need to consolidate multiple probe edges between two nodes into one record call with multiple arguments !>
 >>
 
-instrument_probeTargets(plot) ::= <<
-<plot.outgoingProbes:instrument_oneProbeTarget()>
+instrument_populationProbes(pop) ::= <<
+<if(pop.anyIncomingProbes)><instrument_oneProbeTarget(pop, pop.pythonName)><endif>
+>>
+
+instrument_portProbes(port) ::= <<
+<if(port.anyIncomingProbes)><instrument_oneProbeTarget(port, port_population(port))><endif>
+>>
+
+instrument_modulePortProbes(modinst) ::= <<
+<modinst.outputPorts:instrument_portProbes()>
 >>
 
 probe_target_gid(probe) ::= <<
@@ -80,6 +88,9 @@ port_gid(port) ::= <<
 <port.owningModule.unadornedPythonName>_<port.directionAsString>_<port.unadornedPythonName>
 >>
 
+// TODO code generation for analog signals
+// TODO cyclic multi-colored graphs
+// TODO legend fix still required?
 create_panel(probe) ::= <<
     Panel(
         <probe_target(probe)>.get_data().segments[0].spiketrains,
@@ -91,7 +102,7 @@ create_panel(probe) ::= <<
 
 create_plot(plot, target) ::= <<
 fig = Figure(
-<plot.outgoingProbes:create_panel(); separator="\n">
+<plot.outgoingProbesSorted:create_panel(); separator="\n">
   title="<plot.name>",
   annotations="Simulated with <target.displayName>"
 )
@@ -121,9 +132,10 @@ sim.setup(timestep=<prog.timeStep>)
 
 <scope.moduleInstances:define_module_instance(); separator="\n">
 
-<scope.dataPlots:instrument_probeTargets(); separator="\n">
+<scope.neuronPopulations:instrument_populationProbes(); separator="\n">
+<scope.moduleInstances:instrument_modulePortProbes(); separator="\n">
 
-<scope.connectorKinds:define_connectorKind(); separator="\n">
+<scope.connectorKinds:define_connectorKind(); separator="\n"><! (minor) TODO output referenced connector kinds only !>
 
 <scope.neuronPopulations:define_outgoingSynapses(); separator="\n">
 
@@ -146,7 +158,7 @@ def fix_legends(pynn_fig):
 
 if options.image_viewer != '-':
   import subprocess
-  subprocess.run([options.image_viewer, "XOR_behavior.png", "XOR_hidden.png"])
+  subprocess.run([options.image_viewer, <scope.dataPlots:{it | it.outputFileName}; separator=", ">])
 
 sim.end()
 >>

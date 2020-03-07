@@ -145,7 +145,7 @@ public class BasicGraphEditor extends JPanel
 		inner.setDividerSize(6);
 		inner.setBorder(null);
 
-		JTabbedPane inspector = new JTabbedPane();
+		JTabbedPane inspector = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
 		addInspectorTabs(inspector);
 
 		JSplitPane graphAndInspector = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphComponent, inspector);
@@ -401,8 +401,7 @@ public class BasicGraphEditor extends JPanel
 		return newAction;
 	}
 
-	public void status(String msg)
-	{
+	public void status(String msg) {
 		statusBar.setText(msg);
 	}
 

@@ -6,21 +6,16 @@ import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
-import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
-import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 import de.unibi.hbp.ncc.lang.props.ProbabilityProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
 
-import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 
-public class WinnerTakeAll extends NetworkModule {
-   private final EditableNameProp<NeuronType> neuronType;
+public class WinnerTakeAll extends SingleNeuronTypeModule {
    private final IntegerProp numberOfPopulations, numberOfNeurons;
    private final DoubleProp noiseWeight, inhibitionWeight, excitationWeight;
    private final DoubleProp noiseRate, noiseProbability, inhibitionProbability, excitationProbability, synapseDelay;
@@ -28,7 +23,6 @@ public class WinnerTakeAll extends NetworkModule {
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
-      list.add(neuronType);
       list.add(numberOfPopulations);
       list.add(numberOfNeurons);
       list.add(noiseWeight);
@@ -53,11 +47,7 @@ public class WinnerTakeAll extends NetworkModule {
                          double noiseRate, double noiseProbability,
                          double inhibitionProbability, double excitationProbability,
                          double synapseDelay) {
-      super(namespace, name, CREATOR.getResourceFileBaseName());
-      Namespace<NeuronType> neuronTypes = namespace.getContainingScope().getNeuronTypes();
-      if (neuronType == null)
-         neuronType = ensureDefaultType(neuronTypes, DEFAULT_NEURON_TYPE_NAME);
-      this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this, neuronType, neuronTypes);
+      super(namespace, name, CREATOR.getResourceFileBaseName(), neuronType, DEFAULT_NEURON_TYPE_NAME);
       this.numberOfPopulations = new StrictlyPositiveIntegerProp("Number of Outcomes", this, numberOfPopulations)
             .addImpact(EditableProp.Impact.CELL_STRUCTURE);
       this.numberOfNeurons = new StrictlyPositiveIntegerProp("Neurons per Population", this, numberOfNeurons);
@@ -71,20 +61,28 @@ public class WinnerTakeAll extends NetworkModule {
       this.synapseDelay = new NonNegativeDoubleProp("Synapse Delay", this, synapseDelay).setUnit("ms");
    }
 
-   public WinnerTakeAll (Namespace<NetworkModule> namespace) {
-      this(namespace, null, null,
+   @Override
+   protected NeuronType createDefaultNeuronType (Namespace<NeuronType> neuronTypes, String typeName) {
+      return new NeuronType(neuronTypes, typeName, NeuronType.NeuronKind.IF_COND_EXP,
+                            -70.0, -80.0, -60.0, 0.0, -100.0,
+                            3.0, 3.0, 1.0, 10.0, 0.2, 0.0);
+   }
+
+   public WinnerTakeAll (Namespace<NetworkModule> namespace, String name) {
+      this(namespace, name, null,
            3, 5,
            0.01, 0.005, 0.005,
            20.0, 0.7, 0.5, 0.7,
            1.0);
    }
 
-   public WinnerTakeAll () {
-      this(getGlobalNamespace());
+   public WinnerTakeAll (String name) {
+      this(getGlobalNamespace(), name);
    }
+   public WinnerTakeAll () { this((String) null); }
 
    protected WinnerTakeAll (WinnerTakeAll orig) {
-      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.neuronType.getValue(),
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.getNeuronType(),
            orig.numberOfPopulations.getValue(), orig.numberOfNeurons.getValue(),
            orig.noiseWeight.getValue(), orig.inhibitionWeight.getValue(), orig.excitationWeight.getValue(),
            orig.noiseRate.getValue(), orig.noiseProbability.getValue(),
@@ -120,12 +118,6 @@ public class WinnerTakeAll extends NetworkModule {
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }
 
-   private static final EnumSet<ProbeConnection.DataSeries> SUPPORTED_DATA_SERIES = EnumSet.of(
-         ProbeConnection.DataSeries.SPIKES, ProbeConnection.DataSeries.VOLTAGE);
-
-   @Override
-   public Collection<ProbeConnection.DataSeries> validDataSeries () { return SUPPORTED_DATA_SERIES; }
-
    @Override
    public LanguageEntity duplicate () {
       return new WinnerTakeAll(this);
@@ -148,7 +140,7 @@ public class WinnerTakeAll extends NetworkModule {
 
    public int getNumberOfPopulations () { return numberOfPopulations.getValue(); }
    public int getNumberOfNeuronsPerPopulation () { return numberOfNeurons.getValue(); }
-   public NeuronType getNeuronType () { return neuronType.getValue(); }
+
    public double getNoiseWeight () { return noiseWeight.getValue(); }
    public double getInhibitionWeight () { return inhibitionWeight.getValue(); }
    public double getExcitationWeight () { return excitationWeight.getValue(); }

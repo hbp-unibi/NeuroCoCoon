@@ -5,7 +5,6 @@ import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +53,7 @@ public class StandardPopulation extends NeuronPopulation {
    }
 
    @Override
-   public Collection<ProbeConnection.DataSeries> validDataSeries () {
+   public Collection<ProbeConnection.DataSeries> getSupportedDataSeries () {
       return neuronType.getValue().getSupportedDataSeries();
    }
 

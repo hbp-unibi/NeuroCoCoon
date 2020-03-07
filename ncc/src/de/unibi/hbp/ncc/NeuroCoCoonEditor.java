@@ -19,6 +19,7 @@ import de.unibi.hbp.ncc.editor.BasicGraphEditor;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
+import de.unibi.hbp.ncc.editor.EntityConfigurator;
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.editor.TooltipProvider;
 import de.unibi.hbp.ncc.editor.props.DetailsEditor;
@@ -49,6 +50,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.Component;
@@ -148,7 +150,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 								   100, 60, ModuleExample.CREATOR);
 	}
 
-	private final Component NO_RESULTS_PLACEHOLDER = new JLabel("No results.");
+	private final Component NO_RESULTS_PLACEHOLDER = new JLabel("No results.", SwingConstants.CENTER);
 	private static final String DEFAULT_RESULTS_TAB_TITLE = "Results";
 
 	@Override
@@ -165,7 +167,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		// dataPlotEditor = new MasterDetailsEditor<>(global.getDataPlots(), DataPlot::new, this);
 		resultsTabIndex = inspector.getTabCount();
 		inspector.addTab(DEFAULT_RESULTS_TAB_TITLE, NO_RESULTS_PLACEHOLDER);
-		inspector.setEnabledAt(resultsTabIndex, false);
+		// inspector.setEnabledAt(resultsTabIndex, false);
 		super.addInspectorTabs(inspector);
 	}
 
@@ -175,12 +177,36 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		if (content == null) content = NO_RESULTS_PLACEHOLDER;
 		rightHandTabs.setTitleAt(resultsTabIndex, tabTitle);
 		rightHandTabs.setComponentAt(resultsTabIndex, content);
-		rightHandTabs.setEnabledAt(resultsTabIndex, enableTab);
+		// rightHandTabs.setEnabledAt(resultsTabIndex, enableTab);
+		// disabling only means that clicks on the tab header are ignored
+		// there is no visible difference for a disabled tab header
 		if (activateTab && enableTab)
 			rightHandTabs.setSelectedIndex(resultsTabIndex);
 	}
 
-	public static class ProgramGraphComponent extends mxGraphComponent
+	public void setJobStatus (EditorToolBar.StatusLevel level, String topSummary, String longerBottomText) {
+		getEditorToolBar().setJobStatusInToolBar(level, topSummary);
+		status(longerBottomText);
+	}
+
+	public void setJobStatus (EditorToolBar.StatusLevel level, String shortSummary) {
+		setJobStatus(level, shortSummary, shortSummary);
+	}
+
+	public void setJobStatus (String topSummary, String longerBottomText) {
+		setJobStatus(EditorToolBar.StatusLevel.NEUTRAL, topSummary, longerBottomText);
+	}
+
+	public void setJobStatus (String shortSummary) {
+		setJobStatus(EditorToolBar.StatusLevel.NEUTRAL, shortSummary, shortSummary);
+	}
+
+	public void clearJobStatus () {
+		setJobStatus(EditorToolBar.StatusLevel.PLACEHOLDER, "No Job", "");
+	}
+
+
+		public static class ProgramGraphComponent extends mxGraphComponent
 	{
 		private final ProgramGraph programGraph;
 
@@ -333,6 +359,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					LanguageEntity duplicatedValue = null;
 					if (value instanceof EntityCreator) {
 						duplicatedValue = ((EntityCreator<?>) value).create();
+						if (value instanceof EntityConfigurator) {
+							((EntityConfigurator) value).configureEntityAndCell(duplicatedValue, cell, toolBar);
+						}
 					}
 					else if (value instanceof LanguageEntity) {
 						LanguageEntity entityValue = (LanguageEntity) value;

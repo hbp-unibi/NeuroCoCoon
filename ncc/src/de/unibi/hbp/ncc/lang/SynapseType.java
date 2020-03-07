@@ -180,9 +180,11 @@ public class SynapseType extends NamedEntity {
       return new AbstractCellsCollector(false, true) {
          @Override
          protected boolean matches (mxICell cell, LanguageEntity entity) {
+/*
             if (entity instanceof NeuronConnection)
                System.err.println("getDependentCells: " + cell + ", " + entity + ", " + SynapseType.this + ", " +
                                         ((NeuronConnection) entity).getSynapseType());
+*/
             return entity instanceof NeuronConnection &&
                   SynapseType.this.equals(((NeuronConnection) entity).getSynapseType());
          }

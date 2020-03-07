@@ -128,10 +128,7 @@ public class ErrorCollector implements STErrorListener {
    }
 
    @Override
-   public void runTimeError (STMessage msg) {
-      recordError(null, msg.toString());
-
-   }
+   public void runTimeError (STMessage msg) { recordError(null, msg.toString()); }
 
    @Override
    public void IOError (STMessage msg) {
@@ -149,7 +146,7 @@ public class ErrorCollector implements STErrorListener {
 
    public boolean hasAnyWarnings () { return anyWarnings | anyErrors; }
 
-   private static final int ICON_CELL_SIZE = 26;  // icon itself is 24x24
+   private static final int ICON_CELL_SIZE = 28;  // icon itself is 24x24
 
    public Component buildDisplayAndNavigationComponent (mxGraphComponent graphComponent) {
       TableColumnModel columnModel = new DefaultTableColumnModel();
@@ -161,9 +158,11 @@ public class ErrorCollector implements STErrorListener {
       columnModel.addColumn(severityColumn);
       TableColumn entityColumn = new TableColumn(1);
       entityColumn.setHeaderValue("Affected");
+      entityColumn.setCellRenderer(new FullTextToolTipRenderer());
       columnModel.addColumn(entityColumn);
       TableColumn messageColumn = new TableColumn(2);
       messageColumn.setHeaderValue("Message");
+      messageColumn.setCellRenderer(new FullTextToolTipRenderer());
       columnModel.addColumn(messageColumn);
       JTable errorTable = new JTable(new ErrorTableModel(), columnModel);
       errorTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -179,20 +178,35 @@ public class ErrorCollector implements STErrorListener {
                   LanguageEntity responsible = (LanguageEntity) errorTable.getValueAt(selectedRow, 1);
                   if (responsible != null) {
                      mxICell cell = responsible.getOwningCell();
-                     if (cell != null)
+                     if (cell != null) {
                         graphComponent.scrollCellToVisible(cell);
+                        graphComponent.getGraph().setSelectionCell(cell);
+                     }
                   }
                }
             }
       );
-      // FIXME implement click navigation to graph node
       return errorTable;
+   }
+
+   private static class FullTextToolTipRenderer extends DefaultTableCellRenderer {
+      @Override
+      protected void setValue (Object value) {
+         super.setValue(value);
+         setToolTipText(
+               value instanceof DisplayNamed
+                     ? ((DisplayNamed) value).getLongDisplayName()
+                     : value != null ? value.toString() : null);
+      }
    }
 
    private static class IconCellRenderer extends DefaultTableCellRenderer {
       @Override
       protected void setValue (Object value) {
+         setHorizontalAlignment(CENTER);
+         setVerticalAlignment(CENTER);
          setIcon(((Severity) value).getIcon());
+         setToolTipText(((DisplayNamed) value).getDisplayName());
       }
    }
 

@@ -5,7 +5,6 @@ import de.unibi.hbp.ncc.lang.LanguageEntity;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
-import java.util.EnumSet;
 
 public class DoubleProp extends SimpleEditableProp<Double> {
 
