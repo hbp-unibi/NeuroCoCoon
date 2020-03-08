@@ -12,8 +12,9 @@ import com.mxgraph.model.mxGraphModel.mxVisibleChange;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +42,10 @@ public class mxCodecRegistry
 	 * Holds the list of known packages. Packages are used to prefix short
 	 * class names (eg. mxCell) in XML markup.
 	 */
-	protected static List<String> packages = new ArrayList<>();
+	protected static Set<String> packages = new LinkedHashSet<>();
+	// avoid duplicates, if the same package is registered multiple times, but preserve
+	// original registration order, as earlier packages take precedence when resolving
+	// XML elements that use simple class names without packages
 
 	// Registers the known codecs and package names
 	static {
@@ -72,26 +76,37 @@ public class mxCodecRegistry
 	 * in the codec with the codec object. Automatically creates an alias if the
 	 * codename and the classname are not equal.
 	 */
-	public static mxObjectCodec register (mxObjectCodec codec) {
+	// pretendedTemplateClassName should match what beforeEncode() expects and afterDecode() returns
+	// intended for codes (like our LanguageEntityCodec) that onvert the objects to a completely
+	// unrelated type for XML storage
+	public static mxObjectCodec register (mxObjectCodec codec, String pretendedTemplateClassName) {
 		if (codec != null) {
 			String name = codec.getName();
 			codecs.put(name, codec);
 
-			String classname = getName(codec.getTemplate());
+			String className = pretendedTemplateClassName == null
+					? getName(codec.getTemplate())
+					: pretendedTemplateClassName;
 
-			if (!classname.equals(name))
-				addAlias(classname, name);
+			if (!className.equals(name))
+				addAlias(className, codec);
 		}
 
 		return codec;
 	}
 
+	public static mxObjectCodec register (mxObjectCodec codec) {
+		return register(codec, null);
+	}
+
 	/**
-	 * Adds an alias for mapping a classname to a codecName.
+	 * Adds an alias for mapping a className to a codecName.
 	 */
-	public static void addAlias(String classname, String codecName)
+	public static void addAlias(String className, mxObjectCodec codec)
 	{
-		aliases.put(classname, codecName);
+		String codecName = codec.getName();
+		if (!codecName.equals(className))
+			aliases.put(className, codecName);
 	}
 
 	/**
@@ -133,11 +148,11 @@ public class mxCodecRegistry
 	/**
 	 * Adds the given package name to the list of known package names.
 	 * 
-	 * @param packagename Name of the package to be added.
+	 * @param packageName Name of the package to be added.
 	 */
-	public static void addPackage (String packagename)
+	public static void addPackage (String packageName)
 	{
-		packages.add(packagename);
+		packages.add(packageName);
 	}
 
 	/**

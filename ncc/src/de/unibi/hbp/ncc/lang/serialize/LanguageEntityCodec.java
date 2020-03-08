@@ -1,25 +1,15 @@
 package de.unibi.hbp.ncc.lang.serialize;
 
 import com.mxgraph.io.mxCodec;
-import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxObjectCodec;
-import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
-import de.unibi.hbp.ncc.lang.NeuronConnection;
-import de.unibi.hbp.ncc.lang.NeuronType;
-import de.unibi.hbp.ncc.lang.PoissonSource;
-import de.unibi.hbp.ncc.lang.ProbeConnection;
-import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
-import de.unibi.hbp.ncc.lang.StandardPopulation;
-import de.unibi.hbp.ncc.lang.SynapseType;
-import de.unibi.hbp.ncc.lang.modules.SynfireChain;
-import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
 import org.w3c.dom.Node;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,14 +22,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
    public LanguageEntityCodec (Scope global) {
       super(new LinkedHashMap<String, Object>());  // decoding starts with a clone of this empty order preserving hash map
       globalScope = global;
-      rememberedEntities = new HashMap<>();
-      rememberedRefIds = new HashMap<>();
-      String myName = getName();
-      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
-      mxCodecRegistry.setClassNameRemapper(LanguageEntityCodec::remapAllLanguageEntitySubclasses);
-      mxCodecRegistry.addAlias("LanguageEntity", myName);
-      // we install our remapAllLanguageEntitySubclasses hook so that (concrete) subclasses need not be registered individually
-      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
+      rememberedEntities = new HashMap<>();  // FIXME these two fields really belong into a mxCodec subclass
+      rememberedRefIds = new HashMap<>();  // this will break, if we ever create more than one Program instance (simultaneously)
       // this list must be kep in sync with the cases of the switch in afterDecode
       /*
       mxCodecRegistry.addAlias("RegularSpikeSource", myName);
@@ -57,7 +41,7 @@ public class LanguageEntityCodec extends mxObjectCodec {
       */
    }
 
-   private static String remapAllLanguageEntitySubclasses (Object instance) {
+   public static String remapAllLanguageEntitySubclasses (Object instance) {
       return instance instanceof LanguageEntity ? "LanguageEntity" : null;
    }
 
@@ -125,6 +109,39 @@ public class LanguageEntityCodec extends mxObjectCodec {
       return propValues;
    }
 
+   private Map<String, Constructor<?>> cachedConstructors;
+
+   private Constructor<?> getConstructor (String simpleClassName, boolean haveEntityName) {
+      if (cachedConstructors == null)
+         cachedConstructors = new HashMap<>();
+      Constructor<?> entityConstructor = cachedConstructors.get(simpleClassName);
+      if (entityConstructor == null) {
+         Class<?> entityClass;
+         try {
+            entityClass = Class.forName("de.unibi.hbp.ncc.lang." + simpleClassName);
+         }
+         catch (ClassNotFoundException cnf1) {
+            try {
+               entityClass = Class.forName("de.unibi.hbp.ncc.lang.modules." + simpleClassName);
+            }
+            catch (ClassNotFoundException cnf2) {
+               throw new IllegalArgumentException("normal <ncc> with unsupported class " + simpleClassName);
+            }
+         }
+         try {
+            if (haveEntityName)
+               entityConstructor = entityClass.getConstructor(String.class);
+            else
+               entityConstructor = entityClass.getConstructor();
+         }
+         catch (NoSuchMethodException nsm) {
+            throw new IllegalArgumentException("class " + simpleClassName + " has no suitable constructor");
+         }
+         cachedConstructors.put(simpleClassName, entityConstructor);
+      }
+      return entityConstructor;
+   }
+
    @Override
    public Object afterDecode (mxCodec dec, Node node, Object obj) {
       @SuppressWarnings("unchecked")
@@ -135,6 +152,7 @@ public class LanguageEntityCodec extends mxObjectCodec {
       LanguageEntity entity;
       boolean isPredefined = propValues.containsKey(PREDEFINED_MARKER_PSEUDO_PROPERTY_NAME);
       if (isPredefined) {
+         // if we get (many) more classes with predefined entities, we could try to generalize this via reflection (class method?) somehow
          switch (entityClassName) {
             case "NeuronType":
                entity = globalScope.getNeuronTypes().get(entityName);
@@ -147,42 +165,18 @@ public class LanguageEntityCodec extends mxObjectCodec {
          }
       }
       else {
-         // TODO maybe use reflection to call the (String name) constructor or the parameter-less constructor, if entityName is null
-         switch (entityClassName) {
-            case "RegularSpikeSource":
-               entity = new RegularSpikeSource(entityName);
-               break;
-            case "PoissonSource":
-               entity = new PoissonSource(entityName);
-               break;
-            case "StandardPopulation":
-               entity = new StandardPopulation(entityName);
-               break;
-            case "NeuronType":
-               entity = new NeuronType(entityName);
-               break;
-            case "SynapseType":
-               entity = new SynapseType(entityName);
-               break;
-            case "NeuronConnection":
-               assert entityName == null;
-               entity = new NeuronConnection();
-               break;
-            case "DataPlot":
-               entity = new DataPlot(entityName);
-               break;
-            case "ProbeConnection":
-               assert entityName == null;
-               entity = new ProbeConnection();
-               break;
-            case "SynfireChain":
-               entity = new SynfireChain(entityName);
-               break;
-            case "WinnerTakeAll":
-               entity = new WinnerTakeAll(entityName);
-               break;
-            default:
-               throw new IllegalArgumentException("normal <ncc> with unsupported class " + entityClassName);
+         Constructor<?> entityConstructor = getConstructor(entityClassName, entityName != null);
+         try {
+            if (entityName != null)
+               entity = (NamedEntity) entityConstructor.newInstance(entityName);
+            else {
+               entity = (LanguageEntity) entityConstructor.newInstance();
+               if (entity instanceof NamedEntity)
+                  throw new IllegalStateException("no encoded name for named entity " + entityClassName);
+            }
+         }
+         catch (ReflectiveOperationException roe) {
+            throw new RuntimeException("failed to invoke constructor for " + entityClassName, roe);
          }
       }
       String ownRefId = (String) propValues.get(REFERENCE_ID_PSEUDO_PROPERTY_NAME);

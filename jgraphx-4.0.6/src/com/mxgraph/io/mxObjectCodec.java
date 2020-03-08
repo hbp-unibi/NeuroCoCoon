@@ -108,14 +108,12 @@ public class mxObjectCodec {
 			this.idrefs = Collections.emptySet();
 
 		if (mapping == null)
-			mapping = new Hashtable<>();
-
-		this.mapping = mapping;
-
-		reverse = new Hashtable<>();
-
-		for (Map.Entry<String, String> e: mapping.entrySet()) {
-			reverse.put(e.getValue(), e.getKey());
+			this.reverse = this.mapping = Collections.emptyMap();
+		else {
+			this.mapping = mapping;
+			reverse = new HashMap<>(mapping.size());
+			for (Map.Entry<String, String> e: mapping.entrySet())
+				reverse.put(e.getValue(), e.getKey());
 		}
 	}
 

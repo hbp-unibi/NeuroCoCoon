@@ -1,7 +1,6 @@
 package de.unibi.hbp.ncc.lang.serialize;
 
 import com.mxgraph.io.mxCodec;
-import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxObjectCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
@@ -40,7 +39,6 @@ public class ModulePortCodec extends mxObjectCodec {
       super(new EncodedPort());  // decoding starts with a clone of this empty port description
       this.program = program;
       String myName = getName();
-      mxCodecRegistry.addAlias("Port", myName);
    }
 
    private void rewriteEncodedPorts (NetworkModule enclosingModule, mxICell cell) {
@@ -79,15 +77,15 @@ public class ModulePortCodec extends mxObjectCodec {
    @Override
    public Object beforeEncode (mxCodec enc, Object obj, Node node) {
 //      System.err.println("ModulePortCodec.beforeEncode:" + obj + ", class=" + obj.getClass());
+      // this codec is formally registered for EncodedPort, but such objects should never exist before this
+      // transformation/rewriting method is called
       NetworkModule.Port port = (NetworkModule.Port) obj;
       return new EncodedPort(port.getDirection() == NetworkModule.Port.Direction.IN, port.getName());
    }
 
-   @Override
-   public Object afterDecode (mxCodec dec, Node node, Object obj) {
-      EncodedPort encodedPort = (EncodedPort) obj;
-//      System.err.println("ModulePortCodec.afterDecode: " + encodedPort.isInput() + ", " + encodedPort.getName());
-      // we replace this with the real port later in reviveAfterLoading after decoding everything
-      return encodedPort;
-   }
+   // we replace this with the real port later in reviveAfterLoading after decoding everything
+//   @Override
+//   public Object afterDecode (mxCodec dec, Node node, Object obj) {
+//      return obj;
+//   }
 }

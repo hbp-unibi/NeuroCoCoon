@@ -250,7 +250,9 @@ public class mxCodec
 
 		if (obj != null) {
 			String name = mxCodecRegistry.getName(obj);
+//			System.err.println("encode.getName: " + name + ", class = " + obj.getClass().getName());
 			mxObjectCodec enc = mxCodecRegistry.getCodec(name);
+//			System.err.println("encode.getCodec: " + enc + ", class = " + (enc != null ? enc.getClass().getName() : "null"));
 
 			if (enc != null)
 				node = enc.encode(this, obj);

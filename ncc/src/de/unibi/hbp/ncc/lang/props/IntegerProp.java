@@ -16,6 +16,12 @@ public class IntegerProp extends SimpleEditableProp<Integer> {
    public void setValueFromString (String encodedValue) { setValue(Integer.valueOf(encodedValue)); }
 
    @Override
+   public IntegerProp setPythonName (String pythonName) {  // to get the more precise co-variant return type
+      super.setPythonName(pythonName);
+      return this;
+   }
+
+   @Override
    public IntegerProp addImpact (Impact impact) {  // to get the more precise co-variant return type
       super.addImpact(impact);
       return this;

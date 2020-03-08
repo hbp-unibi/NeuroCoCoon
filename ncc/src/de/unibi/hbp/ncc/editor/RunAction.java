@@ -109,7 +109,7 @@ public class RunAction extends AbstractAction {
       for (String dirPath: Iterators.split(System.getenv("PATH"), File.pathSeparatorChar)) {
          File candidate = new File(dirPath, fileName);
          System.err.println("checking " + candidate);
-         // cannot check for isFile() because virtual envs use symbolic links which are considered !isFile()
+         // can still check for isFile() although virtual envs use symbolic links to files which seem to be considered isFile()
          if (candidate.isFile() && candidate.canExecute())
             return candidate.getAbsolutePath();
       }

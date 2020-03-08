@@ -17,8 +17,10 @@ public interface EditableProp<T> extends ReadOnlyProp<T> {
    void setValue (T value);
 
    default void setRawValue (Object rawValue) {
+/*
       System.err.println("setRawValue: " + rawValue + " (" + rawValue.getClass().getName() + ") --> " +
                                getValueClass().getName());
+*/
       setValue(getValueClass().cast(rawValue));
    }
 

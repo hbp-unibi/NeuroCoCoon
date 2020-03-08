@@ -40,9 +40,16 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       global = new Scope();
       initialize();
       idRememberingCodec = new LanguageEntityCodec(global);
-      mxCodecRegistry.register(idRememberingCodec);
+      mxCodecRegistry.register(idRememberingCodec, "LanguageEntity");
+      // we install our remapAllLanguageEntitySubclasses hook so that (concrete) subclasses need not be registered individually
+      mxCodecRegistry.setClassNameRemapper(LanguageEntityCodec::remapAllLanguageEntitySubclasses);
+      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
+      mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
       portEncodingCodec = new ModulePortCodec(this);
       mxCodecRegistry.register(portEncodingCodec);
+      // we could probably just pass "Port" as the pretended template class name,
+      // but our afterDecode() really returns EncodedPort template instances, before they are rewritten in the end
+      mxCodecRegistry.addAlias("Port", portEncodingCodec);
    }
 
    private void initialize () {
