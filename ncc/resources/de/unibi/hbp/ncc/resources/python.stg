@@ -12,8 +12,13 @@ define_module_instance(modinst) ::= <<
 <modinst.pythonName> = <(modinst.buildInstanceTemplateName)(modinst)>
 >>
 
+// ref_ templates for use in Python function arguments of build_<module>_instance templates
+ref_neuronTypeKind(ntyp) ::= "sim.<pop.neuronType.neuronKind.pythonName>"
+ref_neuronTypeParams(ntyp) ::= "<pop.neuronType.parametersPythonName>"
+ref_neuronType(ntyp) ::= "<ref_neuronTypeKind(ntyp)>, <ref_neuronTypeParams(ntyp)>"
+
 define_population(pop) ::= <<
-<pop.pythonName> = sim.Population(<pop.neuronCount>, sim.<pop.neuronType.neuronKind.pythonName>, <pop.neuronType.parametersPythonName>, label="<pop.name>")
+<pop.pythonName> = sim.Population(<pop.neuronCount>, <ref_neuronType(pop.neuronType)>, label="<pop.name>")
 >>
 
 define_spikeSource(src) ::= <<
@@ -41,18 +46,25 @@ port_population(port) ::= <<
 <port.owningModule.pythonName>['<port.directionAsString>'][<port.index>]
 >>
 
+// ref_ templates for use in Python function arguments of build_<module>_instance templates
+ref_synapseTypeConnectorKind(styp) ::= <<
+<if(!styp.connectorKind.kindSpecificProps)><\\>
+<styp.connectorKind.pythonName>, <\\>
+<else><\\>
+sim.<styp.connectorKind.pyNNClassName>(<styp.connectorParameters:{it | <it.pythonName>=<it.value>}; separator=", ">)<\\>
+<endif><\\>
+>>
+ref_synapseTypeSynapseKind(styp) ::= <<
+sim.<styp.synapseKind.pyNNClassName>(weight=<styp.absoluteWeight>, delay=<styp.delay>)<\\>
+<if(styp.inhibitory)>, receptor_type="inhibitory"<endif><\\>
+>>
+ref_synapseType(styp) ::= "<ref_synapseTypeConnectorKind(styp)>, <ref_synapseTypeConnectorKind(styp)>"
+
 define_oneSynapse(con) ::= <<
 sim.Projection(<\\>
 <if(con.sourceNamedEntity)><con.sourceNamedEntity.pythonName><else><port_population(con.sourceModulePort)><endif>, <\\>
 <if(con.targetNamedEntity)><con.targetNamedEntity.pythonName><else><port_population(con.targetModulePort)><endif>, <\\>
-<if(!con.synapseType.connectorKind.kindSpecificProps)><\\>
-<con.synapseType.connectorKind.pythonName>, <\\>
-<else><\\>
-sim.<con.synapseType.connectorKind.pyNNClassName>(<con.synapseType.connectorParameters:{it | <it.pythonName>=<it.value>}; separator=", ">), <\\>
-<endif><\\>
-sim.<con.synapseType.synapseKind.pyNNClassName>(weight=<con.synapseType.absoluteWeight>, delay=<con.synapseType.delay>)<\\>
-<if(con.synapseType.inhibitory)>, receptor_type="inhibitory"<endif><\\>
-)
+<ref_synapseType(con.synapseType)>)
 >>
 
 define_moduleOutputSynapses(modinst) ::= <<
@@ -65,7 +77,6 @@ probe_target(probe) ::= <<
 
 instrument_oneProbeTarget(target, targetName) ::= <<
 <targetName>.record([<target.requiredDataSeries:{it | '<it.pythonName>'}; separator=", ">])
-<! TODO do we need to consolidate multiple probe edges between two nodes into one record call with multiple arguments !>
 >>
 
 instrument_populationProbes(pop) ::= <<

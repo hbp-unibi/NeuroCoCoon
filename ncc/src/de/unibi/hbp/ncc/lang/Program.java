@@ -1,6 +1,7 @@
 package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.io.mxCodecRegistry;
+import com.mxgraph.io.mxObjectCodec;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
@@ -20,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Program extends LanguageEntity implements DisplayNamed, PythonNamed {
-   private final LanguageEntityCodec idRememberingCodec;
-   private final ModulePortCodec portEncodingCodec;
    private StringProp programName;
    private DoubleProp runTime, timeStep;
    private final Scope global;
@@ -36,20 +35,28 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       return list;
    }
 
-   public Program () {
-      global = new Scope();
-      initialize();
-      idRememberingCodec = new LanguageEntityCodec(global);
-      mxCodecRegistry.register(idRememberingCodec, "LanguageEntity");
+   private static boolean codecsRegistered = false;
+
+   private static void registerCodecs () {
+      if (codecsRegistered)
+         return;
+      mxCodecRegistry.register(new LanguageEntityCodec(), "LanguageEntity");
       // we install our remapAllLanguageEntitySubclasses hook so that (concrete) subclasses need not be registered individually
       mxCodecRegistry.setClassNameRemapper(LanguageEntityCodec::remapAllLanguageEntitySubclasses);
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
-      portEncodingCodec = new ModulePortCodec(this);
-      mxCodecRegistry.register(portEncodingCodec);
+      mxObjectCodec portCodec = new ModulePortCodec();
+      mxCodecRegistry.register(portCodec);
       // we could probably just pass "Port" as the pretended template class name,
       // but our afterDecode() really returns EncodedPort template instances, before they are rewritten in the end
-      mxCodecRegistry.addAlias("Port", portEncodingCodec);
+      mxCodecRegistry.addAlias("Port", portCodec);
+      codecsRegistered = true;
+   }
+
+   public Program () {
+      registerCodecs();
+      global = new Scope();
+      initialize();
    }
 
    private void initialize () {
@@ -76,12 +83,6 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       global.clear();
       initialize();
       toolBar.setCurrentSynapseType(global.getSynapseTypes().getFallbackDefault());
-   }
-
-   // important to forget the temporarily assigned XML _refid attribute <--> LanguageEntity mapping
-   public void announceEncodeDecodeDone (boolean encodeDone) {
-      idRememberingCodec.announceEncodeDecodeDone(encodeDone);
-      portEncodingCodec.announceEncodeDecodeDone(encodeDone);
    }
 
    public void setGraphComponent (mxGraphComponent graphComponent) {

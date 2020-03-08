@@ -230,7 +230,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			// Loads the default stylesheet from an external file
 			mxCodec codec = new mxCodec();
-			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource("resources/default-style.xml").toString());
+			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource("resources/ncc-style.xml").toString());
 			if (doc != null)
 				codec.decode(doc.getDocumentElement(), graph.getStylesheet());
 			// TODO consolidate both stylesheets into a minimal file ncc-style.xml
@@ -312,8 +312,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			addListener(mxEvent.CELLS_RESIZED, (sender, evt ) -> {
 				Object[] cells = (Object[]) evt.getProperty("cells");
 				for (Object obj: cells) {
-					if (obj instanceof mxCell) {
-						mxCell cell = (mxCell) obj;
+					if (obj instanceof mxICell) {
+						mxICell cell = (mxICell) obj;
 						Object value = cell.getValue();
 						if (value instanceof GraphCellConfigurator)
 							((GraphCellConfigurator) value).resizeExisting(this, cell);
@@ -331,8 +331,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
 								boolean absolute, boolean constrain) {
 			for (Object obj: cells) {
-				if (obj instanceof mxCell) {
-					mxCell cell = (mxCell) obj;
+				if (obj instanceof mxICell) {
+					mxICell cell = (mxICell) obj;
 					Object value = cell.getValue();
 					LanguageEntity duplicatedValue = null;
 					if (value instanceof EntityCreator) {
@@ -343,7 +343,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 					}
 					else if (value instanceof LanguageEntity) {
 						LanguageEntity entityValue = (LanguageEntity) value;
-						mxCell owner = entityValue.getOwningCell();
+						mxICell owner = entityValue.getOwningCell();
 						if (owner != cell && owner != null && owner.getParent() != null)
 							// reference has been cloned to another cell and both are part of a graph
 							duplicatedValue = entityValue.duplicate();

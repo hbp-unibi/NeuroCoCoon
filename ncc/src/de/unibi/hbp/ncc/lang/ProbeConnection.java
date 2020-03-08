@@ -53,7 +53,7 @@ public class ProbeConnection extends AnyConnection implements Serializable {
       list.add(dataSeries);
       list.add(firstNeuronIndex);
       list.add(neuronCount);
-      return list;
+      return super.addEditablePropsAtEnd(list);
    }
 
    public ProbeConnection (DataSeries dataSeries, int firstNeuonIndex, int neuronCount) {

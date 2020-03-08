@@ -36,7 +36,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
       list.add(synapseType);
-      return list;
+      return super.addEditablePropsAtEnd(list);
    }
 
    @Override

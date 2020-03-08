@@ -154,7 +154,7 @@ public abstract class NetworkModule extends NamedEntity
    private static final int PORT_SIZE = 20;
    private static final int PORT_SIZE_HALF = PORT_SIZE / 2;
 
-   private void updatePort (mxGraph graph, mxCell moduleCell, Port port, mxGeometry portGeo, String style) {
+   private void updatePort (mxGraph graph, mxICell moduleCell, Port port, mxGeometry portGeo, String style) {
       portGeo.setRelative(true);
       mxICell portCell = port.getCell();
       if (portCell == null) {
@@ -171,7 +171,7 @@ public abstract class NetworkModule extends NamedEntity
       }
    }
 
-   private void updatePortColumn (mxGraph graph, mxCell moduleCell,
+   private void updatePortColumn (mxGraph graph, mxICell moduleCell,
                                   int layoutRows, List<Port> ports, double x, int xOffset, String style) {
       int currentLayoutRow = 1;
       for (Port port: ports) {
@@ -182,7 +182,7 @@ public abstract class NetworkModule extends NamedEntity
       }
    }
 
-   private void updatePortRow (mxGraph graph, mxCell moduleCell,
+   private void updatePortRow (mxGraph graph, mxICell moduleCell,
                                int layoutCols, List<Port> ports, double y, int yOffset, String style) {
       int currentLayoutCol = 1;
       for (Port port: ports) {
@@ -215,7 +215,7 @@ public abstract class NetworkModule extends NamedEntity
             resourceFileBaseName + ".png";
    }
 
-   private void updatePorts (mxGraph graph, mxCell moduleCell, int layoutSteps) {
+   private void updatePorts (mxGraph graph, mxICell moduleCell, int layoutSteps) {
       if (useWideLayout) {
          updatePortRow(graph, moduleCell, layoutSteps, inputPorts, 0.0, 0, "portTop");
          updatePortRow(graph, moduleCell, layoutSteps, outputPorts, 1.0, -PORT_SIZE, "portBottom");
@@ -246,7 +246,7 @@ public abstract class NetworkModule extends NamedEntity
    }
 
    @Override
-   public void restructureExisting (mxGraph graph, mxCell existingCell) {
+   public void restructureExisting (mxGraph graph, mxICell existingCell) {
       // this is called as part of a graph model update transaction
       assert inputPorts != null && outputPorts != null;
       int previousLayoutSteps = computeLayoutSteps();
@@ -270,7 +270,7 @@ public abstract class NetworkModule extends NamedEntity
    }
 
    @Override
-   public void resizeExisting (mxGraph graph, mxCell existingCell) {
+   public void resizeExisting (mxGraph graph, mxICell existingCell) {
       // this is called as part of a graph model update transaction
       // nothing to do: our port children have relative geometry
    }

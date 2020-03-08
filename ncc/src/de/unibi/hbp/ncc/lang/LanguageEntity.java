@@ -1,6 +1,5 @@
 package de.unibi.hbp.ncc.lang;
 
-import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -13,7 +12,7 @@ import java.util.List;
 
 public abstract class LanguageEntity {
    private boolean predefined;  // such entities cannot be deleted and all their properties cannot be edited
-   private mxCell owningCell;
+   private mxICell owningCell;
 
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       return list;
@@ -44,8 +43,8 @@ public abstract class LanguageEntity {
    public boolean isPredefined () { return predefined; }
    public void makePredefined () { predefined = true; }
 
-   public mxCell getOwningCell () { return owningCell; }
-   public void setOwningCell (mxCell owningCell) { this.owningCell = owningCell; }
+   public mxICell getOwningCell () { return owningCell; }
+   public void setOwningCell (mxICell owningCell) { this.owningCell = owningCell; }
    // override in subclasses, where cell style depends on (direct or indirect) property values
    public String getCellStyle () { return null; }
 

@@ -7,7 +7,6 @@ import com.mxgraph.analysis.mxDistanceCostFunction;
 import com.mxgraph.analysis.mxGraphAnalysis;
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxSvgCanvas;
-import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.handler.mxConnectionHandler;
@@ -27,6 +26,7 @@ import com.mxgraph.util.png.mxPngTextDecoder;
 import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 import de.unibi.hbp.ncc.lang.NetworkModule;
+import de.unibi.hbp.ncc.lang.serialize.ProgramCodec;
 import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
@@ -239,20 +239,22 @@ public class EditorActions {
 			BufferedImage image = mxCellRenderer.createBufferedImage(
 					graph, null, 1, bg, graphComponent.isAntiAlias(), null, graphComponent.getCanvas());
 
-			// Creates the URL-encoded XML data
-			mxCodec codec = new mxCodec();
-			String xml = URLEncoder.encode(mxXmlUtils.getXml(codec.encode(graph.getModel())), "UTF-8");
-			editor.getProgram().announceEncodeDecodeDone(true);
-			mxPngEncodeParam param = mxPngEncodeParam.getDefaultEncodeParam(image);
-			param.setCompressedText(new String[] { "mxGraphModel", xml });
+			if (image != null) {
+				// Creates the URL-encoded XML data
+				ProgramCodec codec = new ProgramCodec(editor.getProgram(), true);
+				String xml = URLEncoder.encode(mxXmlUtils.getXml(codec.encode(graph.getModel())), "UTF-8");
+				codec.announceDone();
+				mxPngEncodeParam param = mxPngEncodeParam.getDefaultEncodeParam(image);
+				param.setCompressedText(new String[] { "mxGraphModel", xml });
 
-			// Saves as a PNG file
-			try (FileOutputStream outputStream = new FileOutputStream(new File(filename))) {
-				mxPngImageEncoder encoder = new mxPngImageEncoder(outputStream, param);
+				// Saves as a PNG file
+				try (FileOutputStream outputStream = new FileOutputStream(new File(filename))) {
+					mxPngImageEncoder encoder = new mxPngImageEncoder(outputStream, param);
 
-				encoder.encode(image);
-				editor.setModified(false);
-				editor.setCurrentFile(new File(filename));
+					encoder.encode(image);
+					editor.setModified(false);
+					editor.setCurrentFile(new File(filename));
+				}
 			}
 		}
 
@@ -353,9 +355,9 @@ public class EditorActions {
 						mxUtils.writeFile(mxXmlUtils.getXml(canvas.getDocument()), filename);
 					}
 					else if (ext.equalsIgnoreCase("ncc") || ext.equalsIgnoreCase("xml")) {
-						mxCodec codec = new mxCodec();
+						ProgramCodec codec = new ProgramCodec(editor.getProgram(), true);
 						String xml = mxXmlUtils.getXml(codec.encode(graph.getModel()));
-						editor.getProgram().announceEncodeDecodeDone(true);
+						codec.announceDone();
 
 						mxUtils.writeFile(xml, filename);
 
@@ -701,10 +703,10 @@ public class EditorActions {
 						JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges")) == JOptionPane.YES_OPTION) {
 					mxGraph graph = editor.getGraphComponent().getGraph();
 
+					editor.getProgram().clear(editor.getEditorToolBar());
 					mxCell root = new mxCell();
 					root.insert(new mxCell());
 					graph.getModel().setRoot(root);
-					editor.getProgram().clear(editor.getEditorToolBar());
 
 					editor.setModified(false);
 					editor.setCurrentFile(null);
@@ -736,9 +738,10 @@ public class EditorActions {
 				if (value != null) {
 					Document document = mxXmlUtils.parseXml(URLDecoder.decode(value, "UTF-8"));
 					if (document != null) {
-						mxCodec codec = new mxCodec(document);
+						editor.getProgram().clear(editor.getEditorToolBar());
+						ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
 						codec.decode(document.getDocumentElement(), editor.getGraphComponent().getGraph().getModel());
-						editor.getProgram().announceEncodeDecodeDone(false);
+						codec.announceDone();
 						editor.setCurrentFile(file);
 						resetEditor(editor);
 
@@ -792,9 +795,10 @@ public class EditorActions {
 								else {
 									Document document = mxXmlUtils.parseXml(mxUtils.readFile(fc.getSelectedFile().getAbsolutePath()));
 									if (document != null) {
-										mxCodec codec = new mxCodec(document);
+										editor.getProgram().clear(editor.getEditorToolBar());
+										ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
 										codec.decode(document.getDocumentElement(), graph.getModel());
-										editor.getProgram().announceEncodeDecodeDone(false);
+										codec.announceDone();
 										editor.setCurrentFile(fc.getSelectedFile());
 
 										resetEditor(editor);

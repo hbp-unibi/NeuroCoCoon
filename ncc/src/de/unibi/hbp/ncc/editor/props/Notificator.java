@@ -1,6 +1,5 @@
 package de.unibi.hbp.ncc.editor.props;
 
-import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
@@ -66,7 +65,7 @@ public class Notificator {
          for (PropChangeListener listener: propChangeListeners)
             listener.otherPropertiesVisibilityChanged(enclosingEntity);
       }
-      mxCell cell = enclosingEntity.getOwningCell();
+      mxICell cell = enclosingEntity.getOwningCell();
       if (cell != null && changed.hasChangeImpact(EditableProp.Impact.CELL_LABEL)) {
          graphComponent.labelChanged(cell, enclosingEntity, null);  // enclosingEntity == cell.getValue()
       }

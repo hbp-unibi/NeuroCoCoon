@@ -111,7 +111,7 @@ public class mxCodec
 	}
 
 	/**
-	 * Assoiates the given object with the given ID.
+	 * Associates the given object with the given ID.
 	 * 
 	 * @param id ID for the object to be associated with.
 	 * @param object Object to be associated with the ID.
@@ -287,7 +287,7 @@ public class mxCodec
 	 * object was given.
 	 * 
 	 * @param node XML node to be decoded.
-	 * @param into Optional object to be decodec into.
+	 * @param into Optional object to be decoded into.
 	 * @return Returns an object that represents the given node.
 	 */
 	public Object decode( Node node, Object into) {
