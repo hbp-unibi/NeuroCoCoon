@@ -51,4 +51,9 @@ public class ShellCommandExecutor {
       return commandOutput == null ? "" : commandOutput;
    }
 
+   public CharSequence getOutputTail (int lines) {
+      return getOutput();
+   }
+   // TODO provide a truncated to the last few lines version of the output for the error alert
+
 }

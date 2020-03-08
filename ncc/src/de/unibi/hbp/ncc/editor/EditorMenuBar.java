@@ -175,8 +175,6 @@ public class EditorMenuBar extends JMenuBar
 		submenu.add(editor.bind(mxResources.get("selectTree"), new SelectSpanningTreeAction(false)));
 		submenu.add(editor.bind(mxResources.get("selectDirectedTree"), new SelectSpanningTreeAction(true)));
 
-
-		// TODO (nearly) all items in Options menu should have fixed values for our editor
 		// Creates the options menu
 		menu = add(new JMenu(mxResources.get("options")));
 

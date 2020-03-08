@@ -45,13 +45,6 @@ public abstract class AbstractValueCellEditor<T> extends DefaultCellEditor {
                cancelCellEditing();
          }
       });
-      // FIXME focus transfer does NOT work
-      /*
-      textField.addActionListener(e -> {
-         if (getCellEditorValue() != null && stopCellEditing())
-            getComponent().transferFocus();
-      });
-       */
    }
 
    protected abstract T convertFromString (String s);  // returns null, iff s is invalid
@@ -74,6 +67,7 @@ public abstract class AbstractValueCellEditor<T> extends DefaultCellEditor {
                                                 boolean isSelected,
                                                 int row, int column) {
       ((JComponent) getComponent()).setBorder(new LineBorder(Color.BLACK));
+      @SuppressWarnings("unchecked")
       String s = value != null ? convertToString((T) value) : "";
       return super.getTableCellEditorComponent(table, s, isSelected, row, column);
    }

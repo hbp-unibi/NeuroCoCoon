@@ -10,10 +10,7 @@ import de.unibi.hbp.ncc.lang.utils.Iterators;
 import de.unibi.hbp.ncc.lang.utils.ShellCommandExecutor;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -22,6 +19,7 @@ import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -29,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -39,7 +36,7 @@ import java.util.stream.Stream;
 
 public class RunAction extends AbstractAction {
 
-   private static int counter = 42;
+   private static int counter = 345;  // some distinctive, easy to recognize value
 
    private static final String TOY_CODE =
          "import sys\n" +
@@ -61,6 +58,8 @@ public class RunAction extends AbstractAction {
          editor.status("Preparing …");
          Program program = editor.getProgram();
          NmpiClient.Platform targetPlatform = editor.getEditorToolBar().getCurrentPlatform();
+         if ((e.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0)
+            targetPlatform = NmpiClient.Platform.SOURCE_CODE;  // temporary switch to view source code only
          StringBuilder pythonCode;
          pythonCode = program.generatePythonCode(targetPlatform);
          ErrorCollector diagnostics = program.getLastDiagnostics();
@@ -68,8 +67,8 @@ public class RunAction extends AbstractAction {
          if (pythonCode != null) {
             editor.status(diagnostics.hasAnyWarnings() ? "There were warnings." : "Success!");
             if (diagnostics.hasAnyMessages()) {
-               Component display = diagnostics.buildDisplayAndNavigationComponent(program.getGraphComponent());  // TODO should the scroll pane be added by the error collector?
-               editor.setResultsTab("Messages", new JScrollPane(display), false);
+               Component display = diagnostics.buildComponent(program.getGraphComponent());
+               editor.setResultsTab("Messages", display, false);
             }
             if (targetPlatform == NmpiClient.Platform.SOURCE_CODE)
                showLongText("Python Code", pythonCode);
@@ -81,8 +80,8 @@ public class RunAction extends AbstractAction {
          else {
             editor.status("There were errors.");
             if (diagnostics.hasAnyErrors()) {
-               Component display = diagnostics.buildDisplayAndNavigationComponent(program.getGraphComponent());  // TODO should the scroll pane be added by the error collector?
-               editor.setResultsTab("Errors", new JScrollPane(display), true);
+               Component display = diagnostics.buildComponent(program.getGraphComponent());
+               editor.setResultsTab("Errors", display, true);
             }
          }
       }
@@ -146,17 +145,17 @@ public class RunAction extends AbstractAction {
          List<String> commandList = Arrays.asList(python, "run.py", "nest");
          Thread worker =
                new Thread( () -> {
-                  List<ImageIcon> plotImages = null;
+                  PlotsPanel plotsPanel = null;
                   try {
                      ShellCommandExecutor executor = new ShellCommandExecutor();
                      executor.execute(commandList, tempDir.toFile());
-                     // TODO update status line with toolBar.setJobStatus
                      if (executor.failed())
                         SwingUtilities.invokeLater(
                               () -> {
                                  editor.setJobStatus(EditorToolBar.StatusLevel.BAD, "Simulation failed!");
-                                 JOptionPane.showMessageDialog(null,
-                                                               executor.getOutput(), "NEST Simulation failed",
+                                 JOptionPane.showMessageDialog(editor.getGraphComponent(),
+                                                               executor.getOutputTail(5),
+                                                               "NEST Simulation failed",
                                                                JOptionPane.ERROR_MESSAGE);
                               });
                      else
@@ -172,46 +171,47 @@ public class RunAction extends AbstractAction {
                      }
                      if (!executor.failed()) {
                         try (Stream<Path> dirContent = Files.list(tempDir)) {
-                           plotImages =
+                           List<File> plotImageFiles =
                                  dirContent.filter(
                                        dirChild -> Files.isRegularFile(dirChild, LinkOption.NOFOLLOW_LINKS) &&
                                              dirChild.getFileName().toString().toLowerCase().endsWith(".png"))
-                                       .map(pngChild -> new ImageIcon(pngChild.toString(),
-                                                                      pngChild.getFileName().toString()))
-                                       .sorted(Comparator.comparing(ImageIcon::getDescription,
+                                       .map(Path::toFile)
+                                       .sorted(Comparator.comparing(File::getName,
                                                                     Namespace.getSmartNumericOrderComparator()))
                                        .collect(Collectors.toList());
+                           plotsPanel = new PlotsPanel(plotImageFiles,
+                                                       editor.getProgram().getGlobalScope().getDataPlots());
                         }
                      }
                   }
                   catch (IOException | InterruptedException excp) {
                      SwingUtilities.invokeLater(
-                           () -> JOptionPane.showMessageDialog(null,
+                           () -> JOptionPane.showMessageDialog(editor.getGraphComponent(),
                                                                excp.getMessage(), "Exception in Command",
                                                                JOptionPane.ERROR_MESSAGE));
                   }
                   finally {
+                     // TODO provide a way to preserve the temp directory intact and print its path to stderr instead
                      try {
                         DirTreeDeleter.deleteRecursively(tempDir);
                      }
                      catch (IOException ioe) {
                         SwingUtilities.invokeLater(
-                              () -> JOptionPane.showMessageDialog(null,
+                              () -> JOptionPane.showMessageDialog(editor.getGraphComponent(),
                                                                   ioe.getMessage(), "Exception while cleaning up",
                                                                   JOptionPane.ERROR_MESSAGE));
                      }
-                     final List<ImageIcon> capturedPlotImages = plotImages;
+                     final PlotsPanel capturedPlotsPanel = plotsPanel;
                      SwingUtilities.invokeLater(
                            () -> {
                               finishedJob();
-                              if (capturedPlotImages != null && !capturedPlotImages.isEmpty()) {
-                                 JList<ImageIcon> plotList = new JList<>(new PlotListModel(capturedPlotImages));
-                                 // DefaultListCellRenderer might suffice: it treats icons as a special case
-                                 // TODO add downscaling with enlarge on click and description/title as tool tip
-                                 editor.setResultsTab("Plots", new JScrollPane(plotList), true);
+                              if (capturedPlotsPanel != null && !capturedPlotsPanel.isEmpty()) {
+                                 editor.setResultsTab("Plots",
+                                                      capturedPlotsPanel.buildComponent(),
+                                                      true);
                               }
                               else
-                                 editor.setResultsTab(null, null, false);
+                                 editor.clearResultsTab();
                            });
                   }
                });
@@ -220,35 +220,6 @@ public class RunAction extends AbstractAction {
       }
       catch (IOException ioe) {
          editor.setJobStatus(EditorToolBar.StatusLevel.BAD, "I/O Exception!", ioe.getMessage());
-      }
-   }
-
-   private static class PlotListModel extends AbstractListModel<ImageIcon> {
-      private List<ImageIcon> fullSize, thumbnails;
-
-      public PlotListModel (List<ImageIcon> fullSize) {
-         this.fullSize = fullSize;
-         thumbnails = new ArrayList<>(fullSize.size());
-         // TODO create thumbnail versions lazily on demand
-         // TODO use Image instances instead of ImageIcons? overhead?
-         for (ImageIcon fullIcon: fullSize)
-            thumbnails.add(new ImageIcon(
-//                  fullIcon.getImage().getScaledInstance(160, 90, Image.SCALE_SMOOTH),
-                  fullIcon.getImage(),
-                  fullIcon.getDescription()));
-      }
-
-      public ImageIcon getFullImage (int index) { return fullSize.get(index); }
-
-      @Override
-      public int getSize () { return fullSize.size(); }
-
-      @Override
-      public ImageIcon getElementAt (int index) {
-         // return fullSize.get(index);
-         System.err.println("getElementAt(" + index + "): " +
-                                  thumbnails.get(index).getIconWidth() + " x " + thumbnails.get(index).getIconHeight());
-         return thumbnails.get(index);
       }
    }
 

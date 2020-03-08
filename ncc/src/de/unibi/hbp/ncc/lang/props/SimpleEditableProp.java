@@ -34,8 +34,6 @@ public abstract class SimpleEditableProp<T> implements EditableProp<T> {
       return this;
    }
 
-   // TODO provide an addImpact method instead (e.g. SynapseType needs to augment the impact of its name property)
-
    public SimpleEditableProp<T> addImpact (Impact impact) {
       assert impact != Impact.OWN_VALUE : "impact on own value is assumed by default anyway";
       if (impactSet == null)

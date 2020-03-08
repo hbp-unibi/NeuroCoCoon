@@ -54,7 +54,8 @@ public class NeuronConnection extends AnyConnection implements Serializable {
       this.synapseType = new EditableNameProp<>("Synapse Type", SynapseType.class, this,
                                                 Objects.requireNonNull(synapseType), synapseTypeNamespace)
             .addImpact(EditableProp.Impact.CELL_LABEL)
-            .addImpact(EditableProp.Impact.CELL_STYLE);
+            .addImpact(EditableProp.Impact.CELL_STYLE)
+            .addImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
    }
 
    public NeuronConnection (SynapseType synapseType) {

@@ -9,9 +9,10 @@ import de.unibi.hbp.ncc.lang.serialize.SerializedProbeConnection;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.List;
 
-public class ProbeConnection extends AnyConnection {
+public class ProbeConnection extends AnyConnection implements Serializable {
    private EditableEnumProp<DataSeries> dataSeries;
    private IntegerProp firstNeuronIndex, neuronCount;  // count == 0 means unlimited
 

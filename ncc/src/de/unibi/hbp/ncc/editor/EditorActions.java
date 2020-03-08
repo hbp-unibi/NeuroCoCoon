@@ -142,9 +142,10 @@ public class EditorActions {
 	public static class ExitAction extends AbstractAction {
 
 		public void actionPerformed (ActionEvent e) {
-			BasicGraphEditor editor = getEditor(e);
+			NeuroCoCoonEditor editor = getEditor(e);
 
-			if (editor != null)
+			if (editor != null && (!editor.isModified() ||
+					JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges")) == JOptionPane.YES_OPTION))
 				editor.exit();
 		}
 	}
@@ -154,8 +155,7 @@ public class EditorActions {
 
 		protected int style;
 
-		public GridStyleAction (int style)
-		{
+		public GridStyleAction (int style) {
 			this.style = style;
 		}
 
@@ -658,27 +658,6 @@ public class EditorActions {
 		}
 	}
 
-	// TODO turn this into a toggle wide/narrow layout action for network modules
-	@SuppressWarnings("serial")
-	public static class WarningAction extends AbstractAction {
-
-		public void actionPerformed (ActionEvent e) {
-			if (e.getSource() instanceof mxGraphComponent) {
-				mxGraphComponent graphComponent = (mxGraphComponent) e.getSource();
-				Object[] cells = graphComponent.getGraph().getSelectionCells();
-
-				if (cells != null && cells.length > 0) {
-					String warning = JOptionPane.showInputDialog(mxResources.get("enterWarningMessage"));
-
-					for (Object cell: cells)
-						graphComponent.setCellWarning(cell, warning);
-				}
-				else
-					JOptionPane.showMessageDialog(graphComponent, mxResources.get("noCellSelected"));
-			}
-		}
-	}
-
 	public static class FlipModuleAction extends AbstractAction {
 
 		public void actionPerformed (ActionEvent e) {
@@ -722,7 +701,6 @@ public class EditorActions {
 						JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges")) == JOptionPane.YES_OPTION) {
 					mxGraph graph = editor.getGraphComponent().getGraph();
 
-					// Check modified flag and display save dialog
 					mxCell root = new mxCell();
 					root.insert(new mxCell());
 					graph.getModel().setRoot(root);

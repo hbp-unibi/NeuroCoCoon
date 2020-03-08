@@ -13,6 +13,7 @@ import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+import de.unibi.hbp.ncc.lang.utils.Images;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -26,7 +27,6 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
@@ -193,9 +193,10 @@ public class EditorPalette extends JPanel
 
 		// Scales the image if it's too large for the library
 		if (icon != null) {
-			// TODO this requires the icon to be square (e.g. by padding)
 			if (icon.getIconWidth() > MAX_ICON_SIZE || icon.getIconHeight() > MAX_ICON_SIZE)
-				icon = new ImageIcon(icon.getImage().getScaledInstance(MAX_ICON_SIZE, MAX_ICON_SIZE, Image.SCALE_SMOOTH));
+				icon = new ImageIcon(Images.fit(Images.fromIcon(icon), MAX_ICON_SIZE, MAX_ICON_SIZE));
+// older, lower quality approach; distorts non-square images
+//				icon = new ImageIcon(icon.getImage().getScaledInstance(MAX_ICON_SIZE, MAX_ICON_SIZE, Image.SCALE_SMOOTH));
 		}
 
 		final JLabel entry = new JLabel(icon);

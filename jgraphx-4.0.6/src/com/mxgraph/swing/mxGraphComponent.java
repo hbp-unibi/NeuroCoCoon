@@ -2409,14 +2409,6 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		return event != null && event.isShiftDown();
 	}
 
-	/**
-	 * Note: This is not used during drag and drop operations due to limitations
-	 * of the underlying API. To enable this for move operations set dragEnabled
-	 * to false.
-	 * 
-	 * @param event
-	 * @return Returns true if the given event is constrained.
-	 */
 	public boolean isForceMarqueeEvent(MouseEvent event)
 	{
 		return event != null && event.isAltDown();

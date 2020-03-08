@@ -20,4 +20,6 @@ public interface Connectable {
 
    default boolean hasAnyOutgoingProbes () { return getOutgoingProbes().iterator().hasNext(); }
    default boolean hasAnyIncomingProbes () { return getIncomingProbes().iterator().hasNext(); }
+
+   // TODO provide dependency edge methods (dependency for population sub-view (and possibly assemblies [smart name comparator order?!])
 }

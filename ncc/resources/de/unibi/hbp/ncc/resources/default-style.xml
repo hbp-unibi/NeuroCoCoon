@@ -43,7 +43,7 @@
 	<add as="dataPlot" extend="defaultVertex">
 		<add as="shape" value="cylinder"/>
 		<!-- <add as="shape" value="ellipse"/> -->
-		<add as="perimeter" value="ellipsePerimeter"/>
+		<add as="perimeter" value="ellipsePerimeter"/> <!-- TODO implement and use cylinderPerimeter -->
 		<add as="fillColor" value="#ddffff"/>
 		<add as="strokeColor" value="#bbdddd"/>
 	</add>

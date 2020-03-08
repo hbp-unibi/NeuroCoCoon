@@ -9,6 +9,7 @@ import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.misc.STMessage;
 
 import javax.swing.ImageIcon;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
@@ -148,7 +149,7 @@ public class ErrorCollector implements STErrorListener {
 
    private static final int ICON_CELL_SIZE = 28;  // icon itself is 24x24
 
-   public Component buildDisplayAndNavigationComponent (mxGraphComponent graphComponent) {
+   public Component buildComponent (mxGraphComponent graphComponent) {
       TableColumnModel columnModel = new DefaultTableColumnModel();
       columnModel.setColumnSelectionAllowed(false);
       TableColumn severityColumn = new TableColumn(0, ICON_CELL_SIZE);
@@ -186,7 +187,7 @@ public class ErrorCollector implements STErrorListener {
                }
             }
       );
-      return errorTable;
+      return new JScrollPane(errorTable);
    }
 
    private static class FullTextToolTipRenderer extends DefaultTableCellRenderer {

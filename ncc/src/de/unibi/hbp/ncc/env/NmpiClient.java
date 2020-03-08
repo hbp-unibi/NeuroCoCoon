@@ -48,8 +48,8 @@ public class NmpiClient {
       @Override
       public String getDisplayName () { return pynnName; }  // maybe make this distinct from the PyNN API name
 
-      public boolean requiresWebApp () { return this != NEST && this != SOURCE_CODE; }
-      public boolean conflictsWithWebApp () { return this == NEST; }
+      public boolean worksOutsideWebApp () { return this == NEST || this == SOURCE_CODE; }
+      public boolean worksInWebApp () { return this != NEST; }
    }
 
    private String authToken;

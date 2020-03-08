@@ -38,9 +38,9 @@ public class LanguageEntityCodec extends mxObjectCodec {
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang");
       mxCodecRegistry.setClassNameRemapper(LanguageEntityCodec::remapAllLanguageEntitySubclasses);
       mxCodecRegistry.addAlias("LanguageEntity", myName);
+      // we install our remapAllLanguageEntitySubclasses hook so that (concrete) subclasses need not be registered individually
       mxCodecRegistry.addPackage("de.unibi.hbp.ncc.lang.modules");
-      // this list must be kep in sync with that cases of the switch in afterDecode
-      // TODO use reflection to gather all concrete subclasses of LanguageEntity?
+      // this list must be kep in sync with the cases of the switch in afterDecode
       /*
       mxCodecRegistry.addAlias("RegularSpikeSource", myName);
       mxCodecRegistry.addAlias("PoissonSource", myName);

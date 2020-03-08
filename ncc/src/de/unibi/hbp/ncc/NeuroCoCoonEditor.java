@@ -184,6 +184,10 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			rightHandTabs.setSelectedIndex(resultsTabIndex);
 	}
 
+	public void clearResultsTab () {
+		setResultsTab(null, null, false);
+	}
+
 	public void setJobStatus (EditorToolBar.StatusLevel level, String topSummary, String longerBottomText) {
 		getEditorToolBar().setJobStatusInToolBar(level, topSummary);
 		status(longerBottomText);
@@ -206,24 +210,22 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	}
 
 
-		public static class ProgramGraphComponent extends mxGraphComponent
-	{
+	public static class ProgramGraphComponent extends mxGraphComponent {
 		private final ProgramGraph programGraph;
 
-		public ProgramGraphComponent (ProgramGraph graph)
-		{
+		public ProgramGraphComponent (ProgramGraph graph) {
 			super(graph);
 			programGraph = graph;
 			graph.getProgram().setGraphComponent(this);
 
 			// Sets switches typically used in an editor
 			setPageVisible(false);
-			// setGridVisible(false);
-			// menu item for grid is based on gridEnabled property of graph
+			// setGridVisible(false);  // menu item for grid is based on gridEnabled property of graph
 			setToolTips(true);
-			getConnectionHandler().setCreateTarget(false);
+			getConnectionHandler().setCreateTarget(false);  // no meaningful default target to create when pulling out an edge
+			// setPanning(true);  // is enabled by default
 			// Stops editing after enter has been pressed instead of adding a newline to the current editing value
-			setEnterStopsCellEditing(true);  // FIXME this does NOT help with our Enter inspector problems
+			setEnterStopsCellEditing(true);  // we allow no editable multi-line labels
 
 
 			// Loads the default stylesheet from an external file
@@ -231,6 +233,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource("resources/default-style.xml").toString());
 			if (doc != null)
 				codec.decode(doc.getDocumentElement(), graph.getStylesheet());
+			// TODO consolidate both stylesheets into a minimal file ncc-style.xml
 
 			// Sets the background to white
 			getViewport().setOpaque(true);
@@ -324,31 +327,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		public Program getProgram () { return program; }
 
-		// @Override
-		public Object[] cloneCells_deactivated (Object[] cells, boolean allowInvalidEdges) {
-			Object[] clones =  super.cloneCells(cells, allowInvalidEdges);
-			int index = 0;
-			for (Object clone: clones) {
-				if (clone instanceof mxCell) {
-					mxCell cell = (mxCell) clone;
-					Object value = cell.getValue();
-					LanguageEntity duplicatedValue = null;
-					if (value instanceof EntityCreator) {
-						duplicatedValue = ((EntityCreator<?>) value).create();
-					}
-					else if (value instanceof LanguageEntity && ((mxCell) cells[index]).getParent() != null)
-						// TODO duplicate() the value only, if original cell is part of the graph
-						duplicatedValue = ((LanguageEntity) value).duplicate();
-					if (duplicatedValue != null) {
-						cell.setValue(duplicatedValue);
-						duplicatedValue.setOwningCell(cell);
-					}
-				}
-				index += 1;
-			}
-			return clones;
-		}
-
 		@Override
 		public void cellsAdded (Object[] cells, Object parent, Integer index, Object source, Object target,
 								boolean absolute, boolean constrain) {
@@ -383,6 +361,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		}
 
 
+		// TODO provide a context menu sub-menu to directly select an edge style?
 		private enum EdgeStyles implements DisplayNamed {
 			DEFAULT("Orthogonal", ""),
 			ELBOW_VERTICAL("Elbow, vertical", ";edgeStyle=elbowEdgeStyle;elbow=vertical"),
@@ -577,6 +556,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 	public static void main (String[] args) {
 		// FIXME use SwingUtilities.invokeLater?
+		// TODO support a file name argument to open that .ncc file
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}

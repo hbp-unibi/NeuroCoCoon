@@ -53,6 +53,7 @@ public class ProgramVisitor implements CodeGenVisitor {
             // TODO check unused spike/poisson sources --> Warning
             // TODO check unconnected standard populations --> Warning
             // TODO check unconnected non-optional module ports --> Error
+            // TODO check no plots defined, no regular/poisson sources defined
          }
 
 
@@ -64,6 +65,8 @@ public class ProgramVisitor implements CodeGenVisitor {
                SynapseType synapseType = connection.getSynapseType();
                if (synapseType.getWeight() == 0)
                   diagnostics.recordWarning(connection, "Synapse with weight zero has no effect.");
+               if (synapseType.getDelay() < program.getTimeStep())
+                  diagnostics.recordWarning(connection, "Delay is smaller than time step.");
                if (synapseType.getConnectorKind() == SynapseType.ConnectorKind.ONE_TO_ONE) {
                   Integer sourceCount = AttributeUtils.getNeuronCount(source);
                   Integer targetCount = AttributeUtils.getNeuronCount(target);
@@ -84,8 +87,11 @@ public class ProgramVisitor implements CodeGenVisitor {
          protected void visitLoopEdge (mxICell edge, mxICell sourceAndTarget, LanguageEntity entity) {
             if (entity instanceof NeuronConnection) {
                NeuronConnection connection = (NeuronConnection) entity;
-               if (((NeuronConnection) entity).getSynapseType().getDelay() == 0)
-                  diagnostics.recordWarning(connection, "Self connection with zero delay.");
+               SynapseType synapseType = connection.getSynapseType();
+               if (synapseType.getWeight() == 0)
+                  diagnostics.recordWarning(connection, "Self connection with weight zero has no effect.");
+               if (synapseType.getDelay() < program.getTimeStep())
+                  diagnostics.recordWarning(connection, "Self connection with delay smaller than time step.");
             }
          }
 

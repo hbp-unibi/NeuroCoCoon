@@ -121,7 +121,7 @@ public class SynapseType extends NamedEntity {
    }
 
    public SynapseType (Namespace<SynapseType> namespace, String name, ConnectorKind kind) {
-      this(namespace, name, kind, 1.0, 0.0, 0.5, SynapseKind.STATIC);
+      this(namespace, name, kind, 1.0, 1.0, 0.5, SynapseKind.STATIC);
    }
 
    public SynapseType (Namespace<SynapseType> namespace, String name) {  // default for New button in master/detail editor
@@ -155,6 +155,7 @@ public class SynapseType extends NamedEntity {
    protected List<EditableProp<?>> addExportedEditableProps (List<EditableProp<?>> list) {
       list.add(connectorKind);
       list.add(weight);
+      list.add(delay);
       connectorKind.getValue().addKindSpecificProps(list, this);
       return list;
    }

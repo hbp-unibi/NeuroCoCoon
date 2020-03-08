@@ -54,11 +54,6 @@ public abstract class LanguageEntity {
       return Collections.emptyList();
    }
 
-   public List<LanguageEntity> getDependentEntities () {
-      // TODO implement this
-      return null;
-   }
-
    private List<LanguageEntity> addReferencedEntities (List<LanguageEntity> list, List<? extends ReadOnlyProp<?>> props) {
       for (ReadOnlyProp<?> prop: props) {
          if (prop instanceof NameProp)

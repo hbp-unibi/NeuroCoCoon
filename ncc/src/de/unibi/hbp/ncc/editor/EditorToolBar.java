@@ -17,6 +17,7 @@ import de.unibi.hbp.ncc.env.JavaScriptBridge;
 import de.unibi.hbp.ncc.env.NmpiClient;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.SynapseType;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -174,7 +175,16 @@ public class EditorToolBar extends JToolBar
 		add(checkAction);
 		RunAction runAction = new RunAction();
 		add(editor.bind("Run", runAction, IMAGE_PATH + "run.png"));
-		final JComboBox<NmpiClient.Platform> platformCombo = new JComboBox<>(NmpiClient.Platform.values());
+		final JComboBox<NmpiClient.Platform> platformCombo =
+				new PartialComboBoxModel<NmpiClient.Platform>(NmpiClient.Platform.values()) {
+					@Override
+					protected boolean isAllowed (@NotNull Object value) {
+						return value instanceof NmpiClient.Platform &&
+								(JavaScriptBridge.isWebPlatform()
+								? ((NmpiClient.Platform) value).worksInWebApp()
+								: ((NmpiClient.Platform) value).worksOutsideWebApp());
+					}
+				}.buildComboBox();
 		platformCombo.setEditable(false);
 		platformCombo.setMinimumSize(new Dimension(100, 0));
 		platformCombo.setPreferredSize(new Dimension(140, 0));
@@ -187,54 +197,6 @@ public class EditorToolBar extends JToolBar
 				currentPlatform = (NmpiClient.Platform) selected;
 		});
 		add(platformCombo);
-		// TODO disable unavailable platforms
-		/*
-		1. Disallow selecting items which you want to be disabled
-
-For this you can use a custom ComboBoxModel, and override its setSelectedItem() method to do nothing if the item to be selected is a disabled one:
-
-class MyComboModel extends DefaultComboBoxModel<String> {
-    public MyComboModel() {}
-    public MyComboModel(Vector<String> items) {
-        super(items);
-    }
-    @Override
-    public void setSelectedItem(Object item) {
-        if (item.toString().startsWith("**"))
-            return;
-        super.setSelectedItem(item);
-    };
-}
-And you can set this new model by passing an instance of it to the JComboBox constructor:
-
-JComboBox<String> cb = new JComboBox<>(new MyComboModel());
-2. Display disabled items with different font
-
-For this you have to use a custom ListCellRenderer and in getListCellRendererComponent() method you can configure different visual appearance for disabled and enabled items:
-
-Font f1 = cb.getFont();
-Font f2 = new Font("Tahoma", 0, 14);
-
-cb.setRenderer(new DefaultListCellRenderer() {
-    @Override
-    public Component getListCellRendererComponent(JList<?> list, Object value,
-            int index, boolean isSelected, boolean cellHasFocus) {
-        if (value instanceof JComponent)
-            return (JComponent) value;
-
-        boolean itemEnabled = !value.toString().startsWith("**");
-
-        super.getListCellRendererComponent(list, value, index,
-                isSelected && itemEnabled, cellHasFocus);
-
-        // Render item as disabled and with different font:
-        setEnabled(itemEnabled);
-        setFont(itemEnabled ? f1 : f2);
-
-        return this;
-    }
-});
-		 */
 
 		addSeparator();
 
