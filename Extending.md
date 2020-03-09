@@ -1,2 +1,5 @@
-# NeuroCoCoon
-Visual language and associated editor for SNN model building
+![NeuroCoCoon - Neuromorphic Computing CoCoon](assets/ncc_title_full.png)
+
+# Adding new Network Modules
+
+

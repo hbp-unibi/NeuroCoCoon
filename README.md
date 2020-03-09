@@ -1,7 +1,7 @@
 ![NeuroCoCoon - Neuromorphic Computing CoCoon](assets/ncc_title_full.png)
 
 **NeuroCoCoon** is a **protective** development environment and experimentation **workbench** for
-spiking neural networks(*SNN*s) running on **neuromorphic hardware**.
+spiking neural networks (*SNN*s) running on **neuromorphic hardware**.
 
 The network is described in a graph-based visual language and is built from **neuron populations** (nodes) and **synapse
 connectors** (edges). User-defined **neuron types** and **synapse types** ensure consistent parameter choices for all
