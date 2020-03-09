@@ -14,11 +14,21 @@ that scale the underlying generic module architecture and can influence the numb
 (ports) provided by the module.
 
 A visually created network is then checked for structural and logic errors, before it is translated into
-an equivalent PyNN-based program. Networks can be simulated on the NEST software simulator,
-if NeuroCoCoon is running as a local application, or on the SpiNNaker and BrainScalesS platforms of the
-European Horizon 2020 Human Brain Project (*HBP*), if NeuroCoCoon is running as a client side web application inside
-the HBP collaboratory.
+an equivalent [PyNN][PyNN]-based program. Networks can be simulated on the [NEST][NEST] software simulator,
+if NeuroCoCoon is running as a local application, or on the [SpiNNaker and BrainScalesS][HBP-NMC] platforms of the
+European Horizon 2020 [Human Brain Project][HBP] (*HBP*), if NeuroCoCoon is running as a client side web application inside
+the [HBP collaboratory][HBP-Collab].
 
 ![Editing a small network containing an instance of the Synfire Chain module](assets/editor_window_chaintest_raw.png)
-TODO: add references for PyNN, NEST, SpiNNaker, BrainScales, HBP & its collaboratory  
-TODO: add grant agreement and HBP SGA-2 funding info
+
+---
+
+This open source software code was developed in part in the Human Brain Project, funded from the
+European Union’s Horizon 2020 Framework Programme for Research and Innovation under the
+Specific Grant Agreement No. 720270 (HBP SGA1) and 785907 (HBP SGA2).
+
+[PyNN]: https://neuralensemble.org/PyNN
+[NEST]: https://www.nest-initiative.org
+[HBP]: https://www.humanbrainproject.eu
+[HBP-NMC]: https://www.humanbrainproject.eu/en/silicon-brains/neuromorphic-computing-platform/
+[HBP-Collab]: https://collab.humanbrainproject.eu/

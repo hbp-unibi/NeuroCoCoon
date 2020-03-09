@@ -62,6 +62,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -2369,13 +2370,17 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		// but toggle for right mouse buttons requires CTRL to be pressed.
 	}
 
+	public static boolean isShortcutDown (InputEvent event) {  // Command kex on Mac, Control everywhere else
+		return mxUtils.IS_MAC ? event.isMetaDown() : event.isControlDown();
+	}
+
 	/**
 	 * 
 	 * @param event
 	 * @return Returns true if the given event allows the grid to be applied.
 	 */
 	public boolean isGridEnabledEvent(MouseEvent event) {
-		return event != null && SwingUtilities.isLeftMouseButton(event) && !event.isMetaDown();
+		return event != null && SwingUtilities.isLeftMouseButton(event) && !isShortcutDown(event);
 	}
 
 	/**
@@ -2387,7 +2392,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 * @return Returns true if the given event is a panning event.
 	 */
 	public boolean isPanningEvent(MouseEvent event) {
-		return event != null && SwingUtilities.isLeftMouseButton(event) && event.isShiftDown() && event.isMetaDown();
+		return event != null && SwingUtilities.isLeftMouseButton(event) && event.isShiftDown() && isShortcutDown((event));
 	}
 
 	/**

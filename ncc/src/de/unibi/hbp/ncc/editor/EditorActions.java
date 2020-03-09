@@ -138,14 +138,18 @@ public class EditorActions {
 		}
 	}
 
+	private static boolean confirmIfModified (BasicGraphEditor editor) {
+		return (editor != null && (!editor.isModified() ||
+				JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges"), mxResources.get("confirmation"),
+											  JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION));
+	}
+
 	@SuppressWarnings("serial")
 	public static class ExitAction extends AbstractAction {
 
 		public void actionPerformed (ActionEvent e) {
 			NeuroCoCoonEditor editor = getEditor(e);
-
-			if (editor != null && (!editor.isModified() ||
-					JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges")) == JOptionPane.YES_OPTION))
+			if (confirmIfModified(editor))
 				editor.exit();
 		}
 	}
@@ -330,7 +334,9 @@ public class EditorActions {
 
 					if (new File(filename).exists()
 							&& JOptionPane.showConfirmDialog(graphComponent,
-									mxResources.get("overwriteExistingFile")) != JOptionPane.YES_OPTION)
+															 mxResources.get("overwriteExistingFile"),
+															 mxResources.get("confirmation"),
+															 JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
 						return;
 				}
 				else
@@ -368,7 +374,9 @@ public class EditorActions {
 						Color bg = null;
 
 						if ((!ext.equalsIgnoreCase("gif") && !ext.equalsIgnoreCase("png")) ||
-								JOptionPane.showConfirmDialog(graphComponent, mxResources.get("transparentBackground")) != JOptionPane.YES_OPTION)
+								JOptionPane.showConfirmDialog(graphComponent, mxResources.get("transparentBackground"),
+															  mxResources.get("confirmation"),
+															  JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
 							bg = graphComponent.getBackground();
 
 						if (selectedFilter == xmlPngFilter ||
@@ -698,20 +706,17 @@ public class EditorActions {
 		public void actionPerformed (ActionEvent e) {
 			NeuroCoCoonEditor editor = getEditor(e);
 
-			if (editor != null) {
-				if (!editor.isModified() ||
-						JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges")) == JOptionPane.YES_OPTION) {
-					mxGraph graph = editor.getGraphComponent().getGraph();
+			if (confirmIfModified(editor)) {
+				mxGraph graph = editor.getGraphComponent().getGraph();
 
-					editor.getProgram().clear(editor.getEditorToolBar());
-					mxCell root = new mxCell();
-					root.insert(new mxCell());
-					graph.getModel().setRoot(root);
+				editor.getProgram().clear(editor.getEditorToolBar());
+				mxCell root = new mxCell();
+				root.insert(new mxCell());
+				graph.getModel().setRoot(root);
 
-					editor.setModified(false);
-					editor.setCurrentFile(null);
-					editor.getGraphComponent().zoomAndCenter();
-				}
+				editor.setModified(false);
+				editor.setCurrentFile(null);
+				editor.getGraphComponent().zoomAndCenter();
 			}
 		}
 	}
@@ -756,61 +761,58 @@ public class EditorActions {
 		public void actionPerformed (ActionEvent e) {
 			NeuroCoCoonEditor editor = getEditor(e);
 
-			if (editor != null) {
-				if (!editor.isModified() ||
-						JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges")) == JOptionPane.YES_OPTION) {
-					mxGraph graph = editor.getGraphComponent().getGraph();
+			if (confirmIfModified(editor)) {
+				mxGraph graph = editor.getGraphComponent().getGraph();
 
-					if (graph != null) {
-						String wd = (lastDir != null) ? lastDir : System.getProperty("user.dir");
+				if (graph != null) {
+					String wd = (lastDir != null) ? lastDir : System.getProperty("user.dir");
 
-						JFileChooser fc = new JFileChooser(wd);
+					JFileChooser fc = new JFileChooser(wd);
 
-						// Adds file filter for supported file format
-						DefaultFileFilter nccFilter =
-								new DefaultFileFilter(".ncc",
-													  mxResources.get("allSupportedFormats") + " (.ncc, .png)") {
+					// Adds file filter for supported file format
+					DefaultFileFilter nccFilter =
+							new DefaultFileFilter(".ncc",
+												  mxResources.get("allSupportedFormats") + " (.ncc, .png)") {
 
-							public boolean accept (File file) {
-								return super.accept(file) || file.getName().toLowerCase().endsWith(".png");
-							}
-						};
-						fc.addChoosableFileFilter(nccFilter);
-
-						fc.addChoosableFileFilter(new DefaultFileFilter(".ncc",
-								"NeuroCoCoon " + mxResources.get("file") + " (.ncc)"));
-						fc.addChoosableFileFilter(new DefaultFileFilter(".png",
-								"PNG+XML " + mxResources.get("file") + " (.png)"));
-
-						fc.setFileFilter(nccFilter);
-
-						int rc = fc.showDialog(null, mxResources.get("openFile"));
-
-						if (rc == JFileChooser.APPROVE_OPTION) {
-							lastDir = fc.getSelectedFile().getParent();
-
-							try {
-								if (fc.getSelectedFile().getAbsolutePath().toLowerCase().endsWith(".png"))
-									openXmlPng(editor, fc.getSelectedFile());
-								else {
-									Document document = mxXmlUtils.parseXml(mxUtils.readFile(fc.getSelectedFile().getAbsolutePath()));
-									if (document != null) {
-										editor.getProgram().clear(editor.getEditorToolBar());
-										ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
-										codec.decode(document.getDocumentElement(), graph.getModel());
-										codec.announceDone();
-										editor.setCurrentFile(fc.getSelectedFile());
-
-										resetEditor(editor);
-									}
-									else
-										throw new IOException("Could not parse XML document!");
+								public boolean accept (File file) {
+									return super.accept(file) || file.getName().toLowerCase().endsWith(".png");
 								}
+							};
+					fc.addChoosableFileFilter(nccFilter);
+
+					fc.addChoosableFileFilter(new DefaultFileFilter(".ncc",
+																	"NeuroCoCoon " + mxResources.get("file") + " (.ncc)"));
+					fc.addChoosableFileFilter(new DefaultFileFilter(".png",
+																	"PNG+XML " + mxResources.get("file") + " (.png)"));
+
+					fc.setFileFilter(nccFilter);
+
+					int rc = fc.showDialog(null, mxResources.get("openFile"));
+
+					if (rc == JFileChooser.APPROVE_OPTION) {
+						lastDir = fc.getSelectedFile().getParent();
+
+						try {
+							if (fc.getSelectedFile().getAbsolutePath().toLowerCase().endsWith(".png"))
+								openXmlPng(editor, fc.getSelectedFile());
+							else {
+								Document document = mxXmlUtils.parseXml(mxUtils.readFile(fc.getSelectedFile().getAbsolutePath()));
+								if (document != null) {
+									editor.getProgram().clear(editor.getEditorToolBar());
+									ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
+									codec.decode(document.getDocumentElement(), graph.getModel());
+									codec.announceDone();
+									editor.setCurrentFile(fc.getSelectedFile());
+
+									resetEditor(editor);
+								}
+								else
+									throw new IOException("Could not parse XML document!");
 							}
-							catch (IOException ex) {
-								ex.printStackTrace(System.err);
-								JOptionPane.showMessageDialog(editor.getGraphComponent(), ex.toString(), mxResources.get("error"), JOptionPane.ERROR_MESSAGE);
-							}
+						}
+						catch (IOException ex) {
+							ex.printStackTrace(System.err);
+							JOptionPane.showMessageDialog(editor.getGraphComponent(), ex.toString(), mxResources.get("error"), JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}

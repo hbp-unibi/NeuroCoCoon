@@ -14,7 +14,8 @@ if [ ! -f "$CERT_PATH" ]; then
 fi
 
 echo "launching HTTPS server on port $HTTPS_PORT"
-python -c "import BaseHTTPServer, SimpleHTTPServer, ssl;
-    httpd = BaseHTTPServer.HTTPServer(('${HOST_SERVED}', ${HTTPS_PORT}), SimpleHTTPServer.SimpleHTTPRequestHandler);
-    httpd.socket = ssl.wrap_socket (httpd.socket, certfile='${CERT_PATH}', server_side=True);
-    httpd.serve_forever()"
+python -c "
+import BaseHTTPServer, SimpleHTTPServer, ssl;
+httpd = BaseHTTPServer.HTTPServer(('${HOST_SERVED}', ${HTTPS_PORT}), SimpleHTTPServer.SimpleHTTPRequestHandler);
+httpd.socket = ssl.wrap_socket (httpd.socket, certfile='${CERT_PATH}', server_side=True);
+httpd.serve_forever()"

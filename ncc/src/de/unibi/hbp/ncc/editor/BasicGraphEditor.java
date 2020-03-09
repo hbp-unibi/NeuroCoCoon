@@ -65,7 +65,7 @@ public class BasicGraphEditor extends JPanel
 	{
 		try
 		{
-			mxResources.add("de/unibi/hbp/ncc/resources/editor");
+			mxResources.add("de/unibi/hbp/ncc/resources/ncc");
 			// may NOT be an absolute path for some reason
 		}
 		catch (Exception e)
@@ -309,7 +309,7 @@ public class BasicGraphEditor extends JPanel
 	{
 		// Installs mouse wheel listener for zooming
 		MouseWheelListener wheelTracker = e -> {
-			if (e.getSource() instanceof mxGraphOutline || e.isControlDown())
+			if (e.getSource() instanceof mxGraphOutline || mxGraphComponent.isShortcutDown(e))
 				BasicGraphEditor.this.mouseWheelMoved(e);
 		};
 

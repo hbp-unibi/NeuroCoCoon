@@ -220,6 +220,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 			// Sets switches typically used in an editor
 			setPageVisible(false);
+			setDragEnabled(false);  // disables many smart drag options and we do not support import from external sources anyway
 			// setGridVisible(false);  // menu item for grid is based on gridEnabled property of graph
 			setToolTips(true);
 			getConnectionHandler().setCreateTarget(false);  // no meaningful default target to create when pulling out an edge
@@ -293,7 +294,9 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		public ProgramGraph (Program program) {
 			this.program = program;
 			setGridEnabled(false);
-			setAllowDanglingEdges(true);  // otherwise drag&drop of edge template effectively not be used
+			setGridSize(16);  // default is 10
+			setAllowDanglingEdges(true);  // otherwise drag&drop of edge template is effectively unusable
+			setDropEnabled(false);  // consequences unclear, seems not to harm; palette can still be used as a source
 			setMultigraph(false);
 //			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");  // not used by our overridden version flipEdge
 

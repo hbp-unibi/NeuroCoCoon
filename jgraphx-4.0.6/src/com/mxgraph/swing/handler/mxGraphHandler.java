@@ -996,7 +996,7 @@ public class mxGraphHandler extends mxMouseAdapter implements
 
 	protected void moveCells (Object[] cells, double dx, double dy, Object target, MouseEvent e) {
 		mxGraph graph = graphComponent.getGraph();
-		boolean clone = e.isControlDown() && isCloneEnabled();
+		boolean clone = graphComponent.isCloneEvent(e) && isCloneEnabled();
 
 		if (clone)
 			cells = graph.getCloneableCells(cells);
