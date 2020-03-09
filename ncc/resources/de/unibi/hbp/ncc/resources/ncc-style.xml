@@ -54,6 +54,19 @@
 		<add as="fillColor" value="#ddffff"/>
 		<add as="strokeColor" value="#bbdddd"/>
 	</add>
+	<add as="assembly" extend="defaultVertex">
+		<add as="shape" value="triangle"/>
+		<add as="perimeter" value="trianglePerimeter"/>
+		<add as="direction" value="south"/>
+		<add as="fillColor" value="#ffdddd"/>
+		<add as="strokeColor" value="#ddbbbb"/>
+	</add>
+	<add as="slice" extend="defaultVertex">
+		<add as="shape" value="hexagon"/>
+		<add as="perimeter" value="hexagonPerimeter"/>
+		<add as="fillColor" value="#ffdd88"/>
+		<add as="strokeColor" value="#ddbb77"/>
+	</add>
 	<add as="module" extend="defaultVertex">
 		<add as="foldable" value="0"/>
 		<add as="shape" value="label"/>
@@ -140,6 +153,12 @@
 		<add as="endArrow" value="diamond"/>
 		<add as="dashed" value="1"/>
 		<add as="dashPattern" value="2 4"/>
+	</add>
+	<add as="dependency" extends="straight">
+		<add as="strokeWidth" value="1"/>
+		<add as="strokeColor" value="#886644"/>
+		<add as="endArrow" value="open"/>
+		<add as="endSize" value="12"/>
 	</add>
 	<!-- the following two definitions should be unused -->
 	<add as="label">

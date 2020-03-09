@@ -16,9 +16,11 @@ if NeuroCoCoon is running as a client side web application inside the [HBP colla
 
 # Editor Window
 
-![Editing a small network containing an instance of the Synfire Chain module](assets/editor_window_chaintest_raw.png)
+![Main parts of editor window](assets/editor_window_anatomy.png "Main parts of editor window")
 
 ## Toolbar
+
+![Elements of editor toolbar](assets/editor_toolbar_anatomy.png "Elements of editor toolbar")
 
 ## Palette
 

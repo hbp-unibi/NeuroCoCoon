@@ -19,7 +19,7 @@ if NeuroCoCoon is running as a local application, or on the [SpiNNaker and Brain
 European Horizon 2020 [Human Brain Project][HBP] (*HBP*), if NeuroCoCoon is running as a client side web application inside
 the [HBP collaboratory][HBP-Collab].
 
-![Editing a small network containing an instance of the Synfire Chain module](assets/editor_window_chaintest_raw.png)
+![Editing a small network containing an instance of the Synfire Chain module](assets/editor_window_chaintest_raw.png "Editing a small network containing an instance of the Synfire Chain module")
 
 ---
 

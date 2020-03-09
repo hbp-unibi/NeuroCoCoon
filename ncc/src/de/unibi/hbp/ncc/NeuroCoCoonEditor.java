@@ -130,6 +130,20 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		basicPalette.addEdgeTemplate(NeuronConnection.CREATOR);
 		basicPalette.addTemplate(DataPlot.CREATOR);
 		basicPalette.addEdgeTemplate(ProbeConnection.CREATOR);
+		// TODO add back support for assemblies, slices (a special case of a view) and associated dependency edges
+
+/*
+		basicPalette.addTemplate("Assembly",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/assembly.png")),
+								   "assembly",
+								   100, 60, ModuleExample.CREATOR);
+		basicPalette.addTemplate("Slice",
+								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/dummy.png")),
+								   "slice",
+								   100, 100, ModuleExample.CREATOR);
+*/
+		// basicPalette.addEdgeTemplate(DependencyConnection.CREATOR);
+
 		modulesPalette.addTemplate(SynfireChain.CREATOR);
 		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
 		modulesPalette.addTemplate("Retina",

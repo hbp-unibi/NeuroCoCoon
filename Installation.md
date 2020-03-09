@@ -4,9 +4,28 @@
 
 ## Building
 
+TODO: IntelliJ IDEA by JetBrains s.r.o.
+
 ## Installing as a local application
 
+JDK 8
+
+TODO: Download the [latest release][NCC-Release] of the all-in-one runnable Java archive file `ncc-v1.0.0.jar`,
+where the last part of the filename reflects the version number.
+
+`java -jar ncc-v1.0.0.jar`
+
+## Prerequisites for running NEST simulations locally
+
 ## Installing the collaboratory web app
+
+TODO: CheerpJ by Leaning Technologies
+the Java compiler for the Web
+converts any Java client application into standard HTML5/WebAssembly/JavaScript
+works from Java bytecode, without requiring access to the source code
+compatible with 100% of Java (reflection and dynamic classes included)
+turn-key solution, works on Java Swing clients, Java applets, and Java libraries
+actively developed and supported by Leaning Technologies experts
 
 **NeuroCoCoon** is a **protective** development environment and experimentation **workbench** for
 spiking neural networks (*SNN*s) running on **neuromorphic hardware**.
@@ -29,14 +48,14 @@ the [HBP collaboratory][HBP-Collab].
 
 ![Editing a small network containing an instance of the Synfire Chain module](assets/editor_window_chaintest_raw.png)
 
----
-
-This open source software code was developed in part in the Human Brain Project, funded from the
-European Union’s Horizon 2020 Framework Programme for Research and Innovation under the
-Specific Grant Agreement No. 720270 (HBP SGA1) and 785907 (HBP SGA2).
-
+[NCC-Release]: https://github.com/hbp-unibi/NeuroCoCoon/releases
+[IntelliJ]: https://www.jetbrains.com/idea/
+[OpenJDK]: https://openjdk.java.net/install/
+[Oracle]: https://www.oracle.com/java/technologies/javase-downloads.html
+[CheerpJ]: https://www.leaningtech.com/pages/cheerpj.html
 [PyNN]: https://neuralensemble.org/PyNN
 [NEST]: https://www.nest-initiative.org
 [HBP]: https://www.humanbrainproject.eu
 [HBP-NMC]: https://www.humanbrainproject.eu/en/silicon-brains/neuromorphic-computing-platform/
 [HBP-Collab]: https://collab.humanbrainproject.eu/
+

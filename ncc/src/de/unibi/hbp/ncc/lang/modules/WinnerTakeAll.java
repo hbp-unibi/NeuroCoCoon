@@ -54,7 +54,7 @@ public class WinnerTakeAll extends SingleNeuronTypeModule {
       this.noiseWeight = new NonNegativeDoubleProp("Noise Weight", this, noiseWeight);
       this.inhibitionWeight = new NonNegativeDoubleProp("Inhibitory Weight", this, inhibitionWeight);
       this.excitationWeight = new NonNegativeDoubleProp("Excitatory Weight", this, excitationWeight);
-      this.noiseRate = new NonNegativeDoubleProp("Rate", this, noiseRate).setUnit("Hz");  // zero means non noise
+      this.noiseRate = new NonNegativeDoubleProp("Rate", this, noiseRate).setUnit("Hz");  // zero means no noise
       this.noiseProbability = new ProbabilityProp("Noise Probability", this, noiseProbability);
       this.inhibitionProbability = new ProbabilityProp("Inhibition Probability", this, inhibitionProbability);
       this.excitationProbability = new ProbabilityProp("Excitation Probability", this, excitationProbability);
