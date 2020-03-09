@@ -243,41 +243,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		public ProgramGraph getProgramGraph () { return programGraph; }
 
-		// TODO allow dragging of edges onto edges (and populations onto populations) to set the synapse type (or neuron type)
-		/* *
-		 * Overrides drop behaviour to set the cell style if the target
-		 * is not a valid drop target and the cells are of the same
-		 * type (eg. both vertices or both edges). 
-		 */
-		/*
-		public Object[] importCells(Object[] cells, double dx, double dy,
-				Object target, Point location)
-		{
-			if (target == null && cells.length == 1 && location != null)
-			{
-				target = getCellAt(location.x, location.y);
-
-				if (target instanceof mxICell && cells[0] instanceof mxICell)
-				{
-					mxICell targetCell = (mxICell) target;
-					mxICell dropCell = (mxICell) cells[0];
-
-					if (targetCell.isVertex() == dropCell.isVertex()
-							|| targetCell.isEdge() == dropCell.isEdge())
-					{
-						mxIGraphModel model = graph.getModel();
-						model.setStyle(target, model.getStyle(cells[0]));
-						graph.setSelectionCell(target);
-
-						return null;
-					}
-				}
-			}
-
-			return super.importCells(cells, dx, dy, target, location);
-		}
-		 */
-
+		// TODO allow dragging of neuron/synapse styles onto vertices/edges to set the type
 	}
 
 	/**
@@ -287,10 +253,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 		private final Program program;
 		private EditorToolBar toolBar;
 
-		/**
-		 * Custom graph that defines the alternate edge style to be used when
-		 * the middle control point of edges is double clicked (flipped).
-		 */
 		public ProgramGraph (Program program) {
 			this.program = program;
 			setGridEnabled(false);
@@ -298,7 +260,6 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			setAllowDanglingEdges(true);  // otherwise drag&drop of edge template is effectively unusable
 			setDropEnabled(false);  // consequences unclear, seems not to harm; palette can still be used as a source
 			setMultigraph(false);
-//			setAlternateEdgeStyle("edgeStyle=mxEdgeStyle.ElbowConnector;elbow=vertical");  // not used by our overridden version flipEdge
 
 			addListener(mxEvent.CELLS_ADDED, (sender, evt ) -> {
 				Object[] cells = (Object[]) evt.getProperty("cells");

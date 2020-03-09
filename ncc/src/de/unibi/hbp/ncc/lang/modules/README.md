@@ -30,4 +30,4 @@ The following three files together define all aspects of a module kind:
   The first fragment is usually the definition of a Python function or class that builds a module instance.
   The second fragment is invoked, possibly multiple times, to create each module instance.
 
-[ST4-Syntax]: https://github.com/antlr/stringtemplate4/blob/master/doc/templates.md
+[ST4-Syntax]: https://github.com/antlr/stringtemplate4/blob/master/doc/cheatsheet.md
