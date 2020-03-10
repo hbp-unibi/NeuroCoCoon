@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class LanguageEntityCodec extends mxObjectCodec {
 
+   // TODO provide a separate ScopeCodec that preserves all unreferenced (from the graph) neuron and synapse types; attach the scope to the root node of the graph (temporarily or permanently?)
+
    public LanguageEntityCodec () {
       super(new LinkedHashMap<String, Object>());  // decoding starts with a clone of this empty order preserving hash map
       // this list must be kep in sync with the cases of the switch in afterDecode

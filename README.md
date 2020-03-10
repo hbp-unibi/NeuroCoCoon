@@ -21,6 +21,12 @@ the [HBP collaboratory][HBP-Collab].
 
 ![Editing a small network containing an instance of the Synfire Chain module](assets/editor_window_chaintest_raw.png "Editing a small network containing an instance of the Synfire Chain module")
 
+## More Information
+
+* [**Building and installing NeuroCoCoon**](Installation.md)
+* [**Using the visual editor**](Usage.md)
+* [**Adding new kinds of network modules**](Extending.md)
+
 ---
 
 This open source software code was developed in part in the Human Brain Project, funded from the

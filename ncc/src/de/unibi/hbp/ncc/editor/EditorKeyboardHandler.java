@@ -11,13 +11,14 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * @author Administrator
  * 
  */
-public class EditorKeyboardHandler extends mxKeyboardHandler
-{
+public class EditorKeyboardHandler extends mxKeyboardHandler {
 
 	/**
 	 * 
@@ -31,23 +32,20 @@ public class EditorKeyboardHandler extends mxKeyboardHandler
 	/**
 	 * Return JTree's input map.
 	 */
-	protected InputMap getInputMap(int condition)
-	{
+	protected InputMap getInputMap(int condition) {
 		InputMap map = super.getInputMap(condition);
 
-		if (condition == JComponent.WHEN_FOCUSED && map != null)
-		{
-			map.put(KeyStroke.getKeyStroke("control S"), "save");
-			map.put(KeyStroke.getKeyStroke("control shift S"), "saveAs");
-			map.put(KeyStroke.getKeyStroke("control N"), "new");
-			map.put(KeyStroke.getKeyStroke("control O"), "open");
+		if (condition == JComponent.WHEN_FOCUSED && map != null) {
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_N, MENU_SHORTCUT_DOWN_MASK), "new");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, MENU_SHORTCUT_DOWN_MASK), "open");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_DOWN_MASK), "save");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "saveAs");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar('z'), MENU_SHORTCUT_DOWN_MASK), "undo");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar('z'), MENU_SHORTCUT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "redo");
 
-			map.put(KeyStroke.getKeyStroke("control Z"), "undo");
-			map.put(KeyStroke.getKeyStroke("control Y"), "redo");
-			map
-					.put(KeyStroke.getKeyStroke("control shift V"),
-							"selectVertices");
-			map.put(KeyStroke.getKeyStroke("control shift E"), "selectEdges");
+			// likely not directly useful in our case
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, MENU_SHORTCUT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "selectVertices");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "selectEdges");
 		}
 
 		return map;
@@ -56,8 +54,7 @@ public class EditorKeyboardHandler extends mxKeyboardHandler
 	/**
 	 * Return the mapping between JTree's input map and JGraph's actions.
 	 */
-	protected ActionMap createActionMap()
-	{
+	protected ActionMap createActionMap() {
 		ActionMap map = super.createActionMap();
 
 		map.put("save", new EditorActions.SaveAction(false));

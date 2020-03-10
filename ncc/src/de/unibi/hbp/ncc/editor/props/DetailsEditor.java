@@ -118,6 +118,8 @@ public class DetailsEditor {
       }
    }
 
+   LanguageEntity getSubject () { return tableModel.subject; }  // so that MasterDetailsEditor can re-establish its selection in the master table
+
    public JComponent getComponent () { return component; }
 
    static class PropNameCellRenderer extends DefaultTableCellRenderer {
@@ -230,7 +232,7 @@ public class DetailsEditor {
 
    static class PropsTableModel extends AbstractTableModel
          implements PropPerRowModel, PropChangeListener {
-      private LanguageEntity subject;
+      LanguageEntity subject;
       List<ReadOnlyProp<?>> readOnlyProps;
       List<EditableProp<?>> editableProps;
 

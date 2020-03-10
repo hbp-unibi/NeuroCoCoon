@@ -88,7 +88,7 @@ public abstract class AbstractCellsVisitor {
                mxICell edge = parent.getEdgeAt(i);
                mxICell target = edge.getTerminal(false);
                // visit only incoming edges
-               if (target.equals(parent))
+               if (parent.equals(target))
                   visitEdgeCell(edge, true);
             }
          }
@@ -105,7 +105,7 @@ public abstract class AbstractCellsVisitor {
                mxICell edge = parent.getEdgeAt(i);
                mxICell source = edge.getTerminal(true);
                // visit only outgoing edges
-               if (source.equals(parent))
+               if (parent.equals(source))
                   visitEdgeCell(edge, false);
             }
          }
