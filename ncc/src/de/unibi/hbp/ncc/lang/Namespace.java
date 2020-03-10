@@ -384,8 +384,7 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
                x2++;
 
             // Longer digit run wins, first digit otherwise
-            //  should be good enough although we support transparent differences in number of leading zeroes otherwise:
-            // comparison applies to siblings in same directory and these should follow a consistent numbering scheme,
+            // should be good enough if user follow sa consistent numbering scheme,
             // either relying on "natural" sorting or padded with leading zeroes to lexicographic digit sequences
             return x2 == x1 ? c1 - c2 : x1 - x2;
          }

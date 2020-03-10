@@ -110,6 +110,29 @@ public class LanguageEntityCodec extends mxObjectCodec {
       return entityConstructor;
    }
 
+   private void processProps (ProgramCodec progDecoder, Iterable<EditableProp<?>> props,
+                              Map<String, Object> propValues) {
+      for (EditableProp<?> prop: props) {
+         String propName = prop.getPropName();
+         // System.err.println("editable property: " + propName + " = " + propValues.get(propName));
+         if (prop instanceof NameProp<?>) {
+            Object propValue = propValues.get(propName);
+            // System.err.println("afterDecode: NameProp " + prop.getPropName() + " = " + propValue + ", class=" + propValue.getClass().getName());
+            if (propValue instanceof String)
+               prop.setRawValue(progDecoder.resolveRememberedRefId((String) propValue));
+            else
+               prop.setRawValue(propValue);
+            // System.err.println("got prop value from XML: " + propName + "=" + propValue);
+         }
+         else {
+            String encodedValue;
+            // formally, Name needs to only be skipped, if (entity instanceof NamedEntity), but we never will use Name for anything else
+            if (!NamedEntity.NAME_PROPERTY_NAME.equals(propName) && (encodedValue = (String) propValues.get(propName)) != null)
+               prop.setValueFromString(encodedValue);
+         }
+      }
+
+   }
    @Override
    public Object afterDecode (mxCodec dec, Node node, Object obj) {
       ProgramCodec progDecoder = (ProgramCodec) dec;
@@ -150,27 +173,11 @@ public class LanguageEntityCodec extends mxObjectCodec {
       }
       String ownRefId = (String) propValues.get(REFERENCE_ID_PSEUDO_PROPERTY_NAME);
       progDecoder.rememberRefId(ownRefId, entity);
-      if (isPredefined)
-         return entity;
-      for (EditableProp<?> prop: entity.getEditableProps()) {
-         String propName = prop.getPropName();
-         // System.err.println("editable property: " + propName + " = " + propValues.get(propName));
-         if (prop instanceof NameProp<?>) {
-            Object propValue = propValues.get(propName);
-            if (propValue instanceof String)
-               prop.setRawValue(progDecoder.resolveRememberedRefId((String) propValue));
-            else
-               prop.setRawValue(propValue);
-               // System.err.println("got prop value from XML: " + propName + "=" + propValue);
-         }
-         else {
-            String encodedValue;
-            // formally, Name needs to only be skipped, if (entity instanceof NamedEntity), but we never will use Name for anything else
-            if (!NamedEntity.NAME_PROPERTY_NAME.equals(propName) && (encodedValue = (String) propValues.get(propName)) != null)
-               prop.setValueFromString(encodedValue);
-         }
+      if (!isPredefined) {
+         processProps(progDecoder, entity.getInfluentialEditableProps(), propValues);
+         processProps(progDecoder, entity.getNonInfluentialEditableProps(), propValues);
+         // assumes that there are no multi-level dependencies, where influential props are only exposed by other influential props
       }
-      // System.err.println("afterDecode: " + node + ", " + obj + ", " + entityName);
       return entity;
    }
 }

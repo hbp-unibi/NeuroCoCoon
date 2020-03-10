@@ -5,6 +5,7 @@ import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NameProp;
 import de.unibi.hbp.ncc.lang.props.ReadOnlyProp;
+import de.unibi.hbp.ncc.lang.utils.Iterators;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,18 @@ public abstract class LanguageEntity {
    public List<EditableProp<?>> getIndirectEditableProps () { return addIndirectEditableProps(new ArrayList<>()); }
    public List<EditableProp<?>> getDirectAndIndirectEditableProps () {
       return addIndirectEditableProps(addEditableProps(new ArrayList<>()));
+   }
+
+   // for decoding properties of loaded XML maps String --> propertyValue
+
+   public Iterable<EditableProp<?>> getInfluentialEditableProps () {  // those props that influence the visibility of other, dependent props
+      return Iterators.filter(getEditableProps(),
+                              prop -> prop.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY));
+   }
+
+   public Iterable<EditableProp<?>> getNonInfluentialEditableProps () {  // those props do not influence the set of props
+      return Iterators.filter(getEditableProps(),
+                              prop -> !prop.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY));
    }
 
    public boolean isPredefined () { return predefined; }

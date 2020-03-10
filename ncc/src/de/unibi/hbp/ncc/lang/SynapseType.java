@@ -124,14 +124,14 @@ public class SynapseType extends NamedEntity {
       this(namespace, name, kind, 1.0, 1.0, 0.5, SynapseKind.STATIC);
    }
 
-   public SynapseType (Namespace<SynapseType> namespace, String name) {  // default for New button in master/detail editor
-      this(namespace, null, ConnectorKind.ALL_TO_ALL);
+   public SynapseType (Namespace<SynapseType> namespace, String name) {
+      this(namespace, name, ConnectorKind.ALL_TO_ALL);
    }
 
    public SynapseType (String name) {
       this(getGlobalNamespace(), name);
    }
-   public SynapseType (Namespace<SynapseType> namespace) { this(namespace, null); }
+   public SynapseType (Namespace<SynapseType> namespace) { this(namespace, null); }  // default for New button in master/detail editor
    public SynapseType () { this((String) null); }
 
    public SynapseType (SynapseType orig) {
