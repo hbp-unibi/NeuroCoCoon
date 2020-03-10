@@ -47,7 +47,7 @@ public class mxKeyboardHandler
 		SwingUtilities.replaceUIActionMap(graphComponent, createActionMap());
 	}
 
-	private static final int MENU_SHORTCUT_DOWN_MASK = mxUtils.IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
+	protected static final int MENU_SHORTCUT_DOWN_MASK = mxUtils.IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 
 	/**
 	 * Return JTree's input map.
@@ -91,13 +91,11 @@ public class mxKeyboardHandler
 			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, MENU_SHORTCUT_DOWN_MASK), "paste");
 			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0), "paste");
 			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_DOWN_MASK), "group");
-			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, MENU_SHORTCUT_DOWN_MASK), "ungroup");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "ungroup");
 			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, MENU_SHORTCUT_DOWN_MASK), "zoomIn");
 			map.put(KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar('+'), MENU_SHORTCUT_DOWN_MASK), "zoomIn");
 			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, MENU_SHORTCUT_DOWN_MASK), "zoomOut");
 			map.put(KeyStroke.getKeyStroke(KeyEvent.getExtendedKeyCodeForChar('-'), MENU_SHORTCUT_DOWN_MASK), "zoomOut");
-
-			// TODO add undo/redo
 		}
 
 		return map;

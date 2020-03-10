@@ -8,6 +8,7 @@ import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.editor.EditorActions.*;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -202,7 +203,8 @@ public class EditorMenuBar extends JMenuBar
 		submenu.add(new TogglePropertyItem(graphComponent, mxResources.get("connectable"), "Connectable"));
 		submenu.add(new TogglePropertyItem(graph, mxResources.get("disconnectOnMove"), "DisconnectOnMove"));
 		submenu.addSeparator();
-		submenu.add(editor.bind(mxResources.get("connectMode"), new ToggleConnectModeAction()));
+		submenu.add(new JCheckBoxMenuItem(editor.bind(mxResources.get("connectMode"), new ToggleConnectModeAction())));
+		// assumes that connect mode is initially disabled, otherwise setSelected(menuItem, true) would be needed
 
 		submenu = (JMenu) menu.add(new JMenu(mxResources.get("validation")));
 		submenu.add(new TogglePropertyItem(graph, mxResources.get("allowDanglingEdges"), "AllowDanglingEdges"));

@@ -14,7 +14,7 @@ import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-public abstract class AbstractValueCellEditor<T> extends DefaultCellEditor {
+public abstract class AbstractValueCellEditor<T> extends SelectAllCellEditor {
    private EditableProp<T> prop;
    // private T value;
 
@@ -23,26 +23,18 @@ public abstract class AbstractValueCellEditor<T> extends DefaultCellEditor {
    }
 
    protected AbstractValueCellEditor (EditableProp<T> prop, int align) {
-      super(new JTextField());
+      this(prop, align, new JTextField());
+   }
+
+   protected AbstractValueCellEditor (EditableProp<T> prop, int align, JTextField textField) {
+      super(textField);
       this.prop = prop;
-      JTextField textField = ((JTextField) getComponent());
       textField.setHorizontalAlignment(align);
       textField.setInputVerifier(new InputVerifier() {
          @Override
          public boolean verify (JComponent input) {
             String s = ((JTextField) input).getText();
             return convertFromString(s != null ? s : "") != null;
-         }
-      });
-      textField.addFocusListener(new FocusAdapter() {
-         @Override
-         public void focusLost (FocusEvent e) {
-            // System.err.println("focusLost: " + getCellEditorValue());
-            // TODO do this only, iff the containing table is currently editing?
-            if (getCellEditorValue() != null)
-               stopCellEditing();
-            else
-               cancelCellEditing();
          }
       });
    }

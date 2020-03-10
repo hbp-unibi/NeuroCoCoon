@@ -5,7 +5,8 @@
 		<add as="align" value="center"/>
 		<add as="verticalAlign" value="middle"/>
 		<add as="editable" value="0"/>
-		<add as="fillColor" value="#dddddd"/>
+		<!-- <add as="fillColor" value="#dddddd"/> -->
+		<add as="fillColor" value="rgba(221,221,221,0.75)"/>  <!-- this is used by expanded group cells, which have no specific style of their own -->
 		<add as="strokeColor" value="#bbbbbb"/>
 		<add as="strokeWidth" value="2"/>
 		<add as="fontSize" value="12"/>
@@ -20,9 +21,11 @@
 		<add as="verticalAlign" value="middle"/>
 		<add as="editable" value="0"/>
 		<add as="labelBackgroundColor" value="rgba(255,255,255,0.75)"/>
+		<!-- <add as="labelBackgroundColor" value="#ffffff"/> plus opacity, fillOpacity in label does NOT work -->
 		<add as="rounded" value="1"/>
 		<!-- <add as="edgeStyle" value="elbowEdgeStyle"/> -->
 		<add as="edgeStyle" value="orthogonalEdgeStyle"/>
+		<!-- <add as="orthogonal" value="1"/> -->
 		<add as="strokeColor" value="#666666"/>
 		<add as="fontSize" value="11"/>
 		<add as="fontColor" value="#444444"/>
@@ -160,11 +163,21 @@
 		<add as="endArrow" value="open"/>
 		<add as="endSize" value="12"/>
 	</add>
+	<!-- used by standard mxGraph functionality -->
+	<add as="group">
+		<add as="verticalAlign" value="top"/>
+		<add as="dashed" value="1"/>
+		<add as="opacity" value="50"/>
+		<add as="fillColor" value="rgba(255,0,0,0.75)"/>
+		<add as="labelBackgroundColor" value="rgba(0,255,0,0.75)"/>
+	</add>
 	<!-- the following two definitions should be unused -->
 	<add as="label">
 		<add as="shape" value="label"/>
 		<add as="perimeter" value="rectanglePerimeter"/>
 		<add as="fontStyle" value="1"/>
+		<!-- <add as="fillOpacity" value="75"/>
+		<add as="opacity" value="75"/> -->
 		<add as="align" value="left"/>
 		<add as="verticalAlign" value="middle"/>
 		<add as="spacing" value="2"/>

@@ -20,13 +20,13 @@ import java.util.List;
 public class SynfireChain extends SingleNeuronTypeModule {
    private final IntegerProp numberOfPopulations, numberOfNeurons;
    private final DoubleProp inhibitionWeight, excitationWeight;
-   private final DoubleProp synapseDelay;
 
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
       list.add(numberOfPopulations);
       list.add(numberOfNeurons);
+      list.add(neuronType);
       list.add(inhibitionWeight);
       list.add(excitationWeight);
       list.add(synapseDelay);
@@ -42,13 +42,12 @@ public class SynfireChain extends SingleNeuronTypeModule {
                         int numberOfPopulations, int numberOfNeurons,
                         double inhibitionWeight, double excitationWeight,
                         double synapseDelay) {
-      super(namespace, name, CREATOR.getResourceFileBaseName(), neuronType, DEFAULT_NEURON_TYPE_NAME);
+      super(namespace, name, CREATOR.getResourceFileBaseName(), neuronType, DEFAULT_NEURON_TYPE_NAME, synapseDelay);
       this.numberOfPopulations = new StrictlyPositiveIntegerProp("Length of Chain", this, numberOfPopulations)
             .addImpact(EditableProp.Impact.CELL_STRUCTURE);
       this.numberOfNeurons = new StrictlyPositiveIntegerProp("Neurons per Population", this, numberOfNeurons);
       this.inhibitionWeight = new NonNegativeDoubleProp("Inhibitory Weight", this, inhibitionWeight);
       this.excitationWeight = new NonNegativeDoubleProp("Excitatory Weight", this, excitationWeight);
-      this.synapseDelay = new NonNegativeDoubleProp("Synapse Delay", this, synapseDelay).setUnit("ms");
    }
 
    @Override

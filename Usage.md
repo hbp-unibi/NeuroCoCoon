@@ -22,9 +22,25 @@ if NeuroCoCoon is running as a client side web application inside the [HBP colla
 
 ![Elements of editor toolbar](assets/editor_toolbar_anatomy.png "Elements of editor toolbar")
 
-## Palette
-
 ## Editing the Network
+
+### Creating Neuron Populations and Module Instances
+
+### Adding Synapses
+
+#### Drawing Synapses
+
+![](assets/drawing_synapse.png)
+
+#### Using Connect Mode
+
+![](assets/connectmode_synapse_start.png)
+
+#### Dragging from the Palette
+
+![](assets/dragging_synapse.png)
+
+### Plotting Data
 
 ### Mouse Operations
 
@@ -32,10 +48,19 @@ if NeuroCoCoon is running as a client side web application inside the [HBP colla
 
 ## Inspector
 
+![](assets/inspector_population.png)
+
+![](assets/inspector_synapsetype.png)
+
 ## Neuron and Synapse Types
+
+![](assets/masterdetail_neurontype.png)
+
+![](assets/masterdetail_synapsetype.png)
 
 ## Running a Simulation
 
+![](assets/diagnostics.png)
 
 ---
 

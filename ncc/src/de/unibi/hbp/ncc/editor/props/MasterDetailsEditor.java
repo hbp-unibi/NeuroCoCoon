@@ -1,17 +1,20 @@
 package de.unibi.hbp.ncc.editor.props;
 
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
+import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -23,6 +26,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.function.Function;
 
 public class MasterDetailsEditor<E extends NamedEntity> {
@@ -44,6 +49,7 @@ public class MasterDetailsEditor<E extends NamedEntity> {
       columnModel.addColumn(markerColumn);
       TableColumn nameColumn = new TableColumn(1);
       nameColumn.setHeaderValue("Name");
+      nameColumn.setCellEditor(new SelectAllCellEditor());
       columnModel.addColumn(nameColumn);
       MasterTableModel masterModel = new MasterTableModel();
       masterTable = new JTable(masterModel, columnModel);
@@ -73,9 +79,8 @@ public class MasterDetailsEditor<E extends NamedEntity> {
       duplicateButton.addActionListener(e -> {
          E entity = getSelectedEntity();
          if (entity != null)
-            entity.duplicate();
-         // masterList.setSelectedValue(duplicated, true);
-         // preserve the current selection for further duplicates
+            setSelectedEntityRaw(entity.duplicate());
+         // or preserve the current selection for further duplicates instead
       });
       final JButton deleteButton = new JButton("Delete");
       deleteButton.addActionListener(e -> {
@@ -111,7 +116,14 @@ public class MasterDetailsEditor<E extends NamedEntity> {
          return null;
    }
 
+   @SuppressWarnings("unchecked")  // TODO maybe generify DetailsEditor with <E extends LanguageEntity>, too
+   private void setSelectedEntityRaw (LanguageEntity entity) {
+      setSelectedEntity((E) entity);
+   }
+
    private void setSelectedEntity (E entity) {
+      if (entity == null)
+         return;
       int selectedRow = PropModelSearch.findPosition(listModel, entity);
       if (selectedRow != PropChangeListener.UNKNOWN_POSITION)
          masterTable.getSelectionModel().setSelectionInterval(selectedRow, selectedRow);
@@ -131,20 +143,30 @@ public class MasterDetailsEditor<E extends NamedEntity> {
 
       public MasterTableModel () {
          listModel.addListDataListener(new ListDataListener() {
+
+            private void restoreSelectedEntity () {
+               if (!masterTable.getSelectionModel().isSelectionEmpty()) {
+                  setSelectedEntityRaw(detailsEditor.getSubject());
+               }
+            }
+
             @Override
             public void intervalAdded (ListDataEvent e) {
                fireTableRowsInserted(e.getIndex0(), e.getIndex1());
+               restoreSelectedEntity();  // could be limited to cases, where selectedIndex >= e.getIndex0()
             }
 
             @Override
             public void intervalRemoved (ListDataEvent e) {
                fireTableRowsDeleted(e.getIndex0(), e.getIndex1());
+               restoreSelectedEntity();  // could be limited to cases, where selectedIndex >= e.getIndex0()
             }
 
             @Override
             public void contentsChanged (ListDataEvent e) {
                // should also suffice to just update all name column cells in the range, but that cannot be done in bulk
                fireTableRowsUpdated(e.getIndex0(), e.getIndex1());
+               restoreSelectedEntity();  // could be limited to cases, where e.getIndex0() <= selectedIndex <= e.getIndex1()
             }
          });
       }

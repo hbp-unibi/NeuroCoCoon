@@ -4,25 +4,25 @@ import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.ProbeConnection;
+import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public abstract class SingleNeuronTypeModule extends NetworkModule {
-   private final EditableNameProp<NeuronType> neuronType;
+   protected final EditableNameProp<NeuronType> neuronType;
+   protected final DoubleProp synapseDelay;
 
-   @Override
-   protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
-      super.addEditableProps(list);
-      list.add(neuronType);
-      return list;
-   }
+
+   // this class does not add neuronType and synapseDelay to the editable properties automatically
+   // so that subclasses have full control over the position in the inspector
 
    protected SingleNeuronTypeModule (Namespace<NetworkModule> namespace, String name, String resourceFileBaseName,
-                                     NeuronType neuronType, String defaultNeuronTypeName) {
+                                     NeuronType neuronType, String defaultNeuronTypeName, double synapseDelay) {
       super(namespace, name, resourceFileBaseName);
       Namespace<NeuronType> neuronTypes = namespace.getContainingScope().getNeuronTypes();
       if (neuronType == null) {
@@ -31,6 +31,7 @@ public abstract class SingleNeuronTypeModule extends NetworkModule {
             neuronType = createDefaultNeuronType(neuronTypes, defaultNeuronTypeName);
       }
       this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this, neuronType, neuronTypes);
+      this.synapseDelay = new NonNegativeDoubleProp("Synapse Delay", this, synapseDelay).setUnit("ms");
    }
 
    @Override
