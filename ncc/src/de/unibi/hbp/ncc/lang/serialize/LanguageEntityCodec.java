@@ -15,8 +15,6 @@ import java.util.Map;
 
 public class LanguageEntityCodec extends mxObjectCodec {
 
-   // TODO provide a separate ScopeCodec that preserves all unreferenced (from the graph) neuron and synapse types; attach the scope to the root node of the graph (temporarily or permanently?)
-
    public LanguageEntityCodec () {
       super(new LinkedHashMap<String, Object>());  // decoding starts with a clone of this empty order preserving hash map
       // this list must be kep in sync with the cases of the switch in afterDecode
@@ -54,7 +52,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
       // what to about predefined entities? store them with a special pseudo attribute and remap them to the existing entity based on their name on decode
       Map<String, Object> propValues = new LinkedHashMap<>();  // preserve order of properties in XML
       propValues.put(CLASS_NAME_PSEUDO_PROPERTY_NAME, entity.getClass().getSimpleName());
-      String ownRefId = progEncoder.getExistingRefId(entity);
+      String ownRefId = progEncoder.getExistingRefId(entity,
+                                                     entity.getOwningCell() == null && entity instanceof NamedEntity);
       if (ownRefId != null)
          propValues.put(REFERENCE_ID_PSEUDO_PROPERTY_NAME, ownRefId);
       if (entity.isPredefined()) {
