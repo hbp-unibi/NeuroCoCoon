@@ -2,16 +2,20 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.graph.EdgeCollector;
+import de.unibi.hbp.ncc.lang.props.BooleanProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.utils.Iterators;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public class DataPlot extends NamedEntity implements Connectable {
    private final Namespace<DataPlot> moreSpecificNamespace;
-
-   // TODO make this a visually represented entity with ProbeConnections that store the DataSeries selection
+   private final BooleanProp combineSameKindData;
 
    private static Namespace<DataPlot> globalNamespace;
 
@@ -22,6 +26,7 @@ public class DataPlot extends NamedEntity implements Connectable {
    @Override
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
+      list.add(combineSameKindData);
       // currently no properties, beyond its name
       return list;
    }
@@ -29,21 +34,28 @@ public class DataPlot extends NamedEntity implements Connectable {
    @Override
    protected String getGeneratedNamesPrefix () { return "Plot"; }
 
-   public DataPlot (Namespace<DataPlot> namespace, String name) {
+   public DataPlot (Namespace<DataPlot> namespace, String name, boolean combineSameKindData) {
       super(namespace, name);
       moreSpecificNamespace = namespace;
+      this.combineSameKindData = new BooleanProp("Combine Data of Same Kind", this, combineSameKindData);
+   }
+
+   public DataPlot (Namespace<DataPlot> namespace, String name) {
+      this(namespace, name, true);
    }
 
    public DataPlot (String name) {
       this(getGlobalNamespace(), name);
    }
+
    public DataPlot (Namespace<DataPlot> namespace) {
       this(namespace, null);
    }
+
    public DataPlot () { this((String) null); }
 
    protected DataPlot (DataPlot orig) {
-      this(orig.moreSpecificNamespace, orig.getCopiedName());
+      this(orig.moreSpecificNamespace, orig.getCopiedName(), orig.combineSameKindData.getValue());
    }
 
    public static final EntityCreator<DataPlot> CREATOR = new Creator();
@@ -87,6 +99,8 @@ public class DataPlot extends NamedEntity implements Connectable {
 
    public String getOutputFileName () { return Namespace.buildUnadornedPythonName(getName()) + ".png"; }
 
+   public boolean isCombineSameKindData () { return combineSameKindData.getValue(); }
+
    private static class ProbeComparator implements Comparator<ProbeConnection> {
 
       private static String getTargetEntityName (ProbeConnection con) {
@@ -111,12 +125,82 @@ public class DataPlot extends NamedEntity implements Connectable {
       }
    }
 
+   // for plotting bundle ProbeConnection or a DataSeries with some computed formatting attributes
+   public static class AnnotatedPlotItem<T> {
+      private T item;
+      private char cyclicColor;
+      private boolean first, last;
+
+      private static final String COLOR_SUPPLY = "bgrcmyk";
+
+      AnnotatedPlotItem (T item, int position, int length) {
+         this.item = item;
+         this.cyclicColor = COLOR_SUPPLY.charAt(position % COLOR_SUPPLY.length());
+         this.first = position == 0;
+         this.last = position == length - 1;
+      }
+
+      public T getItem () { return item; }
+
+      public String getCyclicColor () { return String.valueOf(cyclicColor); }
+
+      public boolean isFirst () { return first; }
+      public boolean isLast () { return last; }
+
+   }
+
+   public static class AnnotatedDataSeries extends AnnotatedPlotItem<ProbeConnection.DataSeries> {
+      private Collection<AnnotatedPlotItem<ProbeConnection>> subsidiaryProbes;
+
+      AnnotatedDataSeries (ProbeConnection.DataSeries item, int position, int length,
+                           Collection<AnnotatedPlotItem<ProbeConnection>> subsidiaryProbes) {
+         super(item, position, length);
+         this.subsidiaryProbes = subsidiaryProbes;
+      }
+
+      public Collection<AnnotatedPlotItem<ProbeConnection>> getSubsidiaryProbes () {
+         return subsidiaryProbes;
+      }
+   }
+
+   static Collection<AnnotatedPlotItem<ProbeConnection>> annotateProbeConnections (Collection<ProbeConnection> probes) {
+      int size = probes.size();
+      List<AnnotatedPlotItem<ProbeConnection>> result = new ArrayList<>();
+      int position = 0;
+      for (ProbeConnection probe: probes)
+         result.add(new AnnotatedPlotItem<>(probe, position++, size));
+      return result;
+   }
+
+   Collection<AnnotatedDataSeries> annotateDataSeries (Collection<ProbeConnection.DataSeries> series) {
+      int size = series.size();
+      List<AnnotatedDataSeries> result = new ArrayList<>();
+      int position = 0;
+      for (ProbeConnection.DataSeries oneSeries: series)
+         result.add(new AnnotatedDataSeries(oneSeries, position++, size, getOutgoingProbesSorted(oneSeries)));
+      return result;
+   }
+
    private static final ProbeComparator orderByTargetAndSeries = new ProbeComparator();
 
-   public Collection<ProbeConnection> getOutgoingProbesSorted () {  // for code generation, determines order of panels in figure
+   public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted () {  // for code generation, determines order of panels in figure
       List<ProbeConnection> probes = EdgeCollector.getOutgoingProbes(getOwningCell());
       probes.sort(orderByTargetAndSeries);
-      return probes;
+      return annotateProbeConnections(probes);
+   }
 
+   public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted (ProbeConnection.DataSeries dataSeries) {  // for code generation, determines order of data contributions in one panel of figure
+      List<ProbeConnection> probes = Iterators.asList(Iterators.filter(
+            EdgeCollector.getOutgoingProbes(getOwningCell()).iterator(), probe -> probe.getDataSeries() == dataSeries));
+      probes.sort(orderByTargetAndSeries);
+      return annotateProbeConnections(probes);
+   }
+
+   public Collection<AnnotatedDataSeries> getContributingDataSeries () {
+      List<ProbeConnection> probes = EdgeCollector.getOutgoingProbes(getOwningCell());
+      Set<ProbeConnection.DataSeries> seriesUsed = EnumSet.noneOf(ProbeConnection.DataSeries.class);
+      for (ProbeConnection probe: probes)
+         seriesUsed.add(probe.getDataSeries());
+      return annotateDataSeries(seriesUsed);
    }
 }

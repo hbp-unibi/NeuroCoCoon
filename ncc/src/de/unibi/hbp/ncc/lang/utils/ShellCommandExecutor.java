@@ -51,9 +51,14 @@ public class ShellCommandExecutor {
       return commandOutput == null ? "" : commandOutput;
    }
 
-   public CharSequence getOutputTail (int lines) {
-      return getOutput();
+   public CharSequence getOutputTail (int maxChars) {  // should probably also consider number of lines
+      if (commandOutput == null)
+         return "";
+      int len = commandOutput.length();
+      if (len < maxChars)
+         return commandOutput;
+      else
+         return commandOutput.subSequence(len - maxChars, len);
    }
-   // TODO provide a truncated to the last few lines version of the output for the error alert
 
 }

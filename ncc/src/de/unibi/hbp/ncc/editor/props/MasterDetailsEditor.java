@@ -1,20 +1,19 @@
 package de.unibi.hbp.ncc.editor.props;
 
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
+import de.unibi.hbp.ncc.editor.Dialogs;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -26,8 +25,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.function.Function;
 
 public class MasterDetailsEditor<E extends NamedEntity> {
@@ -70,10 +67,9 @@ public class MasterDetailsEditor<E extends NamedEntity> {
          if (entity != null)
             setSelectedEntity(entity);
          else  // in rare cases creation may fail, e.g., DataPlot requires at least one NeuronPopulation
-            JOptionPane.showMessageDialog(component,
-                                          "Could not create new " + namespace.getDescription() + "!\n" +
-                                                "\nPrecondition not satisfied.",
-                                          "Creation failed!", JOptionPane.ERROR_MESSAGE);
+            Dialogs.error(editor, "Could not create new " + namespace.getDescription() + "!\n" +
+                                "Precondition not satisfied.",
+                          "Creation failed!");
       });
       final JButton duplicateButton = new JButton("Duplicate");
       duplicateButton.addActionListener(e -> {
@@ -86,11 +82,10 @@ public class MasterDetailsEditor<E extends NamedEntity> {
       deleteButton.addActionListener(e -> {
          E candidateEntity = getSelectedEntity();
          if (candidateEntity != null && !namespace.remove(candidateEntity, editor.getGraphModel()))
-            JOptionPane.showMessageDialog(component,
-                                          "Could not delete " + namespace.getDescription() +
-                                                "'" + candidateEntity.getName() + "'" + "!\n" +
-                                                "References to this entity still exist.",
-                                          "Deletion failed!", JOptionPane.ERROR_MESSAGE);
+            Dialogs.error(editor, "Could not delete " + namespace.getDescription() +
+                                "'" + candidateEntity.getName() + "'" + "!\n" +
+                                "References to this entity still exist.",
+                          "Deletion failed!");
       });
       duplicateButton.setEnabled(false);  // configure buttons for initial state: nothing selected
       deleteButton.setEnabled(false);
@@ -197,7 +192,7 @@ public class MasterDetailsEditor<E extends NamedEntity> {
             EditableProp<String> nameProp = getNamePropForRow(rowIndex);
             nameProp.setRawValue(value);
             // fireTableCellUpdated(rowIndex, columnIndex);
-            Notificator.getInstance().notify(nameProp);
+            Notificator.getInstance().notifyListeners(nameProp);
          }
       }
 

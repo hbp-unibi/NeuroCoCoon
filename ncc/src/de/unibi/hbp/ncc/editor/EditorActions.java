@@ -25,6 +25,7 @@ import com.mxgraph.util.png.mxPngImageEncoder;
 import com.mxgraph.util.png.mxPngTextDecoder;
 import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
+import de.unibi.hbp.ncc.env.JavaScriptBridge;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.serialize.ProgramCodec;
 import org.w3c.dom.Document;
@@ -40,6 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -48,6 +50,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -138,10 +141,8 @@ public class EditorActions {
 		}
 	}
 
-	private static boolean confirmIfModified (BasicGraphEditor editor) {
-		return (editor != null && (!editor.isModified() ||
-				JOptionPane.showConfirmDialog(editor, mxResources.get("loseChanges"), mxResources.get("confirmation"),
-											  JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION));
+	private static boolean confirmIfModified (NeuroCoCoonEditor editor) {
+		return editor != null && (!editor.isModified() || Dialogs.confirm(editor, mxResources.get("loseChanges")));
 	}
 
 	@SuppressWarnings("serial")
@@ -149,8 +150,10 @@ public class EditorActions {
 
 		public void actionPerformed (ActionEvent e) {
 			NeuroCoCoonEditor editor = getEditor(e);
-			if (confirmIfModified(editor))
+			if (confirmIfModified(editor)) {
 				editor.exit();
+				System.exit(0);
+			}
 		}
 	}
 
@@ -205,10 +208,13 @@ public class EditorActions {
 				double scale = this.scale;
 
 				if (scale == 0) {
+					NeuroCoCoonEditor editor = getEditor(e);
 					String value = (String) JOptionPane.showInputDialog(
 							graphComponent, mxResources.get("value"),
 							mxResources.get("scale") + " (%)",
-							JOptionPane.PLAIN_MESSAGE, null, null, "");
+							JOptionPane.PLAIN_MESSAGE,
+							editor != null ? editor.getAppIcon() : null,
+							null, "");
 
 					if (value != null)
 						scale = Double.parseDouble(value.replace("%", "")) / 100;
@@ -287,6 +293,8 @@ public class EditorActions {
 						wd = editor.getCurrentFile().getParent();
 					else
 						wd = System.getProperty("user.dir");
+					if (JavaScriptBridge.isWebPlatform()) wd = "/files";  // TODO do this only if user.dir were used
+					// FIXME file saving and loading in web app
 
 					JFileChooser fc = new JFileChooser(wd);
 
@@ -333,10 +341,7 @@ public class EditorActions {
 					}
 
 					if (new File(filename).exists()
-							&& JOptionPane.showConfirmDialog(graphComponent,
-															 mxResources.get("overwriteExistingFile"),
-															 mxResources.get("confirmation"),
-															 JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+							&& !Dialogs.confirm(editor, mxResources.get("overwriteExistingFile")))
 						return;
 				}
 				else
@@ -374,9 +379,7 @@ public class EditorActions {
 						Color bg = null;
 
 						if ((!ext.equalsIgnoreCase("gif") && !ext.equalsIgnoreCase("png")) ||
-								JOptionPane.showConfirmDialog(graphComponent, mxResources.get("transparentBackground"),
-															  mxResources.get("confirmation"),
-															  JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+								!Dialogs.confirm(editor, mxResources.get("transparentBackground")))
 							bg = graphComponent.getBackground();
 
 						if (selectedFilter == xmlPngFilter ||
@@ -390,13 +393,13 @@ public class EditorActions {
 							if (image != null)
 								ImageIO.write(image, ext, new File(filename));
 							else
-								JOptionPane.showMessageDialog(graphComponent, mxResources.get("noImageData"));
+								Dialogs.error(editor, mxResources.get("noImageData"));
 						}
 					}
 				}
 				catch (Throwable ex) {
 					ex.printStackTrace(System.err);
-					JOptionPane.showMessageDialog(graphComponent, ex.toString(), mxResources.get("error"), JOptionPane.ERROR_MESSAGE);
+					Dialogs.error(editor, ex);
 				}
 			}
 		}
@@ -441,7 +444,7 @@ public class EditorActions {
 					graph.setSelectionCells(path);
 				}
 				else
-					JOptionPane.showMessageDialog(graphComponent, mxResources.get("noSourceAndTargetSelected"));
+					Dialogs.error(getEditor(e), mxResources.get("noSourceAndTargetSelected"));
 			}
 		}
 	}
@@ -529,6 +532,7 @@ public class EditorActions {
 
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() instanceof Component) {
+				NeuroCoCoonEditor editor = getEditor(e);
 				try {
 					Method getter = target.getClass().getMethod("get" + fieldName);
 					Object current = getter.invoke(target);
@@ -539,14 +543,18 @@ public class EditorActions {
 
 						String value = (String) JOptionPane.showInputDialog(
 								(Component) e.getSource(), "Value", message,
-								JOptionPane.PLAIN_MESSAGE, null, null, current);
+								JOptionPane.PLAIN_MESSAGE,
+								editor != null ? editor.getAppIcon() : null, null, current);
 
 						if (value != null)
 							setter.invoke(target, Integer.parseInt(value));
 					}
 				}
-				catch (Exception ex) {
-					ex.printStackTrace();
+				catch (NumberFormatException ex) {
+					Dialogs.error(editor, "Invalid number!");
+				}
+				catch (ReflectiveOperationException ex) {
+					ex.printStackTrace(System.err);
 				}
 			}
 
@@ -696,7 +704,7 @@ public class EditorActions {
 				}
 			}
 			else
-				JOptionPane.showMessageDialog((Component) e.getSource(), mxResources.get("noCellSelected"));
+				Dialogs.error(getEditor(e), mxResources.get("noCellSelected"));
 		}
 	}
 
@@ -709,11 +717,14 @@ public class EditorActions {
 			if (confirmIfModified(editor)) {
 				mxGraph graph = editor.getGraphComponent().getGraph();
 
+				graph.getSelectionModel().clear();
 				editor.getProgram().clear(editor.getEditorToolBar());
 				mxCell root = new mxCell();
 				root.insert(new mxCell());
 				graph.getModel().setRoot(root);
 
+				editor.clearResultsTab();
+				editor.clearJobStatus();
 				editor.setModified(false);
 				editor.setCurrentFile(null);
 				editor.getGraphComponent().zoomAndCenter();
@@ -725,7 +736,9 @@ public class EditorActions {
 	public static class OpenAction extends AbstractAction {
 		protected String lastDir;
 
-		protected void resetEditor (BasicGraphEditor editor) {
+		protected void resetEditor (NeuroCoCoonEditor editor) {
+			editor.clearResultsTab();
+			editor.clearJobStatus();
 			editor.setModified(false);
 			editor.getUndoManager().clear();
 			editor.getGraphComponent().zoomAndCenter();
@@ -743,6 +756,7 @@ public class EditorActions {
 				if (value != null) {
 					Document document = mxXmlUtils.parseXml(URLDecoder.decode(value, "UTF-8"));
 					if (document != null) {
+						editor.getGraphComponent().getGraph().getSelectionModel().clear();
 						editor.getProgram().clear(editor.getEditorToolBar());
 						ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
 						codec.decode(document.getDocumentElement(), editor.getGraphComponent().getGraph().getModel());
@@ -754,8 +768,7 @@ public class EditorActions {
 					}
 				}
 			}
-
-			JOptionPane.showMessageDialog(editor, mxResources.get("imageContainsNoDiagramData"));
+			Dialogs.error(editor, mxResources.get("imageContainsNoDiagramData"));
 		}
 
 		public void actionPerformed (ActionEvent e) {
@@ -766,6 +779,7 @@ public class EditorActions {
 
 				if (graph != null) {
 					String wd = (lastDir != null) ? lastDir : System.getProperty("user.dir");
+					if (JavaScriptBridge.isWebPlatform()) wd = "/files";  // TODO do this only if lastDir == null
 
 					JFileChooser fc = new JFileChooser(wd);
 
@@ -812,7 +826,7 @@ public class EditorActions {
 						}
 						catch (IOException ex) {
 							ex.printStackTrace(System.err);
-							JOptionPane.showMessageDialog(editor.getGraphComponent(), ex.toString(), mxResources.get("error"), JOptionPane.ERROR_MESSAGE);
+							Dialogs.error(editor, ex);
 						}
 					}
 				}

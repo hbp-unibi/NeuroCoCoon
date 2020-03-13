@@ -46,7 +46,7 @@ public class Notificator {
 
    // position is only forwarded to the source of the notification
    // all other listeners get an unknown position
-   public void notify (PropChangeListener source, EditableProp<?> changed, int positionInSource) {
+   public void notifyListeners (PropChangeListener source, EditableProp<?> changed, int positionInSource) {
       // no need to notify the originating editor (may be null to notify all editors)
       LanguageEntity enclosingEntity = changed.getEnclosingEntity();
       if (changed.hasChangeImpact(EditableProp.Impact.OWN_VALUE)) {  // should always be included
@@ -104,8 +104,13 @@ public class Notificator {
    }
 
    // for notifications originating outside a ProperytChangeListener (i.e. outside a DetailsEditor
-   public void notify (EditableProp<?> changed) {
-      notify(null, changed, PropChangeListener.UNKNOWN_POSITION);
+   public void notifyListeners (EditableProp<?> changed) {
+      notifyListeners(null, changed, PropChangeListener.UNKNOWN_POSITION);
+   }
+
+   public void notifyListeners (LanguageEntity entity) {  // simulates EditableProp.Impact.OTHER_PROPS_VALUES for the given entity
+      for (PropChangeListener listener: propChangeListeners)
+         listener.multiplePropertyValuesChanged(entity);
    }
 
    private static final Notificator theInstance = new Notificator();

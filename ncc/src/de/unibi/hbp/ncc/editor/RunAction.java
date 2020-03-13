@@ -10,6 +10,7 @@ import de.unibi.hbp.ncc.lang.utils.Iterators;
 import de.unibi.hbp.ncc.lang.utils.ShellCommandExecutor;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -23,9 +24,13 @@ import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -45,9 +50,22 @@ public class RunAction extends AbstractAction {
 
    private static final int POLLING_INTERVAL = 5000;  // milliseconds
 
+   private Action wrapperAction;  // toolbar button is bound to this auxiliary action created by editor.bind()
    private Timer trackJobStatus;
+   private NmpiClient.JobInfo lastJobInfo;
    private CharSequence lastOutput;
-   private LocalDateTime lastOutputWhen;
+   private LocalDateTime lastOutputWhen, runningSince;
+
+   public Action setWrapperAction (Action wrapperAction) {
+      this.wrapperAction = wrapperAction;
+      return wrapperAction;
+   }
+
+   @Override
+   public void setEnabled (boolean newValue) {
+      super.setEnabled(newValue);  // disable ourselves as usual
+      wrapperAction.setEnabled(newValue);  // and inform the toolbar button via the wrapper action
+   }
 
    @Override
    public void actionPerformed (ActionEvent e) {
@@ -58,6 +76,8 @@ public class RunAction extends AbstractAction {
          editor.status("Preparing …");
          Program program = editor.getProgram();
          NmpiClient.Platform targetPlatform = editor.getEditorToolBar().getCurrentPlatform();
+         // System.err.println("RunAction: modifiers = " + e.getModifiers());
+         // modifiers seems to alway be 0
          if ((e.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0)
             targetPlatform = NmpiClient.Platform.SOURCE_CODE;  // temporary switch to view source code only
          StringBuilder pythonCode;
@@ -108,7 +128,6 @@ public class RunAction extends AbstractAction {
    private static String searchPathFor (String fileName) {
       for (String dirPath: Iterators.split(System.getenv("PATH"), File.pathSeparatorChar)) {
          File candidate = new File(dirPath, fileName);
-         System.err.println("checking " + candidate);
          // can still check for isFile() although virtual envs use symbolic links to files which seem to be considered isFile()
          if (candidate.isFile() && candidate.canExecute())
             return candidate.getAbsolutePath();
@@ -133,6 +152,9 @@ public class RunAction extends AbstractAction {
                                 "python3[.exe] not found on command path!");
             return;
          }
+         else {
+            System.err.println("Using Python 3 at " + python);
+         }
          cachedPython3Path = python;
       }
       editor.setJobStatus("Running …");
@@ -153,10 +175,8 @@ public class RunAction extends AbstractAction {
                         SwingUtilities.invokeLater(
                               () -> {
                                  editor.setJobStatus(EditorToolBar.StatusLevel.BAD, "Simulation failed!");
-                                 JOptionPane.showMessageDialog(editor.getGraphComponent(),
-                                                               executor.getOutputTail(5),
-                                                               "NEST Simulation failed",
-                                                               JOptionPane.ERROR_MESSAGE);
+                                 Dialogs.error(editor, executor.getOutputTail(300).toString(),
+                                               "NEST Simulation failed");
                               });
                      else
                         SwingUtilities.invokeLater(
@@ -186,9 +206,7 @@ public class RunAction extends AbstractAction {
                   }
                   catch (IOException | InterruptedException excp) {
                      SwingUtilities.invokeLater(
-                           () -> JOptionPane.showMessageDialog(editor.getGraphComponent(),
-                                                               excp.getMessage(), "Exception in Command",
-                                                               JOptionPane.ERROR_MESSAGE));
+                           () -> Dialogs.error(editor, excp, "Exception in external command"));
                   }
                   finally {
                      // TODO provide a way to preserve the temp directory intact and print its path to stderr instead
@@ -197,14 +215,12 @@ public class RunAction extends AbstractAction {
                      }
                      catch (IOException ioe) {
                         SwingUtilities.invokeLater(
-                              () -> JOptionPane.showMessageDialog(editor.getGraphComponent(),
-                                                                  ioe.getMessage(), "Exception while cleaning up",
-                                                                  JOptionPane.ERROR_MESSAGE));
+                              () -> Dialogs.error(editor, ioe, "Exception while cleaning up"));
                      }
                      final PlotsPanel capturedPlotsPanel = plotsPanel;
                      SwingUtilities.invokeLater(
                            () -> {
-                              finishedJob();
+                              finishedJob(null);
                               if (capturedPlotsPanel != null && !capturedPlotsPanel.isEmpty()) {
                                  editor.setResultsTab("Plots",
                                                       capturedPlotsPanel.buildComponent(),
@@ -247,19 +263,49 @@ public class RunAction extends AbstractAction {
       // JOptionPane.showMessageDialog(null, "RunAction submitJob response: " + client.lastJobResponse);
       if (jobId >= 0) {
          editor.setJobStatus("Running …");
+         runningSince = LocalDateTime.now();
          trackJobStatus =
                new Timer(POLLING_INTERVAL,
                          e -> {
-                            String status = client.getJobStatus(jobId);
+                            NmpiClient.JobInfo jobInfo = client.getJobInfo(jobId);
+                            String status = jobInfo.getJobStatus();
                             if ("finished".equals(status)) {
-                               editor.setJobStatus(EditorToolBar.StatusLevel.GOOD, "Finished");
-                               finishedJob();
+                               editor.setJobStatus(EditorToolBar.StatusLevel.GOOD,
+                                                   durationMessage("Finished after %d:%02d", runningSince));
+                               for (String url: jobInfo.getOutputURLs())
+                                  System.err.println("output URL: " + url);
+                               finishedJob(jobInfo);
+                               Thread worker = new Thread( () -> {
+                                  List<String> plotImageURLs = Iterators.asList(
+                                        Iterators.filter(jobInfo.getOutputURLs(),
+                                                         url -> url.toLowerCase().endsWith(".png")));
+                                  plotImageURLs.sort(Namespace.getSmartNumericOrderComparator());
+                                  // compares the full URLs, but should all have the same prefix before the file name
+                                  PlotsPanel plotsPanel = new PlotsPanel(plotImageURLs,
+                                                                         editor.getProgram().getGlobalScope().getDataPlots(),
+                                                                         true);
+                                  SwingUtilities.invokeLater(
+                                        () -> {
+                                           if (!plotsPanel.isEmpty()) {
+                                              editor.setResultsTab("Plots", plotsPanel.buildComponent(),
+                                                                   true);
+                                           }
+                                           else
+                                              editor.clearResultsTab();
+                                        });
+
+                               });
+                               worker.start();
                             }
                             else if ("error".equals(status)) {
-                               editor.setJobStatus(EditorToolBar.StatusLevel.BAD, "Error!", "Error message");
-                               finishedJob();
+                               editor.setJobStatus(EditorToolBar.StatusLevel.BAD,
+                                                   durationMessage("Error after %d:%02d!", runningSince),
+                                                   "Error message");
                                // TODO add error message
-
+                               finishedJob(jobInfo);
+                            }
+                            else {
+                               editor.setJobStatus(durationMessage("Running for %d:%02d …", runningSince));
                             }
                             // JOptionPane.showMessageDialog(null, "timer: " + status + "\n" + eventSource);
                          });
@@ -273,7 +319,12 @@ public class RunAction extends AbstractAction {
       // JOptionPane.showMessageDialog(null, "RunAction jobInfo: " + client.getJobInfo(jobId).toString(WriterConfig.PRETTY_PRINT));
    }
 
-   private void finishedJob () {
+   private static String durationMessage (String format, LocalDateTime since) {
+      long seconds = Duration.between(since, LocalDateTime.now()).getSeconds();
+      return String.format(format, seconds / 60, seconds % 60);
+   }
+
+   private void finishedJob (NmpiClient.JobInfo jobInfo) {
       if (trackJobStatus != null) {
          trackJobStatus.stop();
          trackJobStatus = null;

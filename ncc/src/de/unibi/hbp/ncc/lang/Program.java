@@ -6,6 +6,7 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
+import de.unibi.hbp.ncc.editor.props.Notificator;
 import de.unibi.hbp.ncc.env.NmpiClient;
 import de.unibi.hbp.ncc.lang.codegen.CodeGenVisitor;
 import de.unibi.hbp.ncc.lang.codegen.ErrorCollector;
@@ -21,8 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Program extends LanguageEntity implements DisplayNamed, PythonNamed {
-   private StringProp programName;
-   private DoubleProp runTime, timeStep;
+   private final StringProp programName;
+   private final DoubleProp runTime, timeStep;
    private final Scope global;
    private mxIGraphModel graphModel;
    private mxGraphComponent graphComponent;
@@ -53,17 +54,24 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
       codecsRegistered = true;
    }
 
+   private static final String DEFAULT_PROG_NAME = "My Experiment";
+   private static final double DEFAULT_TIME_STEP = 0.1;
+   private static final double DEFAULT_RUN_TIME = 5000.0;
+
    public Program () {
       registerCodecs();
       global = new Scope();
+      programName = new StringProp("Program Name", this, DEFAULT_PROG_NAME);
+      timeStep = new StrictlyPositiveDoubleProp("Time Step", this, DEFAULT_TIME_STEP).setUnit("ms");
+      runTime = new StrictlyPositiveDoubleProp("Run Time", this, DEFAULT_RUN_TIME).setUnit("ms");
       initialize();
    }
 
    private void initialize () {
-      // could reuse the property objects, but so we can share more code with the constructor
-      programName = new StringProp("Program Name", this, "My Experiment");
-      timeStep = new StrictlyPositiveDoubleProp("Time Step", this, 0.1).setUnit("ms");
-      runTime = new StrictlyPositiveDoubleProp("Run Time", this, 5000.0).setUnit("ms");
+      // must reuse the property objects, so that inspector does not show stale values
+      programName.setValue(DEFAULT_PROG_NAME);
+      timeStep.setValue(DEFAULT_TIME_STEP);
+      runTime.setValue(DEFAULT_RUN_TIME);
       NeuronPopulation.setGlobalNamespace(global.getNeuronPopulations());
       final Namespace<SynapseType> synapseTypes = global.getSynapseTypes();
       NeuronConnection.setGlobalSynapseTypeNamespace(synapseTypes);
@@ -82,6 +90,7 @@ public class Program extends LanguageEntity implements DisplayNamed, PythonNamed
    public void clear (EditorToolBar toolBar) {
       global.clear();
       initialize();
+      Notificator.getInstance().notifyListeners(this);
       toolBar.setCurrentSynapseType(global.getSynapseTypes().getFallbackDefault());
    }
 

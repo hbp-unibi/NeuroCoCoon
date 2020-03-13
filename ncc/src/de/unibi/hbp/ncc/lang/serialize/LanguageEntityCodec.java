@@ -53,7 +53,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
       Map<String, Object> propValues = new LinkedHashMap<>();  // preserve order of properties in XML
       propValues.put(CLASS_NAME_PSEUDO_PROPERTY_NAME, entity.getClass().getSimpleName());
       String ownRefId = progEncoder.getExistingRefId(entity,
-                                                     entity.getOwningCell() == null && entity instanceof NamedEntity);
+                                                     entity.getOwningCell() == null &&
+                                                           entity instanceof NamedEntity);
       if (ownRefId != null)
          propValues.put(REFERENCE_ID_PSEUDO_PROPERTY_NAME, ownRefId);
       if (entity.isPredefined()) {
@@ -130,8 +131,8 @@ public class LanguageEntityCodec extends mxObjectCodec {
                prop.setValueFromString(encodedValue);
          }
       }
-
    }
+
    @Override
    public Object afterDecode (mxCodec dec, Node node, Object obj) {
       ProgramCodec progDecoder = (ProgramCodec) dec;
@@ -154,6 +155,9 @@ public class LanguageEntityCodec extends mxObjectCodec {
             default:
                throw new IllegalArgumentException("predefined <ncc> with unsupported class " + entityClassName);
          }
+      }
+      else if ("Program".equals(entityClassName)) {
+         entity = progDecoder.getProgram();
       }
       else {
          Constructor<?> entityConstructor = getConstructor(entityClassName, entityName != null);

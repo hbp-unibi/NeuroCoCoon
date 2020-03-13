@@ -28,7 +28,7 @@ public class ProgramCodec extends mxCodec {
       this(program, mxDomUtils.createDocument(), willEncode);
    }
 
-   private void rememberUserDefinedEntities (List<NamedEntity> list, Namespace<? extends NamedEntity> namespace) {
+   private void rememberUserDefinedEntities (List<? super NamedEntity> list, Namespace<? extends NamedEntity> namespace) {
       for (NamedEntity entity: namespace)
          if (!entity.isPredefined())
             list.add(entity);
@@ -41,11 +41,12 @@ public class ProgramCodec extends mxCodec {
       if (willEncode) {  // could check consistent usage encode vs. decode, but will crash anyway, if wrong map is used
          rememberedEntities = new HashMap<>();
          // attach a temporary list of unreferenced (from the graph) language entities that must be preserved
-         List<NamedEntity> unvisualEntities = new ArrayList<>();
+         List<LanguageEntity> unvisualEntities = new ArrayList<>();
+         unvisualEntities.add(program);
          rememberUserDefinedEntities(unvisualEntities, program.getGlobalScope().getNeuronTypes());
          rememberUserDefinedEntities(unvisualEntities, program.getGlobalScope().getSynapseTypes());
          mxICell root = (mxICell) program.getGraphModel().getRoot();
-         assert root.getValue() == null : "root node should nt carry any value by default";
+         assert root.getValue() == null : "root node should not carry any value by default";
          root.setValue(unvisualEntities);
       }
       else
@@ -123,4 +124,5 @@ public class ProgramCodec extends mxCodec {
 
    Scope getGlobalScope () { return program.getGlobalScope(); }  // for resolving predefined entities
 
+   Program getProgram () { return program; }  // for setting properties of the program itself
 }

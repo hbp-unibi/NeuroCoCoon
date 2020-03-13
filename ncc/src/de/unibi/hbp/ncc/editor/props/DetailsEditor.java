@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.editor.props;
 
+import de.unibi.hbp.ncc.editor.TooltipProvider;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -101,8 +102,8 @@ public class DetailsEditor {
          if (table.editCellAt(row, col)) {
             Component editor = table.getEditorComponent();
             editor.requestFocusInWindow();
-            if (editor instanceof JTextComponent)
-               ((JTextComponent) editor).selectAll();
+            // if (editor instanceof JTextComponent) ((JTextComponent) editor).selectAll();
+            // TODO should no longer be necessary? (SelectAllEditor does this hopefully)
          }
       }
    }
@@ -120,6 +121,13 @@ public class DetailsEditor {
 
    LanguageEntity getSubject () { return tableModel.subject; }  // so that MasterDetailsEditor can re-establish its selection in the master table
 
+   public void startEditing () {
+      if (table.editCellAt(0, 2)) {  // first row, value column
+         Component editor = table.getEditorComponent();
+         editor.requestFocusInWindow();
+      }
+   }
+
    public JComponent getComponent () { return component; }
 
    static class PropNameCellRenderer extends DefaultTableCellRenderer {
@@ -133,11 +141,16 @@ public class DetailsEditor {
       public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus,
                                                       int row, int column) {
          Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+         // returns this (a JLabel subclass instance)
          if (normalCellFont == null) {
-            normalCellFont = component.getFont();
+            normalCellFont = getFont();
             italicsCellFont = new Font(normalCellFont.getName(), Font.ITALIC, normalCellFont.getSize());
          }
-         component.setFont(column == 1 && tableModel.isIndirectProp(row) ? italicsCellFont : normalCellFont);
+         setFont(column == 1 && tableModel.isIndirectProp(row) ? italicsCellFont : normalCellFont);
+         if (value instanceof TooltipProvider)
+            setToolTipText(((TooltipProvider) value).getTooltip());
+         else
+            setToolTipText(value.toString());
          return component;
       }
    }
@@ -148,9 +161,14 @@ public class DetailsEditor {
       public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus,
                                                       int row, int column) {
          // System.err.println("Prop Value Cell Renderer: " + value + ", class=" + value.getClass().getName());
+         if (value instanceof Boolean)
+            return table.getDefaultRenderer(Boolean.class).getTableCellRendererComponent(table, value, isSelected,
+                                                                                         hasFocus, row, column);
          setHorizontalAlignment(value instanceof Number ? RIGHT : LEFT);
          return super.getTableCellRendererComponent(table,
-                                                    value instanceof DisplayNamed ? ((DisplayNamed) value).getDisplayName() : value,
+                                                    value instanceof DisplayNamed
+                                                          ? ((DisplayNamed) value).getDisplayName()
+                                                          : value,
                                                     isSelected, hasFocus, row, column);
       }
    }
@@ -324,7 +342,7 @@ public class DetailsEditor {
          if (value != null) {
             EditableProp<?> prop = getEditablePropForRow(rowIndex);
             prop.setRawValue(value);
-            Notificator.getInstance().notify(this, prop, rowIndex);
+            Notificator.getInstance().notifyListeners(this, prop, rowIndex);
          }
       }
 
