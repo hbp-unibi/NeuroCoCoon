@@ -17,4 +17,9 @@ public class StringProp extends SimpleEditableProp<String> {
 
    @Override
    public TableCellEditor getTableCellEditor (JTable table) { return new StringValueCellEditor(this); }
+
+   public boolean isEmpty () {
+      String value = getValue();
+      return value == null || value.isEmpty();  // null should not be possible, but better play safe
+   }
 }

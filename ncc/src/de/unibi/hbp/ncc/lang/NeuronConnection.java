@@ -23,7 +23,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    public static void setGlobalSynapseTypeNamespace (Namespace<SynapseType> ns) { globalSynapseTypeNamespace = ns; }
 
    protected Object writeReplace () throws ObjectStreamException {
-      return new SerializedNeuronConnection(synapseType.getValue());
+      return new SerializedNeuronConnection(synapseType.getValue(), userLabel.getValue());
    }
 
    // readObject method for the serialization proxy pattern
@@ -36,6 +36,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    protected List<EditableProp<?>> addEditableProps (List<EditableProp<?>> list) {
       super.addEditableProps(list);
       list.add(synapseType);
+      list.add(userLabel);  // defined in superclass, positioned by subclass
       return list;
    }
 
@@ -44,8 +45,8 @@ public class NeuronConnection extends AnyConnection implements Serializable {
       return synapseType.getValue().addExportedEditableProps(list);
    }
 
-   public NeuronConnection (Namespace<SynapseType> synapseTypeNamespace, SynapseType synapseType) {
-      super();
+   public NeuronConnection (Namespace<SynapseType> synapseTypeNamespace, SynapseType synapseType, String userLabel) {
+      super(userLabel);
       if (synapseTypeNamespace == null)
          synapseTypeNamespace = globalSynapseTypeNamespace;
       this.synapseTypeNamespace = synapseTypeNamespace;
@@ -59,19 +60,22 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    }
 
    public NeuronConnection (SynapseType synapseType) {
-      this(null, synapseType);
+      this(null, synapseType, null);
    }
 
    public NeuronConnection () {
-      this(null, null);
+      this(null, null, null);
    }
 
    protected NeuronConnection (NeuronConnection orig) {
-      this(orig.synapseTypeNamespace, orig.synapseType.getValue());
+      this(orig.synapseTypeNamespace, orig.synapseType.getValue(), orig.userLabel.getValue());
    }
 
    @Override
    public String toString () {
+      String label = getUserLabelOrNull();
+      if (label != null)
+         return label;
       SynapseType type = synapseType.getValue();
       return type.getDisplayName() + "\n(" + type.getSummary() + ")";
    }  // TODO append .getSummary() for synapse type as well?

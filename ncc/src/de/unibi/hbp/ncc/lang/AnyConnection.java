@@ -4,12 +4,20 @@ import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.lang.props.StringProp;
 
 public abstract class AnyConnection extends LanguageEntity {
-   protected StringProp userLabel;
+   // TODO use the common enum for edge types in Connectable and consolidate all methods into one version with such an enum parameter
+   protected final StringProp userLabel;
 
-   // TODO add a StringProperty that overrides the displayed edge label if set (just for documentary purposes)
+   protected AnyConnection (String userLabel) {
+      this.userLabel = new StringProp("Edge Label", this, userLabel != null ? userLabel : "");
+   }
 
    // this class does not add userLabel to the editable properties automatically
    // so that subclasses have full control over the position in the inspector
+
+   protected String getUserLabelOrNull () {
+      String value = userLabel.getValue();
+      return value != null && value.isEmpty() ? null : value;
+   }
 
    private Object getTerminalValue (boolean source) {
       mxICell edgeCell = getOwningCell();
@@ -60,4 +68,10 @@ public abstract class AnyConnection extends LanguageEntity {
       Object targetValue = getTerminalValue(false);
       return (targetValue instanceof NetworkModule.Port) ? (NetworkModule.Port) targetValue : null;
    }
+
+   public PlotDataSource getTargetPlotDataSource () {
+      Object targetValue = getTerminalValue(false);
+      return (targetValue instanceof PlotDataSource) ? (PlotDataSource) targetValue : null;
+   }
+
 }

@@ -3,6 +3,7 @@ package de.unibi.hbp.ncc.lang;
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import de.unibi.hbp.ncc.lang.props.FilteredEditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeIntegerProp;
 import de.unibi.hbp.ncc.lang.serialize.SerializedProbeConnection;
@@ -38,7 +39,8 @@ public class ProbeConnection extends AnyConnection implements Serializable {
    }
 
    protected Object writeReplace () throws ObjectStreamException {
-      return new SerializedProbeConnection(dataSeries.getValue(), firstNeuronIndex.getValue(), neuronCount.getValue());
+      return new SerializedProbeConnection(dataSeries.getValue(), firstNeuronIndex.getValue(), neuronCount.getValue(),
+                                           userLabel.getValue());
    }
 
    // readObject method for the serialization proxy pattern
@@ -53,27 +55,47 @@ public class ProbeConnection extends AnyConnection implements Serializable {
       list.add(dataSeries);
       list.add(firstNeuronIndex);
       list.add(neuronCount);
+      list.add(userLabel);  // defined in superclass, positioned by subclass
       return list;
    }
 
-   public ProbeConnection (DataSeries dataSeries, int firstNeuonIndex, int neuronCount) {
-      this.dataSeries = new EditableEnumProp<>("Data Series", DataSeries.class, this, dataSeries)
+   class ValidDataSeriesForTarget extends FilteredEditableEnumProp<DataSeries> {
+      protected ValidDataSeriesForTarget (String propName, LanguageEntity owner, DataSeries value) {
+         super(propName, DataSeries.class, owner, value);
+      }
+
+      @Override
+      protected boolean isValidFor (DataSeries enumValue, LanguageEntity enclosingEntity) {
+         PlotDataSource target = getTargetPlotDataSource();
+         if (target != null)
+            return target.getSupportedDataSeries().contains(enumValue);
+         else
+            return true;  // for dangling probes allow all data series
+      }
+   }
+
+   public ProbeConnection (DataSeries dataSeries, int firstNeuronIndex, int neuronCount, String userLabel) {
+      super(userLabel);
+      this.dataSeries = new ValidDataSeriesForTarget("Data Series", this, dataSeries)
             .addImpact(EditableProp.Impact.CELL_LABEL);
-      // TODO can the JComboBox be limited to data series supported by the current target of the probe?
-      this.firstNeuronIndex = new NonNegativeIntegerProp("First Neuron #", this, firstNeuonIndex);
+      this.firstNeuronIndex = new NonNegativeIntegerProp("First Neuron #", this, firstNeuronIndex);
       this.neuronCount = new NonNegativeIntegerProp("Neuron Count", this, neuronCount);
    }
 
    public ProbeConnection () {
-      this(DataSeries.SPIKES, 0, 0);
+      this(DataSeries.SPIKES, 0, 0, null);
    }
 
    protected ProbeConnection (ProbeConnection orig) {
-      this(orig.dataSeries.getValue(), orig.firstNeuronIndex.getValue(), orig.neuronCount.getValue());
+      this(orig.dataSeries.getValue(), orig.firstNeuronIndex.getValue(), orig.neuronCount.getValue(),
+           orig.userLabel.getValue());
    }
 
    @Override
    public String toString () {
+      String label = getUserLabelOrNull();
+      if (label != null)
+         return label;
       StringBuilder sb = new StringBuilder("Probe ").append(dataSeries.getValue().getDisplayName());
       int startIndex = firstNeuronIndex.getValue();
       int count = neuronCount.getValue();
