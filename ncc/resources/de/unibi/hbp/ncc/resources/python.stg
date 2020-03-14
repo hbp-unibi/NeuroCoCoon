@@ -52,11 +52,11 @@ ref_synapseTypeConnectorKind(styp) ::= <<
 <styp.connectorKind.pythonName>, <\\>
 <else><\\>
 sim.<styp.connectorKind.pyNNClassName>(<styp.connectorParameters:{it | <it.pythonName>=<it.value>}; separator=", ">)<\\>
-<endif><\\>
+<endif>
 >>
 ref_synapseTypeSynapseKind(styp) ::= <<
 sim.<styp.synapseKind.pyNNClassName>(weight=<styp.absoluteWeight>, delay=<styp.delay>)<\\>
-<if(styp.inhibitory)>, receptor_type="inhibitory"<endif><\\>
+<if(styp.inhibitory)>, receptor_type="inhibitory"<endif>
 >>
 ref_synapseType(styp) ::= "<ref_synapseTypeConnectorKind(styp)>, <ref_synapseTypeConnectorKind(styp)>"
 
@@ -99,21 +99,48 @@ port_gid(port) ::= <<
 <port.owningModule.unadornedPythonName>_<port.directionAsString>_<port.unadornedPythonName>
 >>
 
+get_probe_data(probe) ::= <<
+get_data().segments[0].<if(probe.dataSeries.filtered)>filter(name='<probe.dataSeries.pythonName>')[0]<else>spiketrains<endif>
+>>
+
+port_title(port) ::= <<
+<port.owningModule.name> - <port.name>
+>>
+
+probe_target_title(probe) ::= <<
+<if(probe.targetNamedEntity)><probe.targetNamedEntity.name><else><port_title(probe.targetModulePort)><endif>
+>>
+
 // TODO code generation for analog signals
 // TODO cyclic multi-colored graphs
 // TODO legend fix still required?
-create_panel(probe) ::= <<
+
+create_group_panel(annoSeries, plot) ::= <<
     Panel(
-        <probe_target(probe)>.get_data().segments[0].spiketrains,
-        xlabel="Time (ms)", xticks=True,
-        gid='<probe_target_gid(probe)>',
-        line_properties= [{'color': 'b'}, ],
+        <annoSeries.subsidiaryProbes:{annoProbe | <probe_target(annoProbe.item)>.<get_probe_data(annoProbe.item)>}; separator=", ">,
+        <if(annoSeries.last)>xlabel="Time (ms)", xticks=True,<endif>
+        <! gid='<probe_target_gid(annoProbe.item)>', !>
+        data_labels=[<annoSeries.subsidiaryProbes:{annoProbe | '<probe_target_title(annoProbe.item)>'}; separator=", ">],
+        line_properties= [<annoSeries.subsidiaryProbes:{annoProbe | {'color': '<annoProbe.cyclicColor>'\}}; separator=", ">]
+    ),
+>>
+
+create_solo_panel(annoProbe) ::= <<
+    Panel(
+        <probe_target(annoProbe.item)>.<get_probe_data(annoProbe.item)>,
+        <if(annoProbe.last)>xlabel="Time (ms)", xticks=True,<endif>
+        data_labels=['<probe_target_title(annoProbe.item)>'],
+        line_properties= [{'color': '<annoProbe.cyclicColor>'} ]
     ),
 >>
 
 create_plot(plot, target) ::= <<
 fig = Figure(
-<plot.outgoingProbesSorted:create_panel(); separator="\n">
+<if (plot.combineSameKindData)><\\>
+<plot.contributingDataSeries:create_group_panel(plot); separator="\n"><\\>
+<else><\\>
+<plot.outgoingProbesSorted:create_solo_panel(); separator="\n"><\\>
+<endif><\\>
   title="<plot.name>",
   annotations="Simulated with <target.displayName>"
 )
@@ -154,6 +181,7 @@ sim.setup(timestep=<prog.timeStep>)
 
 sim.run(runtime)
 
+<if(!scope.dataPlots.empty)>
 from matplotlib.axes import Axes
 
 def fix_legends(pynn_fig):
@@ -170,6 +198,7 @@ def fix_legends(pynn_fig):
 if options.image_viewer != '-':
   import subprocess
   subprocess.run([options.image_viewer, <scope.dataPlots:{it | it.outputFileName}; separator=", ">])
+<endif>
 
 sim.end()
 >>

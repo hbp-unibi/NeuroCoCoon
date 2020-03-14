@@ -141,7 +141,7 @@ public class EditorToolBar extends JToolBar
 							graphComponent.zoomTo(scale, graphComponent.isCenterZoom());
 						}
 						catch (NumberFormatException ex) {
-							JOptionPane.showMessageDialog(editor, ex.getMessage());
+							Dialogs.error(editor instanceof NeuroCoCoonEditor ? (NeuroCoCoonEditor) editor : null, ex);
 						}
 					}
 				}
@@ -174,7 +174,7 @@ public class EditorToolBar extends JToolBar
 		checkAction = editor.bind("Check", new CheckAction(), IMAGE_PATH + "check.png");
 		add(checkAction);
 		RunAction runAction = new RunAction();
-		add(editor.bind("Run", runAction, IMAGE_PATH + "run.png"));
+		add(runAction.setWrapperAction(editor.bind("Run", runAction, IMAGE_PATH + "run.png")));  // FIXME disabled just for testing
 		final JComboBox<NmpiClient.Platform> platformCombo =
 				new PartialComboBoxModel<NmpiClient.Platform>(NmpiClient.Platform.values()) {
 					@Override

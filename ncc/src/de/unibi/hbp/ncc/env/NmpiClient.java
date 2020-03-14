@@ -6,8 +6,10 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.WriterConfig;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
+import de.unibi.hbp.ncc.lang.utils.Iterators;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -15,6 +17,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -130,6 +133,16 @@ public class NmpiClient {
             return "[JSON] " + jsonValue.toString(WriterConfig.PRETTY_PRINT);
          return "[null]";
       }
+   }
+
+   public InputStream authorizedInput (URL url)
+         throws IOException {
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+      conn.setRequestProperty("Authorization", "Bearer " + getAuthToken());
+      int statusCode = conn.getResponseCode();
+      System.err.println("authorizedInput: " + url + ", status = " + statusCode);
+      return conn.getInputStream();
    }
 
    private Response getRequest (String apiEndPoint) {
@@ -369,7 +382,24 @@ public class NmpiClient {
        */
    }
 
-   public JsonObject getJobInfo (long jobId) {
+   public static class JobInfo {
+      private final JsonObject jobInfo;
+
+      JobInfo (JsonObject jobInfo) { this.jobInfo = jobInfo; }
+
+      public String getJobStatus () {
+         return jobInfo.getString("status", "unknown");
+      }
+
+      public JsonArray getOutputData () { return jobInfo.get("output_data").asArray(); }
+
+      public Iterable<String> getOutputURLs () {
+         return Iterators.partialMap(getOutputData(),
+                                     jv -> jv.asObject().getString("url", null));
+      }
+   }
+
+   public JobInfo getJobInfo (long jobId) {
       Response result = getRequest(getResourceEndPoint("queue") + "/" + jobId);
       if (result.isError() && result.getStatusCode() == 404)
          result = getRequest(getResourceEndPoint("results") + "/" + jobId);
@@ -378,10 +408,43 @@ public class NmpiClient {
       JsonObject jobInfo = result.getJsonValue().asObject();
       if (jobInfo.getLong("id", -1) != jobId)
          throw new IllegalStateException("unexpected job info for id " + jobInfo.get("id"));
-      return jobInfo;
+      return new JobInfo(jobInfo);
    }
 
-   public String getJobStatus (long jobId) {
-      return getJobInfo(jobId).getString("status", "unknown");
-   }
+   /*
+       def download_data(self, job, local_dir=".", include_input_data=False):
+        """
+        Download output data files produced by a given job to a local directory.
+
+        *Arguments*:
+            :job: a full job description (dict), as returned by `get_job()`.
+            :local_dir: path to a directory into which files shall be saved.
+            :include_input_data: also download input data files.
+        """
+        filenames = []
+        datalist = job["output_data"]
+        if include_input_data:
+            datalist.extend(job["input_data"])
+
+        if datalist:
+            server_paths = [urlparse(item["url"])[2] for item in datalist]
+            if len(server_paths) > 1:
+                common_prefix = os.path.dirname(os.path.commonprefix(server_paths))
+            else:
+                common_prefix = os.path.dirname(server_paths[0])
+            relative_paths = [os.path.relpath(p, common_prefix) for p in server_paths]
+
+            for relative_path, dataitem in zip(relative_paths, datalist):
+                url = dataitem["url"]
+                (scheme, netloc, path, params, query, fragment) = urlparse(url)
+                if not scheme:
+                    url = "file://" + url
+                local_path = os.path.join(local_dir, "job_{}".format(job["id"]), relative_path)
+                dir = os.path.dirname(local_path)
+                _mkdir_p(dir)
+                urlretrieve(url, local_path)
+                filenames.append(local_path)
+
+        return filenames
+    */
 }

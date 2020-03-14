@@ -26,6 +26,10 @@ if NeuroCoCoon is running as a client side web application inside the [HBP colla
 
 ### Creating Neuron Populations and Module Instances
 
+![](assets/palette_tabs.png)
+
+![](assets/module_instances.png)
+
 ### Adding Synapses
 
 #### Drawing Synapses

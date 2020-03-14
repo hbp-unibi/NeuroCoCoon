@@ -36,6 +36,10 @@ public class ProbeConnection extends AnyConnection implements Serializable {
 
       @Override
       public String getPythonName () { return pythonName; }
+
+      public boolean isFiltered () { return this != SPIKES; }
+
+      public boolean isContinuous () { return isFiltered(); }  // the same subset, just by coincidence
    }
 
    protected Object writeReplace () throws ObjectStreamException {

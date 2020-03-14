@@ -8,6 +8,19 @@ function getHBPContext() { return theHBPContext; }
 var theHBPResponse = null;
 function getHBPResponse() { return theHBPResponse; }
 
+function getHBPRequest(sourceURL) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', sourceURL, true);
+    xhr.setRequestHeader("Authorization", "Bearer " + getHBPToken());
+    xhr.onload = function () {
+        console.log("onload");
+        console.log(this.responseText);
+        console.log(this);
+    };
+    console.log(sourceURL);
+    xhr.send(null);
+}
+
 function postHBPRequest(targetURL, jsonPayload) {
    // console.log('targetURL', targetURL);
    // console.log('jsonPayload', jsonPayload);

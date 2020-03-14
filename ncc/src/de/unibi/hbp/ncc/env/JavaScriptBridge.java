@@ -44,6 +44,44 @@ public class JavaScriptBridge {
       }
    }
 
+   // FIXME show image in pre-existing image element instead
+   public static void openNewWindow (String url) {
+      Global.open(Global.JSString(url), Global.JSString("_blank"));
+   }
+
+   /*
+   import com.leaningtech.client.Document;
+import com.leaningtech.client.Element;
+import com.leaningtech.client.Global;
+import com.leaningtech.client.JSString;
+
+public class DomExample
+{
+        public static void main(String[] a)
+        {
+                // Retrieve the global document object, it comes from the global namespace of the browser.
+                Document d = Global.document;
+                // Retries a known element from the page using it's id
+                // NOTE: Java Strings must be converted to JavaScript string before being used
+                Element e = d.getElementById(Global.JSString("existingNode"));
+                // Currently, setter/getters must be used to access properties
+                e.set_textContent(Global.JSString("sometext"));
+                Element newDiv = Global.document.createElement(Global.JSString("p"));
+                // Initialize the new element with text derived from the previous one
+                newDiv.set_textContent(e.get_textContent().substring(3).toUpperCase())
+                // Add it to the document body
+                Global.document.get_body().appendChild(newDiv);
+                JSString divContent = newDiv.get_textContent();
+                // This logs directly to the browser console
+                Global.console.log(divContent);
+        }
+}
+    */
+   public static String getRequest (String endPoint) {
+      Global.jsCall("getHBPRequest", Global.JSString(endPoint));
+      return null; // TODO return the real result
+   }
+
    private static Boolean cachedWebPlatform = null;
 
    public static boolean isWebPlatform () {

@@ -300,6 +300,19 @@ public final class Iterators {
       return result;
    }
 
+   public static <T> List<T> asList (Iterable<T> iterable) {
+      return asList(iterable.iterator());
+   }
+
+   public static <T> void addAll (Collection<? super T> target, Iterator<T> iter) {
+      while (iter.hasNext())
+         target.add(iter.next());
+   }
+
+   public static <T> void addAll (Collection<? super T> target, Iterable<T> iterable) {
+      addAll(target, iterable.iterator());
+   }
+
    public static <T> Iterable<T> emptyIterable () {
       return Collections::emptyIterator;
    }

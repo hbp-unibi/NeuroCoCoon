@@ -4933,9 +4933,16 @@ public class mxGraph extends mxEventSource
 		if (edge != null && !isAllowDanglingEdges() && (source == null || target == null))
 			return "";
 
+		// this seems wrong (for drag&drop validation at least):
+		// allows loose edge (not attached to any terminal yet) to be attached to any first terminal node
+		/*
 		if (edge != null && model.getTerminal(edge, true) == null
 				&& model.getTerminal(edge, false) == null)
 			return null;
+		 */
+
+		if (edge != null && source == null && target == null)
+			return null;  // we allow dangling edges, so allow any completely detached edge
 
 		// Checks if we're dealing with a loop
 		if (!isAllowLoops() && source == target && source != null)

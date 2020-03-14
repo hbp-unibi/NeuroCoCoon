@@ -21,10 +21,12 @@ import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
 import de.unibi.hbp.ncc.editor.EntityConfigurator;
 import de.unibi.hbp.ncc.editor.EntityCreator;
+import de.unibi.hbp.ncc.editor.InspectorController;
 import de.unibi.hbp.ncc.editor.TooltipProvider;
 import de.unibi.hbp.ncc.editor.props.DetailsEditor;
 import de.unibi.hbp.ncc.editor.props.MasterDetailsEditor;
 import de.unibi.hbp.ncc.editor.props.Notificator;
+import de.unibi.hbp.ncc.editor.props.PropChangeListener;
 import de.unibi.hbp.ncc.lang.AnyConnection;
 import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.DataPlot;
@@ -44,19 +46,23 @@ import de.unibi.hbp.ncc.lang.SynapseType;
 import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.modules.SynfireChain;
 import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
+import de.unibi.hbp.ncc.lang.props.EditableProp;
 import org.w3c.dom.Document;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 
-public class NeuroCoCoonEditor extends BasicGraphEditor
+public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeListener, InspectorController
 {
 
 	public static final String VERSION = "0.9.0";
@@ -118,6 +124,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			}
 		});
 
+		programGraphComponent.setInspector(this);
+
 		graph.addListener(mxEvent.FLIP_EDGE, (sender, evt) -> {
 			ProgramGraph.EdgeStyles style = (ProgramGraph.EdgeStyles) evt.getProperty("style");
 			status("Edge style changed to " + style.getDisplayName());
@@ -164,6 +172,24 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/module.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
+		Notificator.getInstance().subscribe(this);  // to get notified of non-visual (in the graph) property changes
+	}
+
+	@Override
+	public void propertyChanged (EditableProp<?> changed, int position) { setModified(true); }
+
+	@Override
+	public void multiplePropertyValuesChanged (LanguageEntity affected) { setModified(true); }
+
+	@Override
+	public void otherPropertiesVisibilityChanged (LanguageEntity affected) { setModified(true); }
+
+	@Override
+	public void edit (LanguageEntity subject) {
+		detailsEditor.setSubject(subject);
+		rightHandTabs.setSelectedIndex(0);  // reveal the inspector
+		if (!subject.isPredefined())
+			detailsEditor.startEditing();
 	}
 
 	private final Component NO_RESULTS_PLACEHOLDER = new JLabel("No results.", SwingConstants.CENTER);
@@ -222,12 +248,14 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 	}
 
 	public void clearJobStatus () {
-		setJobStatus(EditorToolBar.StatusLevel.PLACEHOLDER, "No Job", "");
+		setJobStatus(EditorToolBar.StatusLevel.PLACEHOLDER, "No Job", "Ready.");
+		// with empty text the status bar disappears completely
 	}
 
 
 	public static class ProgramGraphComponent extends mxGraphComponent {
 		private final ProgramGraph programGraph;
+		private InspectorController inspector;
 
 		public ProgramGraphComponent (ProgramGraph graph) {
 			super(graph);
@@ -250,12 +278,32 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			Document doc = mxUtils.loadDocument(NeuroCoCoonEditor.class.getResource("resources/ncc-style.xml").toString());
 			if (doc != null)
 				codec.decode(doc.getDocumentElement(), graph.getStylesheet());
-			// TODO consolidate both stylesheets into a minimal file ncc-style.xml
 
 			// Sets the background to white
 			getViewport().setOpaque(true);
 			getViewport().setBackground(Color.WHITE);
+			graphControl.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked (MouseEvent e) {
+					if (isEnabled() && inspector != null) {
+						if (!e.isConsumed() && isEditEvent(e)) {
+							Object cell = getCellAt(e.getX(), e.getY(), false);
+
+							Object value;
+							if (cell instanceof mxICell &&
+									(value = ((mxICell) cell).getValue()) instanceof LanguageEntity) {
+								LanguageEntity entity = (LanguageEntity) value;
+								inspector.edit(entity);
+								e.consume();
+							}
+						}
+					}
+				}
+
+			});
 		}
+
+		void setInspector (InspectorController inspector) { this.inspector = inspector; }
 
 		public ProgramGraph getProgramGraph () { return programGraph; }
 
@@ -473,19 +521,31 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 
 		@Override
 		public boolean isValidConnection (Object edge, Object source, Object target) {
+			// System.err.println("isValidConnection: " + edge + ", source=" + source + ", target=" + target);
 			if (super.isValidConnection(edge, source, target)) {
-				if (edge instanceof mxICell && source instanceof mxICell && target instanceof mxICell) {
+				if (edge instanceof mxICell) {
 					Object edgeValue = ((mxICell) edge).getValue();
-					Object sourceValue = ((mxICell) source).getValue();
-					Object targetValue = ((mxICell) target).getValue();
-					if (edgeValue instanceof AnyConnection &&
-							sourceValue instanceof Connectable && targetValue instanceof Connectable) {
-						Connectable sourceCon = (Connectable) sourceValue;
-						Connectable targetCon = (Connectable) targetValue;
-						if (edgeValue instanceof ProbeConnection)
-							return sourceCon.isValidProbeSource() && targetCon.isValidProbeTarget();
-						else
-							return sourceCon.isValidSynapseSource() && targetCon.isValidSynapseTarget();
+					if (edgeValue instanceof AnyConnection) {
+						if (source instanceof mxICell) {
+							Object sourceValue = ((mxICell) source).getValue();
+							if (sourceValue instanceof Connectable) {
+								Connectable sourceCon = (Connectable) sourceValue;
+								if (edgeValue instanceof ProbeConnection && !sourceCon.isValidProbeSource())
+									return false;
+								if (edgeValue instanceof NeuronConnection && !sourceCon.isValidSynapseSource())
+									return false;
+							}
+						}
+						if (target instanceof mxICell) {
+							Object targetValue = ((mxICell) target).getValue();
+							if (targetValue instanceof Connectable) {
+								Connectable targetCon = (Connectable) targetValue;
+								if (edgeValue instanceof ProbeConnection && !targetCon.isValidProbeTarget())
+									return false;
+								if (edgeValue instanceof NeuronConnection && !targetCon.isValidSynapseTarget())
+									return false;
+							}
+						}
 					}
 				}
 				return true;
@@ -534,7 +594,18 @@ public class NeuroCoCoonEditor extends BasicGraphEditor
 			return edge;
 		}
 
+	}
 
+	private static final ImageIcon APP_ICON =
+			new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/appicon.png"));
+
+	public ImageIcon getAppIcon () { return APP_ICON; }
+
+	@Override
+	public JFrame createFrame (JMenuBar menuBar, int width, int height) {
+		JFrame frame = super.createFrame(menuBar, width, height);
+		frame.setIconImage(APP_ICON.getImage());
+		return frame;
 	}
 
 	public static void main (String[] args) {

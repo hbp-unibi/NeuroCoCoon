@@ -1,5 +1,7 @@
 package de.unibi.hbp.ncc.editor;
 
+import de.unibi.hbp.ncc.env.JavaScriptBridge;
+import de.unibi.hbp.ncc.env.NmpiClient;
 import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.utils.Images;
@@ -17,12 +19,15 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +39,7 @@ public class PlotsPanel {
       BufferedImage fullImage;
       ImageIcon thumbnail;
       DataPlot plotEntity;
-      String title;
+      String title, url;
       JFrame detailsWindow;
 
       PlotImage (BufferedImage fullImage, DataPlot plotEntity, String fallBackTitle) {
@@ -46,14 +51,20 @@ public class PlotsPanel {
 
       private static final int DUMMY_SIZE = 16;
 
-      PlotImage (String errorMessage) {
+      PlotImage (Color marker, String message) {
          BufferedImage dummy = new BufferedImage(DUMMY_SIZE, DUMMY_SIZE, BufferedImage.TYPE_INT_RGB);
          Graphics2D g2 = dummy.createGraphics();
-         g2.setBackground(Color.RED);
+         g2.setBackground(marker);
          g2.clearRect(0, 0, DUMMY_SIZE, DUMMY_SIZE);
          g2.dispose();
          this.thumbnail = new ImageIcon(dummy);
-         this.title = errorMessage;
+         this.title = message;
+      }
+
+      PlotImage (DataPlot plotEntity, String url) {
+         this(Color.GREEN, url);
+         this.plotEntity = plotEntity;
+         this.url = url;
       }
 
       ImageIcon getThumbnail () {
@@ -64,12 +75,16 @@ public class PlotsPanel {
       }
 
       JFrame showDetailsWindow (Component locationReference) {
+         if (url != null) {
+            JavaScriptBridge.openNewWindow(url);
+            return null;
+         }
          if (detailsWindow == null) {
             JFrame frame = new JFrame(title);
             // could use a JPanel with a paintComponent override to avoid creating the icon
             if (fullImage != null)
                frame.add(new JLabel(new ImageIcon(fullImage)));
-            else  // just show the red marker plus the (full) error text
+            else  // just show the colored marker plus the (full) (error) text
                frame.add(new JLabel(title, getThumbnail(), SwingConstants.CENTER));
             frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
             frame.pack();
@@ -77,8 +92,10 @@ public class PlotsPanel {
             frame.setVisible(true);
             detailsWindow = frame;
          }
-         else
+         else {
+            detailsWindow.setVisible(true);
             detailsWindow.toFront();
+         }
          return detailsWindow;
       }
 
@@ -109,7 +126,46 @@ public class PlotsPanel {
          catch (IOException ioe) {
             System.err.println("File " + plotImageFile);
             ioe.printStackTrace(System.err);
-            plotImage = new PlotImage(plotImageFile.getName() + ": " + ioe.getMessage());
+            plotImage = new PlotImage(Color.RED, plotImageFile.getName() + ": " + ioe.getMessage());
+         }
+         plotImages.add(plotImage);
+      }
+      model = new PlotListModel(plotImages);
+   }
+
+   private static String extractFileName (String url) {
+      int lastSlash = url.lastIndexOf('/');
+      if (lastSlash >= 0)
+         return url.substring(lastSlash + 1);
+      else
+         return url;  // keep full URL, if there is no slash
+   }
+
+   // boolean parameter only supplied to make the constructor signatures different (after erasure)
+   public PlotsPanel (List<String> plotImageURLs, Namespace<DataPlot> allPlots, boolean externalURLs) {
+      List<PlotImage> plotImages = new ArrayList<>(plotImageURLs.size());
+      for (String plotImageURL: plotImageURLs) {
+         String fileName = extractFileName(plotImageURL);
+         PlotImage plotImage = new PlotImage(findPlotFor(allPlots, fileName), plotImageURL);
+         plotImages.add(plotImage);
+      }
+      model = new PlotListModel(plotImages);
+   }
+
+   public PlotsPanel (List<URL> plotImageURLs, Namespace<DataPlot> allPlots, NmpiClient client) {
+      List<PlotImage> plotImages = new ArrayList<>(plotImageURLs.size());
+      for (URL plotImageURL: plotImageURLs) {
+         PlotImage plotImage;
+         JavaScriptBridge.getRequest(plotImageURL.toString());
+         try (InputStream in = client.authorizedInput(plotImageURL)) {
+            BufferedImage image = ImageIO.read(in);
+            String fileName = plotImageURL.getPath();
+            plotImage = new PlotImage(image, findPlotFor(allPlots, fileName), fileName);
+         }
+         catch (IOException ioe) {
+            System.err.println("URL " + plotImageURL);
+            ioe.printStackTrace(System.err);
+            plotImage = new PlotImage(Color.RED, plotImageURL.getPath() + ": " + ioe.getMessage());
          }
          plotImages.add(plotImage);
       }
