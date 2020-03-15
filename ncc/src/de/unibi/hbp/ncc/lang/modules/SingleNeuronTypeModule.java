@@ -4,14 +4,14 @@ import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.ProbeConnection;
+import de.unibi.hbp.ncc.lang.Program;
+import de.unibi.hbp.ncc.lang.codegen.ErrorCollector;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
-import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.NonNegativeDoubleProp;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public abstract class SingleNeuronTypeModule extends NetworkModule {
    protected final EditableNameProp<NeuronType> neuronType;
@@ -50,4 +50,10 @@ public abstract class SingleNeuronTypeModule extends NetworkModule {
 
    protected abstract NeuronType createDefaultNeuronType (Namespace<NeuronType> neuronTypes, String typeName);
 
+   @Override
+   public void checkStaticSemantics (Program program, ErrorCollector diagnostics) {
+      super.checkStaticSemantics(program, diagnostics);
+      if (synapseDelay.getValue() < program.getTimeStep())
+         diagnostics.recordWarning(this, "Internal synapse delay is smaller than time step.");
+   }
 }

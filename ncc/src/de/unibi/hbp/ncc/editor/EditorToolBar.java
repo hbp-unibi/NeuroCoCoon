@@ -10,7 +10,6 @@ import com.mxgraph.view.mxGraphView;
 import de.unibi.hbp.ncc.NeuroCoCoonEditor;
 import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
 import de.unibi.hbp.ncc.editor.EditorActions.NewAction;
-import de.unibi.hbp.ncc.editor.EditorActions.OpenAction;
 import de.unibi.hbp.ncc.editor.EditorActions.SaveAction;
 import de.unibi.hbp.ncc.editor.props.ComboBoxModelAdapter;
 import de.unibi.hbp.ncc.env.JavaScriptBridge;
@@ -24,7 +23,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 import java.awt.Color;
@@ -54,7 +52,7 @@ public class EditorToolBar extends JToolBar
 		setFloatable(false);
 
 		add(editor.bind("New", new NewAction(), IMAGE_PATH + "new.gif"));
-		add(editor.bind("Open", new OpenAction(), IMAGE_PATH + "open.gif"));
+		add(editor.bind("Open", EditorActions.getOpenAction(), IMAGE_PATH + "open.gif"));
 		add(editor.bind("Save", new SaveAction(false), IMAGE_PATH + "save.gif"));
 
 		addSeparator();

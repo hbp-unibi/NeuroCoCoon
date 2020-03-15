@@ -197,7 +197,7 @@ public class ErrorCollector implements STErrorListener {
          setToolTipText(
                value instanceof DisplayNamed
                      ? ((DisplayNamed) value).getLongDisplayName()
-                     : value != null ? value.toString() : null);
+                     : value != null ? value.toString() : null);  // could instead use Objects.toString(value, null)
       }
    }
 

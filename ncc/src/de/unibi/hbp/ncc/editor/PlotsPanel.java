@@ -19,7 +19,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -49,7 +48,7 @@ public class PlotsPanel {
          this.title = fallBackTitle;
       }
 
-      private static final int DUMMY_SIZE = 16;
+      private static final int DUMMY_SIZE = 24;
 
       PlotImage (Color marker, String message) {
          BufferedImage dummy = new BufferedImage(DUMMY_SIZE, DUMMY_SIZE, BufferedImage.TYPE_INT_RGB);
@@ -61,8 +60,10 @@ public class PlotsPanel {
          this.title = message;
       }
 
+      private static final Color WEB_PLACEHOLDER_COLOR = new Color(0x8888cc);
+
       PlotImage (DataPlot plotEntity, String url) {
-         this(Color.GREEN, url);
+         this(WEB_PLACEHOLDER_COLOR, url);
          this.plotEntity = plotEntity;
          this.url = url;
       }
@@ -76,7 +77,8 @@ public class PlotsPanel {
 
       JFrame showDetailsWindow (Component locationReference) {
          if (url != null) {
-            JavaScriptBridge.openNewWindow(url);
+            JavaScriptBridge.showOnPage(url, "plotDisplay");
+            // ncc.html provides an img element with id plotDisplay
             return null;
          }
          if (detailsWindow == null) {

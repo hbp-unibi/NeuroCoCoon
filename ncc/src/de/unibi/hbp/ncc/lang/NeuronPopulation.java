@@ -4,6 +4,7 @@ import de.unibi.hbp.ncc.graph.EdgeCollector;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
 import de.unibi.hbp.ncc.lang.props.StrictlyPositiveIntegerProp;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,23 +38,21 @@ public abstract class NeuronPopulation extends NamedEntity
    public int getNeuronCount () { return neuronCount.getValue(); }
 
    @Override
-   public boolean isValidSynapseSource () { return true; }
+   public boolean isValidSource (EdgeKind edgeKind) { return edgeKind == EdgeKind.SYNAPSE; }
 
    @Override
-   public boolean isValidProbeTarget () { return !getSupportedDataSeries().isEmpty(); }
-
-   public Iterable<NeuronConnection> getOutgoingSynapses () {
-      return EdgeCollector.getOutgoingSynapses(getOwningCell());
+   public boolean isValidTarget (EdgeKind edgeKind) {
+      return edgeKind == EdgeKind.PROBE && !getSupportedDataSeries().isEmpty();
    }
 
    @Override
-   public Iterable<NeuronConnection> getIncomingSynapses () {
-      return EdgeCollector.getIncomingSynapses(getOwningCell());
+   public @Nullable Iterable<AnyConnection> getOutgoingEdgesImpl (EdgeKind edgeKind) {
+      return EdgeCollector.getOutgoingConnections(edgeKind, getOwningCell());
    }
 
    @Override
-   public Iterable<ProbeConnection> getIncomingProbes () {
-      return EdgeCollector.getIncomingProbes(getOwningCell());
+   public @Nullable Iterable<AnyConnection> getIncomingEdgesImpl (EdgeKind edgeKind) {
+      return EdgeCollector.getIncomingConnections(edgeKind, getOwningCell());
    }
 
    @Override

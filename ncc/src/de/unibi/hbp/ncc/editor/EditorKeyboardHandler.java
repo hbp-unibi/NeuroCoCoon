@@ -60,7 +60,7 @@ public class EditorKeyboardHandler extends mxKeyboardHandler {
 		map.put("save", new EditorActions.SaveAction(false));
 		map.put("saveAs", new EditorActions.SaveAction(true));
 		map.put("new", new EditorActions.NewAction());
-		map.put("open", new EditorActions.OpenAction());
+		map.put("open", EditorActions.getOpenAction());
 		map.put("undo", new EditorActions.HistoryAction(true));
 		map.put("redo", new EditorActions.HistoryAction(false));
 		map.put("selectVertices", mxGraphActions.getSelectVerticesAction());

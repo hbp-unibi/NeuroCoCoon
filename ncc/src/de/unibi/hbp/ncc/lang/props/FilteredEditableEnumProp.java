@@ -13,6 +13,12 @@ public abstract class FilteredEditableEnumProp<E extends Enum<E>> extends Editab
       super(propName, valueClass, owner, value);
    }
 
+   @Override
+   public FilteredEditableEnumProp<E> addImpact (Impact impact) {  // to get the more precise covariant return type
+      super.addImpact(impact);
+      return this;
+   }
+
    protected abstract boolean isValidFor (E enumValue, LanguageEntity enclosingEntity);
 
    @Override

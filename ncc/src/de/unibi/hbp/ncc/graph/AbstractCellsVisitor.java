@@ -3,6 +3,7 @@ package de.unibi.hbp.ncc.graph;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
+import de.unibi.hbp.ncc.lang.NetworkModule;
 
 import java.util.function.BiConsumer;
 
@@ -19,7 +20,8 @@ public abstract class AbstractCellsVisitor {
 
    protected void beginGraph (mxICell root) { }
    protected void endGraph (mxICell root) { }
-   protected void beginVertex (mxICell vertex, LanguageEntity entity) { }
+   protected void beginEntityVertex (mxICell vertex, LanguageEntity entity) { }
+   protected void beginPortVertex (mxICell vertex, NetworkModule.Port port) { }
    protected void beginOtherVertex (mxICell vertex, Object value) { }
    protected void endVertex (mxICell vertex) { }
 
@@ -64,7 +66,9 @@ public abstract class AbstractCellsVisitor {
       assert vertexCell.isVertex();
       Object value = vertexCell.getValue();
       if (value instanceof LanguageEntity)
-         beginVertex(vertexCell, (LanguageEntity) value);
+         beginEntityVertex(vertexCell, (LanguageEntity) value);
+      else if (value instanceof NetworkModule.Port)
+         beginPortVertex(vertexCell, (NetworkModule.Port) value);
       else
          beginOtherVertex(vertexCell, value);
    }

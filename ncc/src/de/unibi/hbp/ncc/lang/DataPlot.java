@@ -2,16 +2,16 @@ package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.editor.EntityCreator;
 import de.unibi.hbp.ncc.graph.EdgeCollector;
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.props.BooleanProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.utils.Iterators;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 public class DataPlot extends NamedEntity implements Connectable {
    private final Namespace<DataPlot> moreSpecificNamespace;
@@ -90,15 +90,21 @@ public class DataPlot extends NamedEntity implements Connectable {
    }
 
    @Override
-   public boolean isValidProbeSource () { return true; }
+   public boolean isValidSource (EdgeKind edgeKind) { return edgeKind == EdgeKind.PROBE; }
 
    @Override
-   public Iterable<ProbeConnection> getOutgoingProbes () {
-      return EdgeCollector.getOutgoingProbes(getOwningCell());
+   public @Nullable Iterable<AnyConnection> getOutgoingEdgesImpl (EdgeKind edgeKind) {
+      return EdgeCollector.getOutgoingConnections(edgeKind, getOwningCell());
+   }
+
+   @Override
+   public @Nullable Iterable<AnyConnection> getIncomingEdgesImpl (EdgeKind edgeKind) {
+      return null;  // no incoming edges allowed
    }
 
    public String getOutputFileName () { return Namespace.buildUnadornedPythonName(getName()) + ".png"; }
 
+   @CodeGenUse
    public boolean isCombineSameKindData () { return combineSameKindData.getValue(); }
 
    private static class ProbeComparator implements Comparator<ProbeConnection> {
@@ -140,11 +146,16 @@ public class DataPlot extends NamedEntity implements Connectable {
          this.last = position == length - 1;
       }
 
+      @CodeGenUse
       public T getItem () { return item; }
 
+      @CodeGenUse
       public String getCyclicColor () { return String.valueOf(cyclicColor); }
 
+      @CodeGenUse
       public boolean isFirst () { return first; }
+
+      @CodeGenUse
       public boolean isLast () { return last; }
 
    }
@@ -183,24 +194,16 @@ public class DataPlot extends NamedEntity implements Connectable {
 
    private static final ProbeComparator orderByTargetAndSeries = new ProbeComparator();
 
-   public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted () {  // for code generation, determines order of panels in figure
-      List<ProbeConnection> probes = EdgeCollector.getOutgoingProbes(getOwningCell());
-      probes.sort(orderByTargetAndSeries);
-      return annotateProbeConnections(probes);
-   }
-
+   @CodeGenUse
    public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted (ProbeConnection.DataSeries dataSeries) {  // for code generation, determines order of data contributions in one panel of figure
       List<ProbeConnection> probes = Iterators.asList(Iterators.filter(
-            EdgeCollector.getOutgoingProbes(getOwningCell()).iterator(), probe -> probe.getDataSeries() == dataSeries));
+            getOutgoingProbes().iterator(), probe -> probe.getDataSeries() == dataSeries));
       probes.sort(orderByTargetAndSeries);
       return annotateProbeConnections(probes);
    }
 
+   @CodeGenUse
    public Collection<AnnotatedDataSeries> getContributingDataSeries () {
-      List<ProbeConnection> probes = EdgeCollector.getOutgoingProbes(getOwningCell());
-      Set<ProbeConnection.DataSeries> seriesUsed = EnumSet.noneOf(ProbeConnection.DataSeries.class);
-      for (ProbeConnection probe: probes)
-         seriesUsed.add(probe.getDataSeries());
-      return annotateDataSeries(seriesUsed);
+      return annotateDataSeries(EdgeCollector.getContributingDataSeries(this));
    }
 }

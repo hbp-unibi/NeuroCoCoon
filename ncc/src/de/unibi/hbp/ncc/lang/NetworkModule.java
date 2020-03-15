@@ -7,7 +7,10 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
 import de.unibi.hbp.ncc.graph.EdgeCollector;
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
+import de.unibi.hbp.ncc.lang.codegen.ErrorCollector;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,7 +34,7 @@ public abstract class NetworkModule extends NamedEntity
    protected static Namespace<NetworkModule> getGlobalNamespace () { return globalNamespace; }
 
 
-   public static class Port implements Serializable, Connectable, PlotDataSource {
+   public static class Port implements Serializable, DisplayNamed, Connectable, PlotDataSource {
       // TODO should Port extend LanguageEntity (and use the owning cell?) or even NamedEntity with one namespace per module instance?
 
       public enum Direction {IN, OUT}
@@ -49,7 +52,10 @@ public abstract class NetworkModule extends NamedEntity
 
       public String getName () { return portName; }
       public Direction getDirection () { return portDirection; }
+
+      @CodeGenUse
       public String getDirectionAsString () { return portDirection.name().toLowerCase(); }
+
       public int getIndex () { return portIndex; }
       void setIndex (int portIndex) { this.portIndex = portIndex; }
 
@@ -61,27 +67,23 @@ public abstract class NetworkModule extends NamedEntity
       public String toString () { return portName; }
 
       @Override
-      public boolean isValidSynapseSource () { return portDirection == Direction.OUT; }
-
-      @Override
-      public boolean isValidSynapseTarget () { return portDirection == Direction.IN; }
-
-      @Override
-      public Iterable<NeuronConnection> getOutgoingSynapses () {
-         return EdgeCollector.getOutgoingSynapses(getCell());
+      public boolean isValidSource (EdgeKind edgeKind) {
+         return portDirection == Direction.OUT && edgeKind == EdgeKind.SYNAPSE;
       }
 
       @Override
-      public Iterable<NeuronConnection> getIncomingSynapses () {
-         return EdgeCollector.getIncomingSynapses(getCell());
+      public boolean isValidTarget (EdgeKind edgeKind) {
+         return portDirection == Direction.IN && (edgeKind == EdgeKind.SYNAPSE || edgeKind == EdgeKind.PROBE);
       }
 
       @Override
-      public boolean isValidProbeTarget () { return portDirection == Direction.OUT; }
+      public @Nullable Iterable<AnyConnection> getOutgoingEdgesImpl (EdgeKind edgeKind) {
+         return EdgeCollector.getOutgoingConnections(edgeKind, getCell());
+      }
 
       @Override
-      public Iterable<ProbeConnection> getIncomingProbes () {
-         return EdgeCollector.getIncomingProbes(getCell());
+      public @Nullable Iterable<AnyConnection> getIncomingEdgesImpl (EdgeKind edgeKind) {
+         return EdgeCollector.getIncomingConnections(edgeKind, getCell());
       }
 
       // code generation needs to access the module owning a port
@@ -101,7 +103,14 @@ public abstract class NetworkModule extends NamedEntity
          return EdgeCollector.getRequiredDataSeries(this);
       }
 
+      @CodeGenUse
       public String getUnadornedPythonName () { return Namespace.buildUnadornedPythonName(portName); }
+
+      @Override
+      public String getDisplayName () { return portName; }
+
+      @Override
+      public String getLongDisplayName () { return "Port " + portName; }
    }
 
    @Override
@@ -309,9 +318,7 @@ public abstract class NetworkModule extends NamedEntity
    protected abstract List<String> getPortNames (Port.Direction direction);
 
    protected abstract int getPortDimension (Port.Direction direction, int portIndex);
-   // TODO need to provide a cardinality (neuron count) per port as well
 
-   // TODO provide a PlotDataSource info per port as well
    protected abstract Collection<ProbeConnection.DataSeries> getPortDataSeries (Port.Direction direction, int portIndex);
 
    protected abstract boolean getPortIsConductanceBased (Port.Direction direction, int portIndex);
@@ -324,16 +331,28 @@ public abstract class NetworkModule extends NamedEntity
       return getPortDimension(port.getDirection(), port.getIndex());
    }
 
+   public boolean isConductanceBasedPort (Port port) {
+      return getPortIsConductanceBased(port.getDirection(), port.getIndex());
+   }
+
    public boolean isOptionalPort (Port port) {
       return getPortIsOptional(port.getDirection(), port.getIndex());
    }
 
    public Iterable<Port> getInputPorts () { return inputPorts; }
    public Iterable<Port> getOutputPorts () { return outputPorts; }
+
+   public void checkStaticSemantics (Program program, ErrorCollector diagnostics) {
+
+   }
+
    // TODO add an empty module-specific checking method to be invoked from ProgramVisitor.check
 
    public String getTemplateGroupFileName () { return resourceFileBaseName + ".stg"; }
 
+   @CodeGenUse
    public String getDefineBuilderTemplateName () { return "define_" + resourceFileBaseName + "_builder"; }
+
+   @CodeGenUse
    public String getBuildInstanceTemplateName () { return "build_" + resourceFileBaseName + "_instance"; }
 }

@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.utils.Iterators;
 
 import java.util.Arrays;
@@ -43,25 +44,30 @@ public class Scope {
 
    // helpers used by code generation
 
+   @CodeGenUse
    public Iterable<StandardPopulation> getStandardPopulations () {
       return Iterators.partialMap(neuronPopulations,
                                   pop -> pop instanceof StandardPopulation ? (StandardPopulation) pop : null);
    }
 
+   @CodeGenUse
    public Iterable<RegularSpikeSource> getSpikeSources () {
       return Iterators.partialMap(neuronPopulations,
                                   pop -> pop instanceof RegularSpikeSource ? (RegularSpikeSource) pop : null);
    }
 
+   @CodeGenUse
    public Iterable<PoissonSource> getPoissonSources () {
       return Iterators.partialMap(neuronPopulations,
                                   pop -> pop instanceof PoissonSource ? (PoissonSource) pop : null);
    }
 
+   @CodeGenUse
    public Iterable<SynapseType.ConnectorKind> getConnectorKinds () {
       return Arrays.asList(SynapseType.ConnectorKind.values());
    }
 
+   @CodeGenUse
    public Iterable<NetworkModule> getOneModuleInstancePerUsedClass () {
       Map<String, NetworkModule> representativePerClass = new TreeMap<>();
       for (NetworkModule moduleInstance: moduleInstances)

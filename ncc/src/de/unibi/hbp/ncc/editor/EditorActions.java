@@ -41,7 +41,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -50,7 +49,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -231,10 +229,10 @@ public class EditorActions {
 
 		protected boolean showDialog;
 
-		protected String lastDir = null;
+		protected static String lastDir = null;  // hack to make all Save/Save As actions share the same idea of the current directory
+		// this is still different from the current directory for Open
 
-		public SaveAction (boolean showDialog)
-		{
+		public SaveAction (boolean showDialog) {
 			this.showDialog = showDialog;
 		}
 
@@ -732,9 +730,15 @@ public class EditorActions {
 		}
 	}
 
+	private static final OpenAction openAction = new OpenAction();
+
+	public static OpenAction getOpenAction () { return openAction; }
+
 	@SuppressWarnings("serial")
 	public static class OpenAction extends AbstractAction {
 		protected String lastDir;
+
+		private OpenAction () { }  // prevent creation of multiple instances with diverging lastDir values
 
 		protected void resetEditor (NeuroCoCoonEditor editor) {
 			editor.clearResultsTab();
@@ -759,7 +763,7 @@ public class EditorActions {
 						editor.getGraphComponent().getGraph().getSelectionModel().clear();
 						editor.getProgram().clear(editor.getEditorToolBar());
 						ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
-						codec.decode(document.getDocumentElement(), editor.getGraphComponent().getGraph().getModel());
+						codec.decode(document.getDocumentElement(), editor.getGraphModel());
 						codec.announceDone();
 						editor.setCurrentFile(file);
 						resetEditor(editor);
@@ -769,6 +773,34 @@ public class EditorActions {
 				}
 			}
 			Dialogs.error(editor, mxResources.get("imageContainsNoDiagramData"));
+		}
+
+		public void openFile (NeuroCoCoonEditor editor, File file) {
+			lastDir = file.getParent();
+
+			try {
+				String absPath = file.getAbsolutePath();
+				if (absPath.toLowerCase().endsWith(".png"))
+					openXmlPng(editor, file);
+				else {
+					Document document = mxXmlUtils.parseXml(mxUtils.readFile(absPath));
+					if (document != null) {
+						editor.getProgram().clear(editor.getEditorToolBar());
+						ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
+						codec.decode(document.getDocumentElement(), editor.getGraphModel());
+						codec.announceDone();
+						editor.setCurrentFile(file);
+
+						resetEditor(editor);
+					}
+					else
+						throw new IOException("Could not parse XML document!");
+				}
+			}
+			catch (IOException ex) {
+				ex.printStackTrace(System.err);
+				Dialogs.error(editor, ex);
+			}
 		}
 
 		public void actionPerformed (ActionEvent e) {
@@ -804,30 +836,7 @@ public class EditorActions {
 					int rc = fc.showDialog(null, mxResources.get("openFile"));
 
 					if (rc == JFileChooser.APPROVE_OPTION) {
-						lastDir = fc.getSelectedFile().getParent();
-
-						try {
-							if (fc.getSelectedFile().getAbsolutePath().toLowerCase().endsWith(".png"))
-								openXmlPng(editor, fc.getSelectedFile());
-							else {
-								Document document = mxXmlUtils.parseXml(mxUtils.readFile(fc.getSelectedFile().getAbsolutePath()));
-								if (document != null) {
-									editor.getProgram().clear(editor.getEditorToolBar());
-									ProgramCodec codec = new ProgramCodec(editor.getProgram(), document, false);
-									codec.decode(document.getDocumentElement(), graph.getModel());
-									codec.announceDone();
-									editor.setCurrentFile(fc.getSelectedFile());
-
-									resetEditor(editor);
-								}
-								else
-									throw new IOException("Could not parse XML document!");
-							}
-						}
-						catch (IOException ex) {
-							ex.printStackTrace(System.err);
-							Dialogs.error(editor, ex);
-						}
+						openFile(editor, fc.getSelectedFile());
 					}
 				}
 			}

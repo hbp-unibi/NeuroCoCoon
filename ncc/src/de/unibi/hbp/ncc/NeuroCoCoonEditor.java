@@ -16,6 +16,7 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphSelectionModel;
 import de.unibi.hbp.ncc.editor.BasicGraphEditor;
+import de.unibi.hbp.ncc.editor.EditorActions;
 import de.unibi.hbp.ncc.editor.EditorMenuBar;
 import de.unibi.hbp.ncc.editor.EditorPalette;
 import de.unibi.hbp.ncc.editor.EditorToolBar;
@@ -55,11 +56,14 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Collection;
 
 public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeListener, InspectorController
@@ -501,7 +505,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 				Object value = ((mxICell) cell).getValue();
 				if (value instanceof Connectable) {
 					Connectable con = (Connectable) value;
-					return (con.isValidSynapseSource() || con.isValidProbeSource()) && super.isValidSource(cell);
+					return con.isAnyValidSource() && super.isValidSource(cell);
 				}
 			}
 			return super.isValidSource(cell);
@@ -513,7 +517,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 				Object value = ((mxICell) cell).getValue();
 				if (value instanceof Connectable) {
 					Connectable con = (Connectable) value;
-					return (con.isValidSynapseTarget() || con.isValidProbeTarget()) && super.isValidSource(cell);
+					return con.isAnyValidTarget() && super.isValidSource(cell);
 				}
 			}
 			return super.isValidSource(cell);  // only the isValidSource method implements the general (direction-agnostic) checks
@@ -526,29 +530,22 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 				if (edge instanceof mxICell) {
 					Object edgeValue = ((mxICell) edge).getValue();
 					if (edgeValue instanceof AnyConnection) {
+						AnyConnection con = (AnyConnection) edgeValue;
 						if (source instanceof mxICell) {
 							Object sourceValue = ((mxICell) source).getValue();
-							if (sourceValue instanceof Connectable) {
-								Connectable sourceCon = (Connectable) sourceValue;
-								if (edgeValue instanceof ProbeConnection && !sourceCon.isValidProbeSource())
-									return false;
-								if (edgeValue instanceof NeuronConnection && !sourceCon.isValidSynapseSource())
-									return false;
-							}
+							if (sourceValue instanceof Connectable &&
+									!((Connectable) sourceValue).isValidSource(con.getEdgeKind()))
+								return false;
 						}
 						if (target instanceof mxICell) {
 							Object targetValue = ((mxICell) target).getValue();
-							if (targetValue instanceof Connectable) {
-								Connectable targetCon = (Connectable) targetValue;
-								if (edgeValue instanceof ProbeConnection && !targetCon.isValidProbeTarget())
-									return false;
-								if (edgeValue instanceof NeuronConnection && !targetCon.isValidSynapseTarget())
-									return false;
-							}
+							if (targetValue instanceof Connectable &&
+									!((Connectable) targetValue).isValidTarget(con.getEdgeKind()))
+								return false;
 						}
 					}
 				}
-				return true;
+				return true;  // allow any unexpected edge connections not related to our language constructs (there should be none)
 			}
 			else
 				return false;
@@ -577,7 +574,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 				Object sourceValue = ((mxICell) source).getValue();
 				if (sourceValue instanceof Connectable) {
 					Connectable sourceCon = (Connectable) sourceValue;
-					if (sourceCon.isValidProbeSource() && !sourceCon.isValidSynapseSource()) {
+					if (sourceCon.isValidSource(Connectable.EdgeKind.PROBE)) {  // data plots are the only valid probe sources (and are not valid as anys other kind of source)
 						ProbeConnection probeConnection = new ProbeConnection();
 						mxCell edge = (mxCell) super.createEdge(parent, id, probeConnection, source, target,
 																ProbeConnection.CREATOR.getCellStyle());
@@ -609,14 +606,44 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 	}
 
 	public static void main (String[] args) {
-		// FIXME use SwingUtilities.invokeLater?
-		// TODO support a file name argument to open that .ncc file
+		final File open;
+		if (args.length == 0)
+			open = null;
+		else {
+			open = new File(args[0]);
+			if (!open.isFile()) {
+				System.err.println("Cannot open document " + open);
+				System.exit(10);
+			}
+			if (args.length > 1)
+				System.err.println("Only a single file can be opened from the command line.");
+		}
+		SwingUtilities.invokeLater(() -> {
+			createAndShowGUI(open);
+		});
+	}
+
+	public static void createAndShowGUI (File open) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
-		catch (Exception excp) {
-			excp.printStackTrace(System.err);
+		catch (ReflectiveOperationException | UnsupportedLookAndFeelException ex) {
+			ex.printStackTrace(System.err);
 		}
+
+		// example, how to force a certain platform-independent look&feel
+/*
+		try {
+			for (UIManager.LookAndFeelInfo laf: UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(laf.getName())) {
+					UIManager.setLookAndFeel(laf.getClassName());
+				}
+			}
+		}
+		catch (ReflectiveOperationException | UnsupportedLookAndFeelException ex) {
+			ex.printStackTrace(System.err);
+		}
+*/
 
 		mxSwingConstants.SHADOW_COLOR = Color.LIGHT_GRAY;
 		mxConstants.W3C_SHADOWCOLOR = "#D3D3D3";
@@ -626,6 +653,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 			editor.initialize();  // moved from constructor so that subclass object fields have been initialized already
 			JFrame frame = editor.createFrame(new EditorMenuBar(editor), 1200, 800);
 			frame.setVisible(true);
+			if (open != null)
+				EditorActions.getOpenAction().openFile(editor, open);
 		}
 		catch (Throwable t) {
 			t.printStackTrace(System.err);

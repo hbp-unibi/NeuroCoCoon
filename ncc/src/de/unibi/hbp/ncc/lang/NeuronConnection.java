@@ -46,7 +46,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    }
 
    public NeuronConnection (Namespace<SynapseType> synapseTypeNamespace, SynapseType synapseType, String userLabel) {
-      super(userLabel);
+      super(Connectable.EdgeKind.SYNAPSE, userLabel);
       if (synapseTypeNamespace == null)
          synapseTypeNamespace = globalSynapseTypeNamespace;
       this.synapseTypeNamespace = synapseTypeNamespace;

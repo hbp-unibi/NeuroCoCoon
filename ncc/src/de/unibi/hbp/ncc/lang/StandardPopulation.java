@@ -88,8 +88,6 @@ public class StandardPopulation extends NeuronPopulation {
       return new StandardPopulation(this);
    }
 
-   public boolean isValidSynapseTarget () { return true; }
-
    public NeuronType getNeuronType () { return neuronType.getValue(); }
 
 }

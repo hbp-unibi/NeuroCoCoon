@@ -1,7 +1,10 @@
 package de.unibi.hbp.ncc.env;
 
 import com.eclipsesource.json.JsonValue;
+import com.leaningtech.client.Document;
+import com.leaningtech.client.Element;
 import com.leaningtech.client.Global;
+import com.leaningtech.client.HTMLImageElement;
 import com.leaningtech.client.JSString;
 
 public class JavaScriptBridge {
@@ -44,9 +47,13 @@ public class JavaScriptBridge {
       }
    }
 
-   // FIXME show image in pre-existing image element instead
-   public static void openNewWindow (String url) {
-      Global.open(Global.JSString(url), Global.JSString("_blank"));
+   public static void showOnPage (String url, String targetId) {
+      Document d = Global.document;
+      Element e = d.getElementById(Global.JSString(targetId));
+      if (!(e instanceof HTMLImageElement))
+         throw new IllegalArgumentException("no <img> element found for id " + targetId);
+      HTMLImageElement img = (HTMLImageElement) e;
+      img.set_src(Global.JSString(url));
    }
 
    /*

@@ -293,6 +293,10 @@ public final class Iterators {
       return !exactFit || !iter.hasNext();  // all elements consumed or caller does not care
    }
 
+   public static <T> boolean collect (Iterable<T> iterable, T[] destination, boolean exactFit) {
+      return collect(iterable.iterator(), destination, exactFit);
+   }
+
    public static <T> List<T> asList (Iterator<T> iter) {
       List<T> result = new ArrayList<>();
       while (iter.hasNext())
@@ -316,4 +320,13 @@ public final class Iterators {
    public static <T> Iterable<T> emptyIterable () {
       return Collections::emptyIterator;
    }
+
+   public static <T> boolean isEmpty (Iterator<T> iter) {
+      return !iter.hasNext();
+   }
+
+   public static <T> boolean isEmpty (Iterable<T> iterable) {
+      return isEmpty(iterable.iterator());
+   }
+
 }

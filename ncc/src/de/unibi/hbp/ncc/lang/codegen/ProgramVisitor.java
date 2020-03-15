@@ -4,13 +4,17 @@ import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.env.NmpiClient;
 import de.unibi.hbp.ncc.graph.AbstractCellsVisitor;
+import de.unibi.hbp.ncc.lang.Connectable;
+import de.unibi.hbp.ncc.lang.DataPlot;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronConnection;
+import de.unibi.hbp.ncc.lang.NeuronPopulation;
 import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.Program;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.SynapseType;
+import de.unibi.hbp.ncc.lang.utils.Iterators;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
@@ -34,7 +38,6 @@ public class ProgramVisitor implements CodeGenVisitor {
       templateGroup = new STGroupFile(Objects.requireNonNull(
             getClass().getClassLoader().getResource("de/unibi/hbp/ncc/resources/python.stg")));
       for (NetworkModule moduleInstance: global.getOneModuleInstancePerUsedClass()) {
-         // TODO do this only once per moduleSubclass, not per instance
          STGroupFile moduleTemplateGroup = new STGroupFile(Objects.requireNonNull(
                getClass().getClassLoader().getResource("de/unibi/hbp/ncc/lang/modules/" +
                                                              moduleInstance.getTemplateGroupFileName())));
@@ -49,13 +52,42 @@ public class ProgramVisitor implements CodeGenVisitor {
    public void check (ErrorCollector diagnostics) {
       AbstractCellsVisitor edgeChecker = new AbstractCellsVisitor(true) {
          @Override
-         protected void beginVertex (mxICell vertex, LanguageEntity entity) {
-            // TODO check unused spike/poisson sources --> Warning
-            // TODO check unconnected standard populations --> Warning
-            // TODO check unconnected non-optional module ports --> Error
-            // TODO check no plots defined, no regular/poisson sources defined
+         protected void beginEntityVertex (mxICell vertex, LanguageEntity entity) {
+            if (entity instanceof NeuronPopulation) {
+               NeuronPopulation pop = (NeuronPopulation) entity;
+               if (!pop.hasAnyOutgoingSynapses() && !pop.hasAnyIncomingProbes())
+                  diagnostics.recordWarning(entity, pop.getLongDisplayName() +
+                        " contributes neither to the network nor to any plot.");
+               if (pop.isValidTarget(Connectable.EdgeKind.SYNAPSE) && !pop.hasAnyIncomingSynapses())
+                  diagnostics.recordWarning(entity, pop.getLongDisplayName() +
+                        " does not receive any input from the network.");
+            }
+            if (entity instanceof NetworkModule) {
+               NetworkModule module = (NetworkModule) entity;
+               module.checkStaticSemantics(program, diagnostics);
+            }
+            if (entity instanceof DataPlot) {
+               DataPlot plot = (DataPlot) entity;
+               if (!plot.hasAnyOutgoingProbes())
+                  diagnostics.recordWarning(entity, plot.getLongDisplayName() + " will not visualise any data.");
+            }
          }
 
+         @Override
+         protected void beginPortVertex (mxICell vertex, NetworkModule.Port port) {
+            NetworkModule module = port.getOwningModule();
+            if (!module.isOptionalPort(port)) {
+               if (port.getDirection() == NetworkModule.Port.Direction.IN) {
+                  if (!port.hasAnyIncomingSynapses())
+                     diagnostics.recordError(module, port.getLongDisplayName() + " requires synapse input.");
+               }
+               else {  // unused non-optional output ports are only a warning; optional output ports are only intended for debugging or deeper analysis and never produce a warning
+                  if (!port.hasAnyOutgoingSynapses() && !port.hasAnyIncomingProbes())
+                     diagnostics.recordWarning(module, port.getLongDisplayName() +
+                           " contributes neither to the network nor to any plot.");
+               }
+            }
+         }
 
          @Override
          protected void visitOutgoingEdge (mxICell edge, mxICell source, mxICell target, LanguageEntity entity) {
@@ -74,10 +106,30 @@ public class ProgramVisitor implements CodeGenVisitor {
                      diagnostics.recordError(entity, "Mismatch in neuron count: " +
                            sourceCount + " != " + targetCount);
                }
+               if (AttributeUtils.definitelyNotEqual(
+                     AttributeUtils.isConductanceBased(source), AttributeUtils.isConductanceBased(target)))
+                  diagnostics.recordError(entity, "Connection between conductance-based and current-based neurons.");
             }
             else if (entity instanceof ProbeConnection) {
-               // TODO check that the target provides the data series on the connection
-               // TODO check if first neuron index and neuron count are within range for the target
+               ProbeConnection connection = (ProbeConnection) entity;
+               if (!((ProbeConnection) entity).hasValidDataSeries())
+                  diagnostics.recordError(entity, AttributeUtils.display(target.getValue()) +
+                        " does not provide data series " + connection.getDataSeries().getDisplayName() + ".");
+               Integer targetNeuronCount = AttributeUtils.getNeuronCount(target);
+               if (targetNeuronCount != null) {
+                  int limit = targetNeuronCount;
+                  int firstIndex = connection.getFirstNeuronIndex();
+                  if (firstIndex < 0 || firstIndex >= limit)
+                     diagnostics.recordError(entity, "Neuron start index " + firstIndex + " is out of range [0, " + limit + ").");
+                  if (connection.isEndLimited()) {
+                     int probeNeuronCount = connection.getNeuronCount();
+                     if (probeNeuronCount < 1)
+                        diagnostics.recordError(entity, "Invalid neuron count " + probeNeuronCount + " at probe.");
+                     if (firstIndex + probeNeuronCount > limit)
+                        diagnostics.recordError(entity, "Neuron count " + probeNeuronCount +
+                              " at probe with start index " + firstIndex + " exceeds target neuron range [0, " + limit + ").");
+                  }
+               }
             }
             else
                throw new IllegalArgumentException("unexpected entity at edge: " + entity);
@@ -125,6 +177,10 @@ public class ProgramVisitor implements CodeGenVisitor {
          }
       };
       edgeChecker.visitGraph(graphModel);
+      if (global.getDataPlots().isEmpty())
+         diagnostics.recordInfo(null, "No data from the network will be plotted.");
+      if (Iterators.isEmpty(global.getSpikeSources()) && Iterators.isEmpty(global.getPoissonSources()))
+         diagnostics.recordInfo(null, "No spikes will be injected into the network.");
    }
 
    public StringBuilder visit (StringBuilder code, ErrorCollector diagnostics) {

@@ -4,17 +4,21 @@ import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.lang.props.StringProp;
 
 public abstract class AnyConnection extends LanguageEntity {
+   private Connectable.EdgeKind edgeKind;
    // TODO use the common enum for edge types in Connectable and consolidate all methods into one version with such an enum parameter
    protected final StringProp userLabel;
 
-   protected AnyConnection (String userLabel) {
+   protected AnyConnection (Connectable.EdgeKind edgeKind, String userLabel) {
+      this.edgeKind = edgeKind;
       this.userLabel = new StringProp("Edge Label", this, userLabel != null ? userLabel : "");
    }
+
+   public Connectable.EdgeKind getEdgeKind () { return edgeKind; }
 
    // this class does not add userLabel to the editable properties automatically
    // so that subclasses have full control over the position in the inspector
 
-   protected String getUserLabelOrNull () {
+   protected String getUserLabelOrNull () {  // normalizes empty labels to null (property never stores null)
       String value = userLabel.getValue();
       return value != null && value.isEmpty() ? null : value;
    }

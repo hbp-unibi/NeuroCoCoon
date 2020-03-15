@@ -6,7 +6,25 @@ import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.view.mxGraph;
-import de.unibi.hbp.ncc.editor.EditorActions.*;
+import de.unibi.hbp.ncc.editor.EditorActions.AlignCellsAction;
+import de.unibi.hbp.ncc.editor.EditorActions.AutosizeAction;
+import de.unibi.hbp.ncc.editor.EditorActions.BackgroundAction;
+import de.unibi.hbp.ncc.editor.EditorActions.ExitAction;
+import de.unibi.hbp.ncc.editor.EditorActions.FlipModuleAction;
+import de.unibi.hbp.ncc.editor.EditorActions.GridColorAction;
+import de.unibi.hbp.ncc.editor.EditorActions.GridStyleAction;
+import de.unibi.hbp.ncc.editor.EditorActions.HistoryAction;
+import de.unibi.hbp.ncc.editor.EditorActions.NewAction;
+import de.unibi.hbp.ncc.editor.EditorActions.PromptPropertyAction;
+import de.unibi.hbp.ncc.editor.EditorActions.SaveAction;
+import de.unibi.hbp.ncc.editor.EditorActions.ScaleAction;
+import de.unibi.hbp.ncc.editor.EditorActions.SelectShortestPathAction;
+import de.unibi.hbp.ncc.editor.EditorActions.SelectSpanningTreeAction;
+import de.unibi.hbp.ncc.editor.EditorActions.ToggleConnectModeAction;
+import de.unibi.hbp.ncc.editor.EditorActions.ToggleGridItem;
+import de.unibi.hbp.ncc.editor.EditorActions.ToggleOutlineItem;
+import de.unibi.hbp.ncc.editor.EditorActions.TogglePropertyItem;
+import de.unibi.hbp.ncc.editor.EditorActions.ToggleRulersItem;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -34,7 +52,7 @@ public class EditorMenuBar extends JMenuBar
 		menu = add(new JMenu(mxResources.get("file")));
 
 		menu.add(editor.bind(mxResources.get("new"), new NewAction(), IMAGE_PATH + "new.gif"));
-		menu.add(editor.bind(mxResources.get("openFile"), new OpenAction(), IMAGE_PATH + "open.gif"));
+		menu.add(editor.bind(mxResources.get("openFile"), EditorActions.getOpenAction(), IMAGE_PATH + "open.gif"));
 
 		menu.addSeparator();
 

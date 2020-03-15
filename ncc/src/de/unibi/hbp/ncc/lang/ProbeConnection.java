@@ -1,7 +1,7 @@
 package de.unibi.hbp.ncc.lang;
 
 import de.unibi.hbp.ncc.editor.EntityCreator;
-import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.FilteredEditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
@@ -14,8 +14,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ProbeConnection extends AnyConnection implements Serializable {
-   private EditableEnumProp<DataSeries> dataSeries;
-   private IntegerProp firstNeuronIndex, neuronCount;  // count == 0 means unlimited
+   private final FilteredEditableEnumProp<DataSeries> dataSeries;
+   private final IntegerProp firstNeuronIndex, neuronCount;  // count == 0 means unlimited
 
    public enum DataSeries implements DisplayNamed, PythonNamed {
       SPIKES("Spikes", "spikes"),
@@ -24,6 +24,7 @@ public class ProbeConnection extends AnyConnection implements Serializable {
       GSYN_INH("gsyn inh", "gsyn_inh"),
       IZHIKEVICH_U("Izhikevich u", "u");
 
+      // TODO add support for y axis label text (at least for all continuous measures, spike trains have a built-in y axis label already)
       private String pythonName, displayName;
 
       DataSeries (String displayName, String pythonName) {
@@ -79,7 +80,7 @@ public class ProbeConnection extends AnyConnection implements Serializable {
    }
 
    public ProbeConnection (DataSeries dataSeries, int firstNeuronIndex, int neuronCount, String userLabel) {
-      super(userLabel);
+      super(Connectable.EdgeKind.PROBE, userLabel);
       this.dataSeries = new ValidDataSeriesForTarget("Data Series", this, dataSeries)
             .addImpact(EditableProp.Impact.CELL_LABEL);
       this.firstNeuronIndex = new NonNegativeIntegerProp("First Neuron #", this, firstNeuronIndex);
@@ -144,10 +145,20 @@ public class ProbeConnection extends AnyConnection implements Serializable {
 
    public DataSeries getDataSeries () { return dataSeries.getValue(); }
 
+   public boolean hasValidDataSeries () { return dataSeries.hasValidValue(); }
+
+   @CodeGenUse
    public int getFirstNeuronIndex () { return firstNeuronIndex.getValue(); }
+
    public int getNeuronCount () { return neuronCount.getValue(); }
+
+   @CodeGenUse
    public boolean isExcerpt () { return firstNeuronIndex.getValue() != 0 || neuronCount.getValue() != 0; }
+
+   @CodeGenUse
    public boolean isEndLimited () { return neuronCount.getValue() != 0; }
+
    // exclusive end index, as needed by Python
+   @CodeGenUse
    public int getNeuronEndIndex () { return firstNeuronIndex.getValue() + neuronCount.getValue(); }
 }

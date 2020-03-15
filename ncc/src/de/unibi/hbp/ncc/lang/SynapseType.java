@@ -3,6 +3,7 @@ package de.unibi.hbp.ncc.lang;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import de.unibi.hbp.ncc.graph.AbstractCellsCollector;
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -68,6 +69,7 @@ public class SynapseType extends NamedEntity {
 
    public enum SynapseKind implements DisplayNamed, PyNNAssociated {
       STATIC("Static", "StaticSynapse");
+      // TODO add a mostly pre-configured STDP synapse type as an alternative
 
       private String displayName, pyNNClassName;
 
@@ -90,6 +92,7 @@ public class SynapseType extends NamedEntity {
    private final EditableEnumProp<ConnectorKind> connectorKind;
    private final DoubleProp weight, delay, probability;
    private final EditableEnumProp<SynapseKind> synapseKind;
+   // TODO provide a multi-case property mechanism like Weight ::= Double(value | RandomDistribution(shape, mean, variance)
 
    public SynapseType (Namespace<SynapseType> namespace, String name, ConnectorKind connectorKind,
                        double weight, double delay, double probability,
@@ -165,11 +168,16 @@ public class SynapseType extends NamedEntity {
    public double getWeight () { return weight.getValue(); }
    public double getDelay () { return delay.getValue(); }
 
+   @CodeGenUse
    public boolean isInhibitory () { return weight.getValue() < 0; }
+
+   @CodeGenUse
    public double getAbsoluteWeight () { return Math.abs(weight.getValue()); }
 
+   @CodeGenUse
    public SynapseKind getSynapseKind () { return synapseKind.getValue(); }
 
+   @CodeGenUse
    public Iterable<ReadOnlyProp<?>> getConnectorParameters () {
       List<ReadOnlyProp<?>> result = new ArrayList<>();
       connectorKind.getValue().addKindSpecificProps(result, this);

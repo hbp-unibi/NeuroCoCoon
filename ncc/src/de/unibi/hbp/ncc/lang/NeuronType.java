@@ -1,5 +1,6 @@
 package de.unibi.hbp.ncc.lang;
 
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableEnumProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -163,8 +164,6 @@ public class NeuronType extends NamedEntity {
       return new NeuronType(this);
    }
 
-   public String getParametersPythonName () { return getDerivedPythonName("npm"); }
-
    public NeuronKind getNeuronKind () { return neuronKind.getValue(); }
 
    public boolean isConductanceBased () { return getNeuronKind().isConductanceBased(); }
@@ -173,6 +172,10 @@ public class NeuronType extends NamedEntity {
       return getNeuronKind().getSupportedDataSeries();
    }
 
+   @CodeGenUse
+   public String getParametersPythonName () { return getDerivedPythonName("npm"); }
+
+   @CodeGenUse
    public Iterable<ReadOnlyProp<?>> getNeuronParameters () {
       List<ReadOnlyProp<?>> result = new ArrayList<>();
       neuronKind.getValue().addKindSpecificProps(result, this);
