@@ -5,10 +5,10 @@
    <title>NeuroCoCoon</title>
    <link rel="stylesheet" href="./lib/collaboratory.bootstrap.css">
    <link rel="stylesheet" href="ncc.css">
-   <script src="https://cjrtnc.leaningtech.com/1.4/loader.js"></script>
+   <script src="https://cjrtnc.leaningtech.com/2.0/loader.js"></script>
 </head>
 <body>
-   <h1><img src="Logo_NCC.png" title="NeuroCoCoon Logo" height="80" alt="Logo"> <b><span class="nccRed">Neuro</span><span  class="nccBlue">Co</span><span class="nccDarkViolet">Coon</span></b> — Neuromorphic Computing Cocoon</h1>
+   <h1><img src="Logo_NCC_80h.png" title="NeuroCoCoon Logo" height="80" width="53" alt="Logo"> <b><span class="nccRed">Neuro</span><span  class="nccBlue">Co</span><span class="nccDarkViolet">Coon</span></b> — Neuromorphic Computing Cocoon</h1>
 
    <script src="./lib/jquery-2.1.4.min.js" charset="utf-8"></script>
    <script src="./lib/hello.all.js" charset="utf-8"></script>
@@ -19,11 +19,11 @@
       // above shortcut does NOT work
       cheerpjInit();
       cjCall("java.lang.System", "setProperty", "java.protocol.handler.pkgs", "com.leaningtech.handlers");
-      cheerpjCreateDisplay(1240,840);
+      cheerpjCreateDisplay(1200,800);  // matches size of created JFrame
       cheerpjRunJar("/app/ncc.jar");  // "de.unibi.hbp.ncc.NeuroCoCoonEditor"
    </script>
-
-   <p><img id="plotDisplay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8f/f/fwAJmgPcTP/7UwAAAABJRU5ErkJggg=="></p>
+   <hr>
+   <img id="plotDisplay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8f/f/fwAJmgPcTP/7UwAAAABJRU5ErkJggg==" alt="Result Plot">
 <!-- base64 for transparent (instead of #fdf violet) 1x1 pixel PNG: VBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8f/f/fwAJmgPcTP/7UwAAAABJRU5ErkJggg== -->
 </body>
 </html>
