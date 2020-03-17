@@ -118,6 +118,7 @@ probe_target_title(probe) ::= <<
 create_group_panel(annoSeries, plot) ::= <<
     Panel(
         <annoSeries.subsidiaryProbes:{annoProbe | <probe_target(annoProbe.item)>.<get_probe_data(annoProbe.item)>}; separator=", ">,
+        ylabel='<annoSeries.item.valueAxisLabel>',
         <if(annoSeries.last)>xlabel="Time (ms)", xticks=True,<endif>
         <! gid='<probe_target_gid(annoProbe.item)>', !>
         data_labels=[<annoSeries.subsidiaryProbes:{annoProbe | '<probe_target_title(annoProbe.item)>'}; separator=", ">],
@@ -128,6 +129,7 @@ create_group_panel(annoSeries, plot) ::= <<
 create_solo_panel(annoProbe) ::= <<
     Panel(
         <probe_target(annoProbe.item)>.<get_probe_data(annoProbe.item)>,
+        ylabel='<annoProbe.item.dataSeries.valueAxisLabel>',
         <if(annoProbe.last)>xlabel="Time (ms)", xticks=True,<endif>
         data_labels=['<probe_target_title(annoProbe.item)>'],
         line_properties= [{'color': '<annoProbe.cyclicColor>'} ]

@@ -13,6 +13,12 @@ public class StringProp extends SimpleEditableProp<String> {
    }
 
    @Override
+   public StringProp addImpact (Impact impact) {  // to get the more precise covariant return type
+      super.addImpact(impact);
+      return this;
+   }
+
+   @Override
    public void setValueFromString (String encodedValue) { setValue(encodedValue); }
 
    @Override

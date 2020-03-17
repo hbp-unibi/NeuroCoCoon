@@ -312,35 +312,6 @@ public class NmpiClient {
       return Collections.emptyList();
    }
 
-   /*
-      submitted jobs:
-           return self._query(self.job_server + self.resource_map["queue"] + "/submitted/?user_id=" + str(self.user_info["id"]), verbose=verbose)
-
-      completed jobs:
-           return self._query(self.job_server + self.resource_map["results"] + "?collab_id=" + str(collab_id), verbose=verbose)
-
-    def _query(self, resource_uri, verbose=False, ignore404=False):
-        """
-        Retrieve a resource or list of resources.
-        """
-        req = requests.get(resource_uri, auth=self.auth,
-                           cert=self.cert, verify=self.verify)
-        if req.ok:
-            if "objects" in req.json():
-                objects = req.json()["objects"]
-                if verbose:
-                    return objects
-                else:
-                    return [obj["resource_uri"] for obj in objects]
-            else:
-                return req.json()
-        elif ignore404 and req.status_code == 404:
-            return None
-        else:
-            self._handle_error(req)
-
-    */
-
    public long submitJob (String code, Platform platform) {
 
       JsonObject jobData = new JsonObject();
@@ -370,16 +341,6 @@ public class NmpiClient {
       else if (jobURL.startsWith("Status "))
          return -3;
       return extractJobId(jobURL);
-      /*
-      Response response = postRequest(getResourceEndPoint("queue"), jobData);
-      lastJobResponse = response.toString();
-      if (response.hasLocation()) {
-         String jobURL = response.getLocation();
-         return extractJobId(jobURL);
-      }
-      else
-         return -1;
-       */
    }
 
    public static class JobInfo {
@@ -399,6 +360,14 @@ public class NmpiClient {
       }
    }
 
+   public String getJobLog (long jobId) {
+      Response result = getRequest(getResourceEndPoint("log") + "/" + jobId);
+      if (result.isError())
+         return null;
+      JsonObject jobLog = result.getJsonValue().asObject();
+      return jobLog.getString("content", "No log content!");
+   }
+
    public JobInfo getJobInfo (long jobId) {
       Response result = getRequest(getResourceEndPoint("queue") + "/" + jobId);
       if (result.isError() && result.getStatusCode() == 404)
@@ -411,40 +380,4 @@ public class NmpiClient {
       return new JobInfo(jobInfo);
    }
 
-   /*
-       def download_data(self, job, local_dir=".", include_input_data=False):
-        """
-        Download output data files produced by a given job to a local directory.
-
-        *Arguments*:
-            :job: a full job description (dict), as returned by `get_job()`.
-            :local_dir: path to a directory into which files shall be saved.
-            :include_input_data: also download input data files.
-        """
-        filenames = []
-        datalist = job["output_data"]
-        if include_input_data:
-            datalist.extend(job["input_data"])
-
-        if datalist:
-            server_paths = [urlparse(item["url"])[2] for item in datalist]
-            if len(server_paths) > 1:
-                common_prefix = os.path.dirname(os.path.commonprefix(server_paths))
-            else:
-                common_prefix = os.path.dirname(server_paths[0])
-            relative_paths = [os.path.relpath(p, common_prefix) for p in server_paths]
-
-            for relative_path, dataitem in zip(relative_paths, datalist):
-                url = dataitem["url"]
-                (scheme, netloc, path, params, query, fragment) = urlparse(url)
-                if not scheme:
-                    url = "file://" + url
-                local_path = os.path.join(local_dir, "job_{}".format(job["id"]), relative_path)
-                dir = os.path.dirname(local_path)
-                _mkdir_p(dir)
-                urlretrieve(url, local_path)
-                filenames.append(local_path)
-
-        return filenames
-    */
 }

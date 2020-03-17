@@ -22,10 +22,9 @@ public abstract class NetworkModule extends NamedEntity
       implements GraphCellConfigurator {
    protected final Namespace<NetworkModule> moreSpecificNamespace;
 
-   private String resourceFileBaseName;  // TODO store file basename (shared between icon and ST4 template file)
+   private String resourceFileBaseName;
    private List<Port> inputPorts, outputPorts;
    private boolean useWideLayout;
-   // TODO provide list of supported plots
 
    private static Namespace<NetworkModule> globalNamespace;
 
@@ -342,11 +341,7 @@ public abstract class NetworkModule extends NamedEntity
    public Iterable<Port> getInputPorts () { return inputPorts; }
    public Iterable<Port> getOutputPorts () { return outputPorts; }
 
-   public void checkStaticSemantics (Program program, ErrorCollector diagnostics) {
-
-   }
-
-   // TODO add an empty module-specific checking method to be invoked from ProgramVisitor.check
+   public void checkStaticSemantics (Program program, ErrorCollector diagnostics) { }
 
    public String getTemplateGroupFileName () { return resourceFileBaseName + ".stg"; }
 

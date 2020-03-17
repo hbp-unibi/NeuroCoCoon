@@ -185,7 +185,7 @@ public class PlotsPanel {
                new MouseAdapter() {
                   @Override
                   public void mouseClicked (MouseEvent e) {
-                     if (e.getClickCount() == 2) {
+                     if (e.getClickCount() == 2 || JavaScriptBridge.isWebPlatform()) {
                         int index = plotList.locationToIndex(e.getPoint());
                         PlotImage plotImage = model.getElementAt(index);
                         plotImage.showDetailsWindow(plotList);

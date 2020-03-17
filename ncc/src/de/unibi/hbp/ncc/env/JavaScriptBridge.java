@@ -48,12 +48,16 @@ public class JavaScriptBridge {
    }
 
    public static void showOnPage (String url, String targetId) {
+      // System.err.println("showOnPage: " + url + " in " + targetId);
       Document d = Global.document;
       Element e = d.getElementById(Global.JSString(targetId));
-      if (!(e instanceof HTMLImageElement))
+      if (e != null) {
+         e.setAttribute(Global.JSString("src"),  Global.JSString(url));
+         // the following does NOT work, maybe with an element that we created via the same API?
+         // ((HTMLImageElement) e).set_src( Global.JSString(url));
+      }
+      else
          throw new IllegalArgumentException("no <img> element found for id " + targetId);
-      HTMLImageElement img = (HTMLImageElement) e;
-      img.set_src(Global.JSString(url));
    }
 
    /*

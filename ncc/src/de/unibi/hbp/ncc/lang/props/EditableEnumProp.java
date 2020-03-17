@@ -36,7 +36,6 @@ public class EditableEnumProp<E extends Enum<E>> extends SimpleEditableProp<E> {
       return new DefaultCellEditor(comboBox);
    }
 
-   // TODO support an optional filter to reduce the set of available values (or to disable the other values)
    @Override
    public TableCellEditor getTableCellEditor (JTable table) {
       return configureEditor(new JComboBox<>(allEnumValues));

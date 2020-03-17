@@ -172,7 +172,7 @@ public class EditorToolBar extends JToolBar
 		checkAction = editor.bind("Check", new CheckAction(), IMAGE_PATH + "check.png");
 		add(checkAction);
 		RunAction runAction = new RunAction();
-		add(runAction.setWrapperAction(editor.bind("Run", runAction, IMAGE_PATH + "run.png")));  // FIXME disabled just for testing
+		add(runAction.setWrapperAction(editor.bind("Run", runAction, IMAGE_PATH + "run.png")));
 		final JComboBox<NmpiClient.Platform> platformCombo =
 				new PartialComboBoxModel<NmpiClient.Platform>(NmpiClient.Platform.values()) {
 					@Override

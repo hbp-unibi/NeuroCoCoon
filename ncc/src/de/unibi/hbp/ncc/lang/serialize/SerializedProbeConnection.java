@@ -5,7 +5,6 @@ import de.unibi.hbp.ncc.lang.ProbeConnection;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
-// TODO factor out a common SerializedAnyConnection superclass for the label
 public class SerializedProbeConnection extends SerializedAnyConnection implements Serializable {
    private ProbeConnection.DataSeries dataSeries;
    private int firstNeuronIndex, neuronCount;

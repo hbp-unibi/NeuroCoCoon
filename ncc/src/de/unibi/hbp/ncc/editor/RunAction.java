@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 
 public class RunAction extends AbstractAction {
 
-   private static int counter = 345;  // some distinctive, easy to recognize value
+   private static int counter = 567;  // some distinctive, easy to recognize value
 
    private static final String TOY_CODE =
          "import sys\n" +
@@ -298,10 +298,10 @@ public class RunAction extends AbstractAction {
                                worker.start();
                             }
                             else if ("error".equals(status)) {
+                               String jobLog = client.getJobLog(jobId);
                                editor.setJobStatus(EditorToolBar.StatusLevel.BAD,
                                                    durationMessage("Error after %d:%02d!", runningSince),
-                                                   "Error message");
-                               // TODO add error message
+                                                   "Log: " + jobLog);
                                finishedJob(jobInfo);
                             }
                             else {

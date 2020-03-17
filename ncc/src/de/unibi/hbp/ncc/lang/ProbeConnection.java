@@ -18,18 +18,18 @@ public class ProbeConnection extends AnyConnection implements Serializable {
    private final IntegerProp firstNeuronIndex, neuronCount;  // count == 0 means unlimited
 
    public enum DataSeries implements DisplayNamed, PythonNamed {
-      SPIKES("Spikes", "spikes"),
-      VOLTAGE("Membrane Voltage", "v"),
-      GSYN_EXC("gsyn exc", "gsyn_exc"),
-      GSYN_INH("gsyn inh", "gsyn_inh"),
-      IZHIKEVICH_U("Izhikevich u", "u");
+      SPIKES("Spikes", "spikes", "Neuron index"),
+      VOLTAGE("Membrane Voltage", "v", "Membrane potential (mV)"),
+      GSYN_EXC("gsyn exc", "gsyn_exc", "Synaptic exc. conductance (uS)"),
+      GSYN_INH("gsyn inh", "gsyn_inh", "Synaptic inh. conductance (uS)"),
+      IZHIKEVICH_U("Izhikevich u", "u", "Membrane recovery (mV/ms)");
 
-      // TODO add support for y axis label text (at least for all continuous measures, spike trains have a built-in y axis label already)
-      private String pythonName, displayName;
+      private String pythonName, displayName, valueAxisLabel;
 
-      DataSeries (String displayName, String pythonName) {
+      DataSeries (String displayName, String pythonName, String valueAxisLabel) {
          this.displayName = displayName;
          this.pythonName = pythonName;
+         this.valueAxisLabel = valueAxisLabel;
       }
 
       @Override
@@ -37,6 +37,8 @@ public class ProbeConnection extends AnyConnection implements Serializable {
 
       @Override
       public String getPythonName () { return pythonName; }
+
+      public String getValueAxisLabel () { return valueAxisLabel; }
 
       public boolean isFiltered () { return this != SPIKES; }
 

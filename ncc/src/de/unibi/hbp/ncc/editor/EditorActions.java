@@ -224,6 +224,15 @@ public class EditorActions {
 		}
 	}
 
+	private static final String WEB_APP_HOME_DIR = "/files";
+
+	private static String getHomeDirectory () {
+		if (JavaScriptBridge.isWebPlatform())
+			return WEB_APP_HOME_DIR;
+		else
+			return System.getProperty("user.dir");
+	}
+
 	@SuppressWarnings("serial")
 	public static class SaveAction extends AbstractAction {
 
@@ -290,9 +299,7 @@ public class EditorActions {
 					else if (editor.getCurrentFile() != null)
 						wd = editor.getCurrentFile().getParent();
 					else
-						wd = System.getProperty("user.dir");
-					if (JavaScriptBridge.isWebPlatform()) wd = "/files";  // TODO do this only if user.dir were used
-					// FIXME file saving and loading in web app
+						wd = getHomeDirectory();
 
 					JFileChooser fc = new JFileChooser(wd);
 
@@ -810,8 +817,7 @@ public class EditorActions {
 				mxGraph graph = editor.getGraphComponent().getGraph();
 
 				if (graph != null) {
-					String wd = (lastDir != null) ? lastDir : System.getProperty("user.dir");
-					if (JavaScriptBridge.isWebPlatform()) wd = "/files";  // TODO do this only if lastDir == null
+					String wd = (lastDir != null) ? lastDir : getHomeDirectory();
 
 					JFileChooser fc = new JFileChooser(wd);
 

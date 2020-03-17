@@ -4,6 +4,8 @@ import com.mxgraph.model.mxICell;
 import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronPopulation;
+import de.unibi.hbp.ncc.lang.PoissonSource;
+import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
 
 final class AttributeUtils {
@@ -26,12 +28,14 @@ final class AttributeUtils {
       Object value = cell.getValue();
       if (value instanceof StandardPopulation)
          return ((StandardPopulation) value).getNeuronType().isConductanceBased();
-      // TODO what about RegularSpikeSource and PoissonSource?
       else if (value instanceof NetworkModule.Port) {
          NetworkModule.Port port = (NetworkModule.Port) value;
          NetworkModule module = port.getOwningModule();
          return module.isConductanceBasedPort(port);
       }
+      else if (value instanceof RegularSpikeSource || value instanceof PoissonSource)
+         return true;
+         // RegularSpikeSource and PoissonSource always use conductance-based neurons
       else
          return null;
    }

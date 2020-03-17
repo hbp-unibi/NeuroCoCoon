@@ -42,6 +42,5 @@ public class EditableNameProp<E extends NamedEntity> extends SimpleEditableProp<
       comboBox.setEditable(false);
       // comboBox.setInputVerifier();
       return new DefaultCellEditor(comboBox);
-      // FIXME combobox does NOT commit changes on itemChanged (but only on focus lost and maybe ENTER?)
    }
 }

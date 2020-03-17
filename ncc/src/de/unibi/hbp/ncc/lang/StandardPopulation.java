@@ -57,6 +57,11 @@ public class StandardPopulation extends NeuronPopulation {
       return neuronType.getValue().getSupportedDataSeries();
    }
 
+   @Override
+   public boolean isValidTarget (EdgeKind edgeKind) {
+      return edgeKind == EdgeKind.SYNAPSE || super.isValidTarget(edgeKind);
+   }
+
    public static final EntityCreator<StandardPopulation> CREATOR = new StandardPopulation.Creator();
 
    private static class Creator implements EntityCreator<StandardPopulation> {

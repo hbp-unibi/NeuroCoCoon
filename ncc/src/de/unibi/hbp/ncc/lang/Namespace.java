@@ -108,7 +108,6 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
       add(memberClazz.cast(Objects.requireNonNull(entity)));
    }
 
-   // TODO make this package scoped again and provide a public safe method (with reference checking) here instead [currently in MasterDetailsEditor]
    void remove (NamedEntity member) {
       String memberName = member.getName();
       T oldValue = members.remove(memberName);
@@ -142,12 +141,10 @@ public class Namespace<T extends NamedEntity> implements Iterable<T> {
    }
 
    void renameTo (NamedEntity member, String futureName) {
-      // TODO implement this with atomic model notification and use it
       if (!canRenameTo(member, futureName))
          throw new LanguageException(member, "name " + futureName + " conflicts with an existing name");
       if (futureName.equals(member.getName()))
          return;  // a no-op
-      // TODO need an atomic way to rename something in the namespace (without temporarily removing it and adding it back) to avoid loss of combo box selections
       if (listModel != null)
          listModel.setNotificationsEnabled(false);
       remove(member);

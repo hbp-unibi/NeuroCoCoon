@@ -1,16 +1,17 @@
 package de.unibi.hbp.ncc.lang;
 
 import com.mxgraph.model.mxICell;
+import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.StringProp;
 
 public abstract class AnyConnection extends LanguageEntity {
    private Connectable.EdgeKind edgeKind;
-   // TODO use the common enum for edge types in Connectable and consolidate all methods into one version with such an enum parameter
    protected final StringProp userLabel;
 
    protected AnyConnection (Connectable.EdgeKind edgeKind, String userLabel) {
       this.edgeKind = edgeKind;
-      this.userLabel = new StringProp("Edge Label", this, userLabel != null ? userLabel : "");
+      this.userLabel = new StringProp("Edge Label", this, userLabel != null ? userLabel : "")
+            .addImpact(EditableProp.Impact.CELL_LABEL);
    }
 
    public Connectable.EdgeKind getEdgeKind () { return edgeKind; }
