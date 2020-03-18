@@ -38,8 +38,10 @@ public class ProbeConnection extends AnyConnection implements Serializable {
       @Override
       public String getPythonName () { return pythonName; }
 
+      @CodeGenUse
       public String getValueAxisLabel () { return valueAxisLabel; }
 
+      @CodeGenUse
       public boolean isFiltered () { return this != SPIKES; }
 
       public boolean isContinuous () { return isFiltered(); }  // the same subset, just by coincidence
