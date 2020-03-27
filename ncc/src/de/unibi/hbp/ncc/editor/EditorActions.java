@@ -233,13 +233,13 @@ public class EditorActions {
 			return System.getProperty("user.dir");
 	}
 
+	protected static String lastDir = null;
+	// hack to make all Open/Save/Save As actions share the same idea of the current directory
+
 	@SuppressWarnings("serial")
 	public static class SaveAction extends AbstractAction {
 
 		protected boolean showDialog;
-
-		protected static String lastDir = null;  // hack to make all Save/Save As actions share the same idea of the current directory
-		// this is still different from the current directory for Open
 
 		public SaveAction (boolean showDialog) {
 			this.showDialog = showDialog;
@@ -341,8 +341,12 @@ public class EditorActions {
 
 					if (selectedFilter instanceof DefaultFileFilter) {
 						String ext = ((DefaultFileFilter) selectedFilter).getExtension();
-						if (!filename.toLowerCase().endsWith(ext))
+						if (!filename.toLowerCase().endsWith(ext)) {
+							int lastDot = filename.lastIndexOf('.');
+							if (lastDot > 0)  // dot present and not at very start of name
+								filename = filename.substring(0, lastDot);  // strp last extension
 							filename += ext;
+						}
 					}
 
 					if (new File(filename).exists()
@@ -743,7 +747,6 @@ public class EditorActions {
 
 	@SuppressWarnings("serial")
 	public static class OpenAction extends AbstractAction {
-		protected String lastDir;
 
 		private OpenAction () { }  // prevent creation of multiple instances with diverging lastDir values
 

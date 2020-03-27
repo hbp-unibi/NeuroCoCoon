@@ -2370,7 +2370,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 		// but toggle for right mouse buttons requires CTRL to be pressed.
 	}
 
-	public static boolean isShortcutDown (InputEvent event) {  // Command kex on Mac, Control everywhere else
+	public static boolean isShortcutDown (InputEvent event) {  // Command key on Mac, Control everywhere else
 		return mxUtils.IS_MAC ? event.isMetaDown() : event.isControlDown();
 	}
 

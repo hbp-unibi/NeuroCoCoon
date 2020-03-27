@@ -23,7 +23,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    public static void setGlobalSynapseTypeNamespace (Namespace<SynapseType> ns) { globalSynapseTypeNamespace = ns; }
 
    protected Object writeReplace () throws ObjectStreamException {
-      return new SerializedNeuronConnection(synapseType.getValue(), userLabel.getValue());
+      return new SerializedNeuronConnection(synapseType.getValue(), userLabel.getValue(), routingStyle.getValue());
    }
 
    // readObject method for the serialization proxy pattern
@@ -37,6 +37,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
       super.addEditableProps(list);
       list.add(synapseType);
       list.add(userLabel);  // defined in superclass, positioned by subclass
+      list.add(routingStyle);
       return list;
    }
 
@@ -45,8 +46,9 @@ public class NeuronConnection extends AnyConnection implements Serializable {
       return synapseType.getValue().addExportedEditableProps(list);
    }
 
-   public NeuronConnection (Namespace<SynapseType> synapseTypeNamespace, SynapseType synapseType, String userLabel) {
-      super(Connectable.EdgeKind.SYNAPSE, userLabel);
+   public NeuronConnection (Namespace<SynapseType> synapseTypeNamespace, SynapseType synapseType, String userLabel,
+                            RoutingStyle routingStyle) {
+      super(Connectable.EdgeKind.SYNAPSE, userLabel, routingStyle);
       if (synapseTypeNamespace == null)
          synapseTypeNamespace = globalSynapseTypeNamespace;
       this.synapseTypeNamespace = synapseTypeNamespace;
@@ -60,15 +62,15 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    }
 
    public NeuronConnection (SynapseType synapseType) {
-      this(null, synapseType, null);
+      this(null, synapseType, null, null);
    }
 
    public NeuronConnection () {
-      this(null, null, null);
+      this(null, null, null, null);
    }
 
    protected NeuronConnection (NeuronConnection orig) {
-      this(orig.synapseTypeNamespace, orig.synapseType.getValue(), orig.userLabel.getValue());
+      this(orig.synapseTypeNamespace, orig.synapseType.getValue(), orig.userLabel.getValue(), orig.routingStyle.getValue());
    }
 
    @Override
@@ -88,7 +90,7 @@ public class NeuronConnection extends AnyConnection implements Serializable {
    public SynapseType getSynapseType () { return synapseType.getValue(); }
 
    @Override
-   public String getCellStyle () {
+   protected String getEdgeStyle () {
       return synapseType.getValue().getCellStyle();
    }
 

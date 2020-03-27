@@ -13,8 +13,8 @@ define_module_instance(modinst) ::= <<
 >>
 
 // ref_ templates for use in Python function arguments of build_<module>_instance templates
-ref_neuronTypeKind(ntyp) ::= "sim.<pop.neuronType.neuronKind.pythonName>"
-ref_neuronTypeParams(ntyp) ::= "<pop.neuronType.parametersPythonName>"
+ref_neuronTypeKind(ntyp) ::= "sim.<ntyp.neuronKind.pythonName>"
+ref_neuronTypeParams(ntyp) ::= "<ntyp.parametersPythonName>"
 ref_neuronType(ntyp) ::= "<ref_neuronTypeKind(ntyp)>, <ref_neuronTypeParams(ntyp)>"
 
 define_population(pop) ::= <<
@@ -49,7 +49,7 @@ port_population(port) ::= <<
 // ref_ templates for use in Python function arguments of build_<module>_instance templates
 ref_synapseTypeConnectorKind(styp) ::= <<
 <if(!styp.connectorKind.kindSpecificProps)><\\>
-<styp.connectorKind.pythonName>, <\\>
+<styp.connectorKind.pythonName><\\>
 <else><\\>
 sim.<styp.connectorKind.pyNNClassName>(<styp.connectorParameters:{it | <it.pythonName>=<it.value>}; separator=", ">)<\\>
 <endif>
@@ -58,7 +58,7 @@ ref_synapseTypeSynapseKind(styp) ::= <<
 sim.<styp.synapseKind.pyNNClassName>(weight=<styp.absoluteWeight>, delay=<styp.delay>)<\\>
 <if(styp.inhibitory)>, receptor_type="inhibitory"<endif>
 >>
-ref_synapseType(styp) ::= "<ref_synapseTypeConnectorKind(styp)>, <ref_synapseTypeConnectorKind(styp)>"
+ref_synapseType(styp) ::= "<ref_synapseTypeConnectorKind(styp)>, <ref_synapseTypeSynapseKind(styp)>"
 
 define_oneSynapse(con) ::= <<
 sim.Projection(<\\>
@@ -88,19 +88,12 @@ instrument_portProbes(port) ::= <<
 >>
 
 instrument_modulePortProbes(modinst) ::= <<
-<modinst.outputPorts:instrument_portProbes()>
->>
-
-probe_target_gid(probe) ::= <<
-<if(probe.targetNamedEntity)><probe.targetNamedEntity.unadornedPythonName><else><port_gid(probe.targetModulePort)><endif>
->>
-
-port_gid(port) ::= <<
-<port.owningModule.unadornedPythonName>_<port.directionAsString>_<port.unadornedPythonName>
+<modinst.outputPorts:instrument_portProbes(); separator="\n">
 >>
 
 get_probe_data(probe) ::= <<
-get_data().segments[0].<if(probe.dataSeries.filtered)>filter(name='<probe.dataSeries.pythonName>')[0]<else>spiketrains<endif>
+<if(probe.excerpt)>[<if(probe.startLimited)><probe.firstNeuronIndex><endif>:<if(probe.endLimited)><probe.neuronEndIndex><endif>]<endif>
+.get_data().segments[0].<if(probe.dataSeries.filtered)>filter(name='<probe.dataSeries.pythonName>')[0]<else>spiketrains<endif>
 >>
 
 port_title(port) ::= <<
@@ -111,24 +104,20 @@ probe_target_title(probe) ::= <<
 <if(probe.targetNamedEntity)><probe.targetNamedEntity.name><else><port_title(probe.targetModulePort)><endif>
 >>
 
-// TODO code generation for analog signals
-// TODO cyclic multi-colored graphs
-// TODO legend fix still required?
-
 create_group_panel(annoSeries, plot) ::= <<
     Panel(
-        <annoSeries.subsidiaryProbes:{annoProbe | <probe_target(annoProbe.item)>.<get_probe_data(annoProbe.item)>}; separator=", ">,
+        <annoSeries.subsidiaryProbes:{annoProbe | <probe_target(annoProbe.item)><get_probe_data(annoProbe.item)>}; separator=", ">,
         ylabel='<annoSeries.item.valueAxisLabel>',
         <if(annoSeries.last)>xlabel="Time (ms)", xticks=True,<endif>
-        <! gid='<probe_target_gid(annoProbe.item)>', !>
-        data_labels=[<annoSeries.subsidiaryProbes:{annoProbe | '<probe_target_title(annoProbe.item)>'}; separator=", ">],
+        data_labels=['<annoSeries.subsidiaryProbes:{annoProbe | <probe_target_title(annoProbe.item)>}; separator=", ">'<\\>
+        <annoSeries.subsidiaryProbes:{annoProbe | <if(!annoProbe.first)>, None<endif>}>],
         line_properties= [<annoSeries.subsidiaryProbes:{annoProbe | {'color': '<annoProbe.cyclicColor>'\}}; separator=", ">]
     ),
 >>
 
 create_solo_panel(annoProbe) ::= <<
     Panel(
-        <probe_target(annoProbe.item)>.<get_probe_data(annoProbe.item)>,
+        <probe_target(annoProbe.item)><get_probe_data(annoProbe.item)>,
         ylabel='<annoProbe.item.dataSeries.valueAxisLabel>',
         <if(annoProbe.last)>xlabel="Time (ms)", xticks=True,<endif>
         data_labels=['<probe_target_title(annoProbe.item)>'],
@@ -138,15 +127,14 @@ create_solo_panel(annoProbe) ::= <<
 
 create_plot(plot, target) ::= <<
 fig = Figure(
-<if (plot.combineSameKindData)><\\>
-<plot.contributingDataSeries:create_group_panel(plot); separator="\n"><\\>
-<else><\\>
-<plot.outgoingProbesSorted:create_solo_panel(); separator="\n"><\\>
-<endif><\\>
+<if (plot.combineSameKindData)>
+<plot.contributingDataSeries:create_group_panel(plot); separator="\n">
+<else>
+<plot.outgoingProbesSorted:create_solo_panel(); separator="\n">
+<endif>
   title="<plot.name>",
   annotations="Simulated with <target.displayName>"
 )
-fix_legends(fig)
 fig.save("<plot.outputFileName>")
 fig.fig.clear()
 >>
@@ -184,18 +172,8 @@ sim.setup(timestep=<prog.timeStep>)
 sim.run(runtime)
 
 <if(!scope.dataPlots.empty)>
-from matplotlib.axes import Axes
-
-def fix_legends(pynn_fig):
-   for panel in pynn_fig.fig.get_children():
-      if isinstance(panel, Axes):
-         gids = [ child.get_gid() for child in panel.get_children() if child.get_gid() ]
-         if gids:
-            panel.legend(gids[0].split(', '))
-
 
 <scope.dataPlots:create_plot(target); separator="\n">
-
 
 if options.image_viewer != '-':
   import subprocess

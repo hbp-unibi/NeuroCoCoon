@@ -129,37 +129,20 @@ public class EditorPalette extends JPanel
 	private static final int TILE_SIZE = 64;
 	private static final int MAX_ICON_SIZE = TILE_SIZE * 3 / 4;
 
-	public void setPreferredWidth(int width)
-	{
+	public void setPreferredWidth (int width) {
 		int cols = Math.max(1, width / TILE_SIZE);
 		setPreferredSize(new Dimension(width, (getComponentCount() * TILE_SIZE / cols) + 30));
 		revalidate();
 	}
 
-	public void addEdgeTemplate(final String name, ImageIcon icon, String style, int width, int height,
-								EntityCreator<?> value)
-	{
-		mxGeometry geometry = new mxGeometry(0, 0, width, height);
-		geometry.setTerminalPoint(new mxPoint(0, height), true);
-		geometry.setTerminalPoint(new mxPoint(width, 0), false);
-		geometry.setRelative(true);
-
-		mxCell cell = new mxCell(value, geometry, style);
-		cell.setEdge(true);
-
-		addTemplate(name, name, icon, cell);
-	}
-
-	public void addTemplate(final String name, ImageIcon icon, String style, int width, int height, EntityCreator<?> value)
-	{
+	public void addTemplate (final String name, ImageIcon icon, String style, int width, int height, EntityCreator<?> value) {
 		mxCell cell = new mxCell(value, new mxGeometry(0, 0, width, height), style);
 		cell.setVertex(true);
 
 		addTemplate(name, name, icon, cell);
 	}
 
-	public void addEdgeTemplate (EntityCreator<?> creator)
-	{
+	public void addEdgeTemplate (EntityCreator<?> creator) {
 		int width = creator.getInitialCellWidth(),
 				height = creator.getInitialCellHeight();
 		mxGeometry geometry = new mxGeometry(0, 0, width, height);
@@ -175,8 +158,7 @@ public class EditorPalette extends JPanel
 					cell);
 	}
 
-	public void addTemplate (EntityCreator<?> creator)
-	{
+	public void addTemplate (EntityCreator<?> creator) {
 		mxCell cell = new mxCell(creator, new mxGeometry(0, 0,
 														 creator.getInitialCellWidth(), creator.getInitialCellHeight()),
 								 creator.getCellStyle());

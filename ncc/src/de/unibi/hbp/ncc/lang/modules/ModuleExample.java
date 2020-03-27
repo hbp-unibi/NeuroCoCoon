@@ -20,8 +20,8 @@ public class ModuleExample extends NetworkModule {
 
    public ModuleExample (Namespace<NetworkModule> namespace, String name) {
       super(namespace, name, CREATOR.getResourceFileBaseName());
-      inputPortDimensions = Arrays.asList(1, 2);
-      outputPortDimensions = Arrays.asList(4, 8);
+      inputPortDimensions = Arrays.asList(2, 4);
+      outputPortDimensions = Arrays.asList(2, 4, 2 * 4);
    }
 
    public ModuleExample () {
@@ -39,7 +39,7 @@ public class ModuleExample extends NetworkModule {
       if (direction == Port.Direction.IN)
          return Arrays.asList("in X", "in Y");
       else if (direction == Port.Direction.OUT)
-         return Arrays.asList("out X", "out Y", "gq M");
+         return Arrays.asList("out X", "out Y", "result");
       else
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }

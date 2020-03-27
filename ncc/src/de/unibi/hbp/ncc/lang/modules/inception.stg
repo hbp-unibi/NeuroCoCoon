@@ -1,0 +1,24 @@
+define_inception_builder() ::= <<
+def build_inception_group(min_stages, max_stages, num_neurons, neuron_kind, neuron_params, conn_prob, weight_exc, syn_delay):
+    input_pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="input")
+    branches_range = range(min_stages, max_stages + 1)
+    branch_outputs = []
+
+    # create branches stage by stage
+    for branch_len in branches_range:
+        prev_pop = input_pop
+        for stage_index in range(0, branch_len):
+            pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="pop_" + str(branch_len) + "_" + str(stage_index + 1))
+            sim.Projection(prev_pop, pop, sim.FixedProbabilityConnector(p_connect=conn_prob), sim.StaticSynapse(weight=weight_exc, delay=syn_delay))
+            prev_pop = pop
+        branch_outputs.append(prev_pop)
+
+    output_pop = sim.Assembly(*branch_outputs, label="output")
+    return { 'in': [ input_pop ], 'out': [ output_pop ] + branch_outputs }  # return list of input ports and output ports
+>>
+
+build_inception_instance(incept) ::= <<
+build_inception_group(<incept.minimumNumberOfStages>, <incept.maximumNumberOfStages>, <\\>
+<incept.numberOfNeuronsPerPopulation>, <ref_neuronType(incept.neuronType)>, <\\>
+<incept.connectionProbability>, <incept.excitationWeight>, <incept.synapseDelay>)
+>>

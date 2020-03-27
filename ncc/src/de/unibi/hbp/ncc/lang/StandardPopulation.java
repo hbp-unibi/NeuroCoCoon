@@ -32,7 +32,9 @@ public class StandardPopulation extends NeuronPopulation {
       if (neuronType == null)
          neuronType = neuronTypes.get("Default");
       this.neuronType = new EditableNameProp<>("Neuron Type", NeuronType.class, this,
-                                               Objects.requireNonNull(neuronType), neuronTypes);
+                                               Objects.requireNonNull(neuronType), neuronTypes)
+            .addImpact(EditableProp.Impact.OTHER_PROPS_VALUES)
+            .addImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY);
    }
 
    public StandardPopulation (Namespace<NeuronPopulation> namespace, String name) {

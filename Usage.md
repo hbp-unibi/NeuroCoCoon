@@ -109,7 +109,10 @@ with input port along the top border and output port along the bottom border, in
 the left and right border respectively. This is a purely cosmetic choice to get a better general layout of the
 visual network architecture. Similarly, the box for a module instance my be resized graphically to get a more
 appropriate spacing between ports.
-  
+
+The drawing area for the network graph automatically extends to the right or to the bottom, if you drag any node so that
+it extends beyond the current boundaries.
+
 ### Adding Synapses
 
 Synapses are the most prevalent kind of edges in the network graph. Such an edge between two neuron populations usually
@@ -170,12 +173,52 @@ edge, if any valid kind exists, based on the source and target nodes involved.
 ### Plotting Data
 
 Simulation results are provided in the form of plots that monitor spiking behaviour or continuous state variables of
-selected neurons over the course of the simulation. Which neuron populations to mnitor and what data to collect is
+selected neurons over the course of the simulation. Which neuron populations to monitor and what data to collect is
 also represented visually in the graph of the network.
 
-TODO
+to create a plot composed of one or more panels, drag a **Data Plot** node from the palette into the main view.
+This node needs to be connected to neuron populations or ports of network module instances by drawing **Data Probe**
+connections. A probe starts at the data plot node and ends at the target node to be monitored, as if the data plot
+node were measuring device. The probe connection is annotated with the kind of data to record and collect from the
+target. In addition, a probe can be limited to just one sub-range of the neurons in the target node, because it is
+often not practical to monitor all individual neurons of a population.
+
+After running a simulation of the network small thumbnail images of all data plots are shown in the **Results** tab
+of the details area. Double-clicking a thumbnail opens the full-sized plot in a separate window. Due to
+security concerns in the HBP collaboratory, cross-origin resource sharing is disabled for the plot images created by
+a remote simulation. Thus, the webb app cannot display thumbnail images with the actual plots. Selecting such a
+placeholder image displays the full-sized plot image at the bottom of the web page, below the virtual screen of the
+web app. 
+
+By default, a data plot consists of one separate panel per monitored data kind. The same kind of data collected from
+multiple target populations is shown as differently colored curves or dots inside this panel. You can reconfigure the
+data plot node in the **Inspector** tab to use a separate panel per probe. This helps to distinguish otherwise
+overlapping curves or spike train dots from multiple populations.
+
 
 ### Mouse Operations
+
+The main view supports the following operations by using the mouse in conjunction with combinations of modifier keys.
+
+* **Left click:** select a graph node or an edge for further editing.
+* **Left double click:** select a node or edge and show its properties in the **Inspector** tab of the details area
+* **Left drag:** move a selected node or draw an edge from the center of a node;
+  dragging from the empty background area outside any node or edge creates a rectangular selection marquee that selects
+  all completely enclosed items
+* **Right click:** opens a context menu with the most important operations for the clicked item
+* **\<Shift> + left click:** add the clicked item to the current selection or remove an already selected item from the
+  current selection
+* **\<Alt> + left drag:** creates a copy of the dragged item at the target position instead of just moving the
+  existing item
+* **\<Shift> + left drag:** limits movement of the dragged item to strictly horizontal or vertical
+* **\<Ctrl> + left drag:** temporarily disables the grid while dragging an item
+* **\<Ctrl> + \<Shift> + left drag:** pans (moves) the drawing area inside the main view
+* **\<Alt> + \<Shift> + left drag:** always creates a rectangular selection marquee, even when starting the drag over
+  an existing item (instead of the empty background)
+* **\<Alt> + left double click:** cycles through the available routing schemes for clicked edge. This has purely a
+  visual effect on the appearance of the graph. The name of the selected routing scheme is shown in the status bar
+  at the bottom of the editor window. Several of the routing schemes provide additional draggable control points along
+  the edge to influence the routing manually
 
 **Usage on macOS:** The listed modifier keys apply to the local application on the Linux/Unix and Windows platforms,
 as well as to the web application. On macOS the \<Option> key replaces the \<Alt> key and the
@@ -183,23 +226,122 @@ as well as to the web application. On macOS the \<Option> key replaces the \<Alt
 modifier keys on that platform. The \<Ctrl> key is used on macOS only to simulate the right
 mouse button with input devices that offer just a single button.
 
-### Important Menu Items
+### Important Menu Operations
 
+The editor provides the usual menu operations for managing editor documents and copying, cutting, deleting the currently
+selected graph nodes with their connecting edges. In addition, there are two sets of menu operations that help you in
+organising the network graph: a **grid** for tidy alignment of graph nodes and a mechanism to **group** related
+sub-structures of the graph.
+
+The grid is enabled or disabled by the menu item **View**>**Grid**. The spacing between the grid locations is set by
+**Diagram**>**Grid**>**Grid Size…**. That submenu also offer options to configure the visual appearance of the grid.
+When the grid is enabled newly created nodes and dragged existing nodes automatically snap to the closets grid location.
+The grid is enabled and shown as small dots by default. You can temporarily disable the snapping to grid locations by
+holding down the \<Ctrl> key while dragging an item. 
+
+To combine the currently selected graph nodes and their connecting edges into a group invoke **Shape**>**Group**.
+Such a group is shown as a grey rectangle with a partly transparent background that encloses all contained nodes.
+A group can be collapsed into a small square to hide its inner nodes. It is also possible to edit the subgraph
+inside a group in isolation (menu **Shape**>**Enter group**) to reduce visual clutter and focus on just a part of
+a larger network. Such groups merely combine manually created nodes and edges of the graph. In contrast to network
+module instances groups have no properties of their own and do not generate structures according to scalable
+architectural principles.
+
+Although not shown in the menus for technical reasons, the standard keyboard shortcuts are available for menu items.
+Usage of the \<Ctrl> versus \<Command> modifier key depends on platform conventions, as explained for the mouse
+operations above. 
+ 
 ## Inspector
 
-![](assets/inspector_population.png)
+The **Inspector** tab in the details area shows all properties of the currently selected graph node or edge in a table.
+Values of properties can be edited, by clicking into the corresponding table cell and entering a new value or by
+selecting from a popup menu with all possible choices. The latter applies, for example, to the neuron type of a
+neuron population, as shown in the image below. Here, the popup menu lists all neuron types that have been defined
+for the currently edited network.
 
-![](assets/inspector_synapsetype.png)
+![Editing the neuron type property of a neuron population node](assets/inspector_population.png "Editing the neuron type property of a neuron population node")
+
+Pressing the \<Return>, \<Enter>, or \<Tab> key commits the property value in the currently focused cell and moves the
+focus to the next property in the row below. Hold down \<Shift> to move upward instead. Obviously invalid entries,
+like invalid characters inside a number, a negative neuron count, or an out-of-range probability must be corrected
+before the value can be committed. More complex conditions that depend on multiple property values, possibly spread
+across multiple elements of the network graph, are checked separately before the simulation can be started.
+
+The narrow first column of the table marks properties with special behaviour. An arrow indicates a property that is
+*not* defined in the selected graph item itself, but is part of the neuron or synapse type referenced by the item.
+Such properties are shown in the table for convenience and can, in general, be edited in the same way as the item's
+own properties. However, as neuron and synapse types are intended to share a consistent set of parameters across
+multiple neuron populations of synapse connections, editing a property of such a type affects all elements of the
+network that refer to this type. If this is not intended, you need to create a separate copy (a *duplicate*) of the
+type and change the **Neuron Type** or **Synapse Type** property of the currently selected item to refer to the new
+type.
+
+![Inspecting a synapse connection with a pre-defined (left) or a user-defined (right) synapse type](assets/inspector_synapsetype.png "Inspecting a synapse connection with a pre-defined (left) or a user-defined (right) synapse type")
+
+The double-circle symbol marks properties that cannot be modified, because they belong to a pre-defined neuron or
+synapse type. The image above demonstrates this difference, where the synapse inspected in the left part references
+a pre-defined synapse type. The properties of this synapse type are thus marked with an arrow (referenced property)
+and the double-circle (read-only predefined value). The right part of the image shows a similar constellation with a
+user-defined synapse type, where the referenced properties are editable.
 
 ## Neuron and Synapse Types
 
-![](assets/masterdetail_neurontype.png)
+The concept of shared types for multiple neuron populations or synapses that play a similar role in the network
+architecture supports experiments with a manageable scope for parameter exploration. While a type is referenced
+by nearly every graph node and edge, the type definitions themselves have no direct visible representation in the
+graph, as this would introduce too much visual clutter and obscure the network architecture.
 
-![](assets/masterdetail_synapsetype.png)
+Instead, the **Neurons** and **Synapses** tabs in the details area are used to manage and edit those types. Both tabs
+share the same general structure of a master-detail editor. The table at the top lists all currently defined types
+and provides buttons for creating a new type from scratch, duplicating the selected type, or deleting the selected
+type. Types can be renamed by double-clicking their name. This is equivalent to editing the **Name** property of the
+type. The double-circle marks pre-defined types, which can be neither renamed nor deleted, but they can be duplicated
+as a starting point for a user-defined type.
+
+![Master-detail editor with a pre-defined neuron type selected (left) and a user-defined neuron type selected (right)](assets/masterdetail_neurontype.png "Master-detail editor with a pre-defined neuron type selected (left) and a user-defined neuron type selected (right)")
+
+The image above shows in the left part a pre-defined neuron type selected in the master table. The property details
+table at the bottom thus has all properties marked as read-only. In the right part of the image a user-defined type
+has been selected in the master table and the details table at the bottom can be used to change the properties of the
+neuron type. Note that the set of neuron parameters shown in the details table depends on the selected **Neuron Kind**
+near the top of the table. Inapplicable neuron parameters retain their values during an editing session, but revert to
+their default values, when loading a network from disk.
+
+The image below shows a similar constellation with synapse types, where the set of available properties depends on the
+selected **Connector**. For example, the **Probability** property is not applicable to the simpler *one-to-one* or
+*all-to-all* connectors.
+
+![Master-detail editor with a pre-defined synapse type selected (left) and a user-defined synapse type selected (right)](assets/masterdetail_synapsetype.png "Master-detail editor with a pre-defined synapse type selected (left) and a user-defined synapse type selected (right)")
 
 ## Running a Simulation
 
-![](assets/diagnostics.png)
+To start a simulation run of the currently edited network, select the desired target platform from the popup menu in the
+toolbar and click the **Run** button to the left of that menu. This first checks the network for structural
+problems and invalid parameter constellations. These checks would be meaningless (or outright annoying) while the
+network is still under construction and it is normal to have temporary inconsistencies. 
+
+The image below shows, what happens when trying to simulate a network with such inconsistencies. The **Problems** tab
+in the details area replaces the usual **Results** tab with data plots. Each row in that table represents one
+error message (red stop sign) or a warning message (yellow triangle sign). The second column gives the name of the
+graph node or edge that caused the message and the message itself appears in the third column. Selecting a table row
+scrolls the affected graph node or edge into view and selects it in the main view. Every item in the graph with an
+associated error or warning message is also marked with a small overlay symbol so that problem areas of the network
+can be easily recognised in the main view.
+
+![Diagnostics displayed when trying to run a network with an error and two warnings](assets/diagnostics.png "Diagnostics displayed when trying to run a network with an error and two warnings")
+
+If the network contains no errors, the actual simulation is started. While the simulation runs, progress information is
+shown in the status summary display at the right end of the toolbar. For the remote platforms, the status is updated
+every 5 seconds and you should expect a minimum round-trip time of two or three minutes, even if your simulation job
+makes it to the front of the work queue immediately.
+
+When the simulation run finishes successfully, the **Results** tab is brought forward and gives you access to all
+the data plots you have added to the network. 
+
+TODO
+* platform availability, Source only platform
+* differences compared to explicit check action (info items)
+* changing icon of Check toolbar button
 
 ---
 

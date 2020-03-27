@@ -31,7 +31,6 @@ import de.unibi.hbp.ncc.editor.props.PropChangeListener;
 import de.unibi.hbp.ncc.lang.AnyConnection;
 import de.unibi.hbp.ncc.lang.Connectable;
 import de.unibi.hbp.ncc.lang.DataPlot;
-import de.unibi.hbp.ncc.lang.DisplayNamed;
 import de.unibi.hbp.ncc.lang.GraphCellConfigurator;
 import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.NamedEntity;
@@ -44,7 +43,9 @@ import de.unibi.hbp.ncc.lang.RegularSpikeSource;
 import de.unibi.hbp.ncc.lang.Scope;
 import de.unibi.hbp.ncc.lang.StandardPopulation;
 import de.unibi.hbp.ncc.lang.SynapseType;
+import de.unibi.hbp.ncc.lang.modules.InceptionGroup;
 import de.unibi.hbp.ncc.lang.modules.ModuleExample;
+import de.unibi.hbp.ncc.lang.modules.RetinaGrid;
 import de.unibi.hbp.ncc.lang.modules.SynfireChain;
 import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -131,8 +132,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 		programGraphComponent.setInspector(this);
 
 		graph.addListener(mxEvent.FLIP_EDGE, (sender, evt) -> {
-			ProgramGraph.EdgeStyles style = (ProgramGraph.EdgeStyles) evt.getProperty("style");
-			status("Edge style changed to " + style.getDisplayName());
+			AnyConnection.RoutingStyle style = (AnyConnection.RoutingStyle) evt.getProperty("style");
+			status("Routing style changed to " + style.getDisplayName());
 		});
 
 		// Adds some template cells for dropping into the graph
@@ -160,22 +161,13 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 
 		modulesPalette.addTemplate(SynfireChain.CREATOR);
 		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
-		modulesPalette.addTemplate("Retina",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/retina.png")),
-								   "module",
-								   100, 60, ModuleExample.CREATOR);
-		modulesPalette.addTemplate("Inception",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/inception.png")),
-								   "module",
-								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate(RetinaGrid.CREATOR);
+		modulesPalette.addTemplate(InceptionGroup.CREATOR);
 		modulesPalette.addTemplate("Direction",
 								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/robot_head.png")),
 								   "module",
 								   100, 60, ModuleExample.CREATOR);
-		modulesPalette.addTemplate("Generic",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/module.png")),
-								   "module",
-								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate(ModuleExample.CREATOR);
 		Notificator.getInstance().subscribe(this);  // to get notified of non-visual (in the graph) property changes
 	}
 
@@ -394,72 +386,15 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 			super.cellsAdded(cells, parent, index, source, target, absolute, constrain);
 		}
 
-
-		// TODO provide a context menu sub-menu to directly select an edge style?
-		private enum EdgeStyles implements DisplayNamed {
-			DEFAULT("Orthogonal", ""),
-			ELBOW_VERTICAL("Elbow, vertical", ";edgeStyle=elbowEdgeStyle;elbow=vertical"),
-			ELBOW_HORIZONTAL("Elbow, horizontal", ";edgeStyle=elbowEdgeStyle;elbow=horizontal"),
-			RELATION("Relation", ";edgeStyle=entityRelationEdgeStyle"),
-			TOP_TO_BOTTOM("Top-to-bottom", ";edgeStyle=topToBottomEdgeStyle"),
-			SIDE_TO_SIDE("Side-to-side", ";edgeStyle=sideToSideEdgeStyle");
-			// ";edgeStyle=segmentEdgeStyle",  // segment edges seem to allow additional control points,
-			// but how to edit them is unclear and toggling to some other edge style seems to leave garbage control points behind
-			// ";edgeStyle=loopEdgeStyle"  // this is applied automatically for loops?
-
-			private String displayName, edgeStyle;
-
-			EdgeStyles (String displayName, String edgeStyle) {
-				this.displayName = displayName;
-				this.edgeStyle = edgeStyle;
-			}
-
-			static EdgeStyles getNextStyle (String cellStyle) {
-				int startPos = cellStyle.indexOf(";edgeStyle");
-				String oldEdgeStyle;
-				if (startPos < 0) // DEFAULT
-					oldEdgeStyle = "";
-				else
-					oldEdgeStyle = cellStyle.substring(startPos);
-				boolean exitNextRound = false;
-				for (EdgeStyles style: values())
-					if (exitNextRound)
-						return style;
-					else if (style.edgeStyle.equals(oldEdgeStyle))
-						exitNextRound = true;
-				if (exitNextRound)  // last style in list --> default (first style)
-					return DEFAULT;
-				throw new IllegalStateException("unknown edge style in " + cellStyle);
-			}
-
-			String updateCellStyle (String cellStyle) {
-				int startPos = cellStyle.indexOf(";edgeStyle");
-				if (startPos >= 0)
-					return cellStyle.substring(0, startPos) + edgeStyle;
-				else
-					return cellStyle + edgeStyle;
-			}
-
-			@Override
-			public String getDisplayName () { return displayName; }
-		}
-
 		@Override
 		public Object flipEdge (Object edge) {
-			if (edge != null) {
-				model.beginUpdate();
-				try {
-					String cellStyle = model.getStyle(edge);
-					EdgeStyles nextStyle = EdgeStyles.getNextStyle(cellStyle);
-					// System.err.println("flipEdge: current = " + cellStyle);
-					// System.err.println("flipEdge: next = " + nextStyle);
-					model.setStyle(edge, nextStyle.updateCellStyle(cellStyle));
-					// Removes all existing control points
-					resetEdge(edge);
-					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge, "style", nextStyle));
-				}
-				finally {
-					model.endUpdate();
+			if (edge instanceof mxICell) {
+				Object value = ((mxICell) edge).getValue();
+				if (value instanceof AnyConnection) {
+					AnyConnection connection = (AnyConnection) value;
+					connection.cycleRoutingStyle();
+					fireEvent(new mxEventObject(mxEvent.FLIP_EDGE, "edge", edge,
+												"style", connection.getRoutingStyle()));
 				}
 			}
 
@@ -610,7 +545,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 		if (args.length == 0)
 			open = null;
 		else {
-			open = new File(args[0]);
+			open = new File(args[0]).getAbsoluteFile();
 			if (!open.isFile()) {
 				System.err.println("Cannot open document " + open);
 				System.exit(10);

@@ -57,13 +57,14 @@ public class Notificator {
                                            : PropChangeListener.UNKNOWN_POSITION);
          }
       }
-      if (changed.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VALUES)) {
-         for (PropChangeListener listener: propChangeListeners)
-            listener.multiplePropertyValuesChanged(enclosingEntity);
-      }
       if (changed.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VISIBILITY)) {
+         // this is more general and implies that values of other properties may also have changed
          for (PropChangeListener listener: propChangeListeners)
             listener.otherPropertiesVisibilityChanged(enclosingEntity);
+      }
+      else if (changed.hasChangeImpact(EditableProp.Impact.OTHER_PROPS_VALUES)) {
+         for (PropChangeListener listener: propChangeListeners)
+            listener.multiplePropertyValuesChanged(enclosingEntity);
       }
       mxICell cell = enclosingEntity.getOwningCell();
       if (cell != null && changed.hasChangeImpact(EditableProp.Impact.CELL_LABEL)) {
@@ -103,7 +104,7 @@ public class Notificator {
       }
    }
 
-   // for notifications originating outside a ProperytChangeListener (i.e. outside a DetailsEditor
+   // for notifications originating outside a PropertyChangeListener (i.e. outside a DetailsEditor
    public void notifyListeners (EditableProp<?> changed) {
       notifyListeners(null, changed, PropChangeListener.UNKNOWN_POSITION);
    }

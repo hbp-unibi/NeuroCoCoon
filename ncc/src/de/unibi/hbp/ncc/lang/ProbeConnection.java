@@ -49,7 +49,7 @@ public class ProbeConnection extends AnyConnection implements Serializable {
 
    protected Object writeReplace () throws ObjectStreamException {
       return new SerializedProbeConnection(dataSeries.getValue(), firstNeuronIndex.getValue(), neuronCount.getValue(),
-                                           userLabel.getValue());
+                                           userLabel.getValue(), routingStyle.getValue());
    }
 
    // readObject method for the serialization proxy pattern
@@ -65,7 +65,13 @@ public class ProbeConnection extends AnyConnection implements Serializable {
       list.add(firstNeuronIndex);
       list.add(neuronCount);
       list.add(userLabel);  // defined in superclass, positioned by subclass
+      list.add(routingStyle);
       return list;
+   }
+
+   @Override
+   protected String getEdgeStyle () {
+      return CREATOR.getCellStyle();
    }
 
    class ValidDataSeriesForTarget extends FilteredEditableEnumProp<DataSeries> {
@@ -83,8 +89,9 @@ public class ProbeConnection extends AnyConnection implements Serializable {
       }
    }
 
-   public ProbeConnection (DataSeries dataSeries, int firstNeuronIndex, int neuronCount, String userLabel) {
-      super(Connectable.EdgeKind.PROBE, userLabel);
+   public ProbeConnection (DataSeries dataSeries, int firstNeuronIndex, int neuronCount, String userLabel,
+                           RoutingStyle routingStyle) {
+      super(Connectable.EdgeKind.PROBE, userLabel, routingStyle);
       this.dataSeries = new ValidDataSeriesForTarget("Data Series", this, dataSeries)
             .addImpact(EditableProp.Impact.CELL_LABEL);
       this.firstNeuronIndex = new NonNegativeIntegerProp("First Neuron #", this, firstNeuronIndex);
@@ -92,12 +99,12 @@ public class ProbeConnection extends AnyConnection implements Serializable {
    }
 
    public ProbeConnection () {
-      this(DataSeries.SPIKES, 0, 0, null);
+      this(DataSeries.SPIKES, 0, 0, null, null);
    }
 
    protected ProbeConnection (ProbeConnection orig) {
       this(orig.dataSeries.getValue(), orig.firstNeuronIndex.getValue(), orig.neuronCount.getValue(),
-           orig.userLabel.getValue());
+           orig.userLabel.getValue(), orig.routingStyle.getValue());
    }
 
    @Override
@@ -157,7 +164,10 @@ public class ProbeConnection extends AnyConnection implements Serializable {
    public int getNeuronCount () { return neuronCount.getValue(); }
 
    @CodeGenUse
-   public boolean isExcerpt () { return firstNeuronIndex.getValue() != 0 || neuronCount.getValue() != 0; }
+   public boolean isExcerpt () { return isStartLimited() || isEndLimited(); }
+
+   @CodeGenUse
+   public boolean isStartLimited () { return firstNeuronIndex.getValue() != 0; }
 
    @CodeGenUse
    public boolean isEndLimited () { return neuronCount.getValue() != 0; }

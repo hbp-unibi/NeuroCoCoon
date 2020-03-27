@@ -61,6 +61,14 @@ public abstract class LanguageEntity {
    // override in subclasses, where cell style depends on (direct or indirect) property values
    public String getCellStyle () { return null; }
 
+   protected static String joinCellStyles (String styleA, String styleB) {
+      if (styleA == null || styleA.isEmpty())
+         return styleB;
+      if (styleB == null || styleB.isEmpty())
+         return styleA;
+      return styleA + ";" + styleB;
+   }
+
    // override this in subclasses, indirectly referenced from (multiple) cell-associated entities
    public List<mxICell> getDependentCells (mxIGraphModel graphModel) {
       return Collections.emptyList();

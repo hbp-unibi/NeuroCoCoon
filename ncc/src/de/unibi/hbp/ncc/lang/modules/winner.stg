@@ -20,7 +20,7 @@ def build_winner_take_all(num_pops, num_neurons, neuron_kind, neuron_params, wei
         input = sim.Population(num_neurons, sim.SpikeSourcePoisson,
                      {'duration': runtime, 'rate': rate_noise }, label="input")
         proj = sim.Projection(input, pop, sim.FixedProbabilityConnector(prob_noise),
-                    sim.StaticSynapse(weight=weight_noise, delay=syn_delay)
+                    sim.StaticSynapse(weight=weight_noise, delay=syn_delay))
 
         # Self-excitatory connection
         proj = sim.Projection(pop, pop, sim.FixedProbabilityConnector(prob_exc),

@@ -1,0 +1,46 @@
+define_retina_builder() ::= <<
+from math import exp
+
+def retina_weight(index, count, center_weight, border_weight, variance):
+    x = 2 * index / (count - 1) - 1  # map index to range -1 .. +1
+    return center_weight + (center_weight - border_weight) * exp(-x * x / (2 * variance) )
+
+def build_retina_grid(num_rows, num_columns, num_neurons, neuron_kind, neuron_params,
+                      weight_exc_center, weight_exc_border, variance, syn_delay):
+    conn = sim.OneToOneConnector()
+    input_pops = []
+    prev_row_pops = None
+    for row_idx in range(num_rows):
+        # build input population in a column to the left of the grid row
+        prev_pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="row_" + str(row_idx + 1))
+        input_pops.append(prev_pop)
+        # build one row of grid, connect to the left and connect up, except for the first row
+        row_pops = []
+        row_weight = retina_weight(row_idx, num_rows, weight_exc_center, weight_exc_border, variance)
+        for col_idx in range(num_columns):
+            pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="grid_" + str(row_idx + 1) + "_" + str(col_idx + 1))
+            sim.Projection(prev_pop, pop, conn, sim.StaticSynapse(weight=row_weight, delay=syn_delay))
+            if prev_row_pops:
+                col_weight = retina_weight(col_idx, num_columns, weight_exc_center, weight_exc_border, variance)
+                sim.Projection(prev_row_pops[col_idx], pop, conn, sim.StaticSynapse(weight=col_weight, delay=syn_delay))
+            row_pops.append(pop)
+            prev_pop = pop
+        prev_row_pops = row_pops
+
+    # build output population row below the grid, connect only upward
+    output_pops = []
+    for col_idx in range(num_columns):
+        pop = sim.Population(num_neurons, neuron_kind, neuron_params, label="col_" + str(col_idx + 1))
+        col_weight = retina_weight(col_idx, num_columns, weight_exc_center, weight_exc_border, variance)
+        sim.Projection(prev_row_pops[col_idx], pop, conn, sim.StaticSynapse(weight=col_weight, delay=syn_delay))
+        output_pops.append(pop)
+
+    return { 'in': input_pops, 'out': output_pops }  # return list of input ports and output ports
+>>
+
+build_retina_instance(retina) ::= <<
+build_retina_grid(<retina.numberOfInputRows>, <retina.numberOfOutputColumns>, <\\>
+<retina.numberOfNeuronsPerPopulation>, <ref_neuronType(retina.neuronType)>, <\\>
+<retina.excitationWeightAtCenter>, <retina.excitationWeightAtBorder>, <retina.weightVariance>, <\\>
+<retina.synapseDelay>)
+>>

@@ -20,9 +20,14 @@ public class CheckAction extends AbstractAction {
          Program program = editor.getProgram();
          NmpiClient.Platform targetPlatform = editor.getEditorToolBar().getCurrentPlatform();
          ErrorCollector diagnostics = program.checkProgram(targetPlatform);
-         editor.status(diagnostics.hasAnyWarnings()
-                             ? "There were warnings."
-                             : (diagnostics.hasAnyErrors() ? "There were errors." : "Success!"));
+         if (diagnostics.hasAnyErrors())
+            editor.setJobStatus(EditorToolBar.StatusLevel.BAD, "There are errors.");
+         else if (diagnostics.hasAnyWarnings())
+            editor.setJobStatus(EditorToolBar.StatusLevel.NEUTRAL, "There are warnings.");
+         else if (diagnostics.hasAnyMessages())
+            editor.setJobStatus(EditorToolBar.StatusLevel.NEUTRAL, "There are some remarks.");
+         else
+            editor.setJobStatus(EditorToolBar.StatusLevel.GOOD, "No problems found!");
          editor.getEditorToolBar().setProblemStatus(diagnostics.hasAnyErrors());
          if (diagnostics.hasAnyMessages()) {
             Component display = diagnostics.buildComponent(program.getGraphComponent());

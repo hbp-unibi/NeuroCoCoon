@@ -125,9 +125,10 @@ public class NeuronType extends NamedEntity {
    }
 
    public NeuronType (Namespace<NeuronType> namespace, String name) {
+      // matches the PyNN default values
       this(namespace, name, NeuronKind.IF_COND_EXP,
-           -70.0, -80.0, -65.0, 0.0, -100.0,
-           2.0, 2.0, 2.0, 10.0, 0.2,
+           -65.0, -65.0, -50.0, 0.0, -70.0,
+           5.0, 5.0, 0.1, 20.0, 1.0,
            0.0);
    }
 

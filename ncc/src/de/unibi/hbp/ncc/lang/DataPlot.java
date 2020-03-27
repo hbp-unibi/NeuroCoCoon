@@ -169,6 +169,7 @@ public class DataPlot extends NamedEntity implements Connectable {
          this.subsidiaryProbes = subsidiaryProbes;
       }
 
+      @CodeGenUse
       public Collection<AnnotatedPlotItem<ProbeConnection>> getSubsidiaryProbes () {
          return subsidiaryProbes;
       }
@@ -194,10 +195,16 @@ public class DataPlot extends NamedEntity implements Connectable {
 
    private static final ProbeComparator orderByTargetAndSeries = new ProbeComparator();
 
-   @CodeGenUse
-   public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted (ProbeConnection.DataSeries dataSeries) {  // for code generation, determines order of data contributions in one panel of figure
+   public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted (ProbeConnection.DataSeries dataSeries) {
       List<ProbeConnection> probes = Iterators.asList(Iterators.filter(
             getOutgoingProbes().iterator(), probe -> probe.getDataSeries() == dataSeries));
+      probes.sort(orderByTargetAndSeries);
+      return annotateProbeConnections(probes);
+   }
+
+   @CodeGenUse
+   public Collection<AnnotatedPlotItem<ProbeConnection>> getOutgoingProbesSorted () {  // for code generation, determines order of data contributions in one panel of figure
+      List<ProbeConnection> probes = Iterators.asList(getOutgoingProbes());
       probes.sort(orderByTargetAndSeries);
       return annotateProbeConnections(probes);
    }

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -72,7 +73,8 @@ public abstract class NetworkModule extends NamedEntity
 
       @Override
       public boolean isValidTarget (EdgeKind edgeKind) {
-         return portDirection == Direction.IN && (edgeKind == EdgeKind.SYNAPSE || edgeKind == EdgeKind.PROBE);
+         return (portDirection == Direction.IN && edgeKind == EdgeKind.SYNAPSE) ||
+               (portDirection == Direction.OUT && edgeKind == EdgeKind.PROBE);
       }
 
       @Override
@@ -305,13 +307,21 @@ public abstract class NetworkModule extends NamedEntity
       this.resourceFileBaseName = Objects.requireNonNull(resourceFileBaseName);
    }
 
-   protected List<String> getPortNames (List<String> cache, int count, String prefix) {
-      if (cache == null || cache.size() != count) {
-         cache = new ArrayList<>(count);
-         for (int nr = 1; nr <= count; nr++)
+   protected List<String> getPortNames (List<String> cache, List<String> prependPorts,
+                                        int minCount, int maxCount, String prefix, List<String> appendPorts) {
+      int expectedSize = prependPorts.size() + Math.max(maxCount - minCount + 1, 0) + appendPorts.size();
+      if (cache == null || cache.size() != expectedSize) {
+         cache = new ArrayList<>(expectedSize);
+         cache.addAll(prependPorts);
+         for (int nr = minCount; nr <= maxCount; nr++)
             cache.add(prefix + " " + nr);
+         cache.addAll(appendPorts);
       }
       return cache;
+   }
+
+   protected List<String> getPortNames (List<String> cache, int count, String prefix) {
+      return getPortNames(cache, Collections.emptyList(), 1, count, prefix, Collections.emptyList());
    }
 
    protected abstract List<String> getPortNames (Port.Direction direction);
