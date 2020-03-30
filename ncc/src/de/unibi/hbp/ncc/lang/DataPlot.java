@@ -16,6 +16,7 @@ import java.util.List;
 public class DataPlot extends NamedEntity implements Connectable {
    private final Namespace<DataPlot> moreSpecificNamespace;
    private final BooleanProp combineSameKindData;
+   // TODO add support for stacking spike trains of multiple populations in the combined case
 
    private static Namespace<DataPlot> globalNamespace;
 
