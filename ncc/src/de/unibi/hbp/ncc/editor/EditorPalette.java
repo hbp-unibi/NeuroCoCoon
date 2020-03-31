@@ -135,13 +135,6 @@ public class EditorPalette extends JPanel
 		revalidate();
 	}
 
-	public void addTemplate (final String name, ImageIcon icon, String style, int width, int height, EntityCreator<?> value) {
-		mxCell cell = new mxCell(value, new mxGeometry(0, 0, width, height), style);
-		cell.setVertex(true);
-
-		addTemplate(name, name, icon, cell);
-	}
-
 	public void addEdgeTemplate (EntityCreator<?> creator) {
 		int width = creator.getInitialCellWidth(),
 				height = creator.getInitialCellHeight();

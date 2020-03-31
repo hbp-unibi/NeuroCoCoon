@@ -53,13 +53,13 @@ public class SynfireChain extends SingleNeuronTypeModule {
    protected NeuronType createDefaultNeuronType (Namespace<NeuronType> neuronTypes, String typeName) {
       return new NeuronType(neuronTypes, typeName, NeuronType.NeuronKind.IF_COND_EXP,
                             -70.0, -80.0, -60.0, 0.0, -100.0,
-                            3.0, 3.0, 1.0, 10.0, 0.2, 0.0);
+                            5.0, 3.0, 1.0, 10.0, 0.2, 0.0);
    }
 
    public SynfireChain (Namespace<NetworkModule> namespace, String name) {
       this(namespace, name, null,
-           3, 5,
-           0.03, 0.015,
+           5, 5,
+           0.07, 0.015,
            1.0);
    }
 
@@ -83,7 +83,7 @@ public class SynfireChain extends SingleNeuronTypeModule {
       if (direction == Port.Direction.IN)
          return inputPortNames;
       else if (direction == Port.Direction.OUT)
-         return outputPortNames = getPortNames(outputPortNames, numberOfPopulations.getValue(), "link");
+         return outputPortNames = buildPortNames(outputPortNames, "link", numberOfPopulations.getValue());
       else
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }

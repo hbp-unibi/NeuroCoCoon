@@ -46,6 +46,7 @@ import de.unibi.hbp.ncc.lang.SynapseType;
 import de.unibi.hbp.ncc.lang.modules.InceptionGroup;
 import de.unibi.hbp.ncc.lang.modules.ModuleExample;
 import de.unibi.hbp.ncc.lang.modules.RetinaGrid;
+import de.unibi.hbp.ncc.lang.modules.RobotHeadDirection;
 import de.unibi.hbp.ncc.lang.modules.SynfireChain;
 import de.unibi.hbp.ncc.lang.modules.WinnerTakeAll;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
@@ -70,7 +71,7 @@ import java.util.Collection;
 public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeListener, InspectorController
 {
 
-	public static final String VERSION = "0.9.2";
+	public static final String VERSION = "1.0.0-M24";
 
 	private ProgramGraphComponent programGraphComponent;
 	private JTabbedPane rightHandTabs;
@@ -145,8 +146,8 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 		basicPalette.addEdgeTemplate(NeuronConnection.CREATOR);
 		basicPalette.addTemplate(DataPlot.CREATOR);
 		basicPalette.addEdgeTemplate(ProbeConnection.CREATOR);
-		// TODO add back support for assemblies, slices (a special case of a view) and associated dependency edges
 
+		// TODO add back support for assemblies, slices (a special case of a view) and associated dependency edges
 /*
 		basicPalette.addTemplate("Assembly",
 								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/assembly.png")),
@@ -163,10 +164,7 @@ public class NeuroCoCoonEditor extends BasicGraphEditor implements PropChangeLis
 		modulesPalette.addTemplate(WinnerTakeAll.CREATOR);
 		modulesPalette.addTemplate(RetinaGrid.CREATOR);
 		modulesPalette.addTemplate(InceptionGroup.CREATOR);
-		modulesPalette.addTemplate("Direction",
-								   new ImageIcon(NeuroCoCoonEditor.class.getResource("editor/images/lang/robot_head.png")),
-								   "module",
-								   100, 60, ModuleExample.CREATOR);
+		modulesPalette.addTemplate(RobotHeadDirection.CREATOR);
 		modulesPalette.addTemplate(ModuleExample.CREATOR);
 		Notificator.getInstance().subscribe(this);  // to get notified of non-visual (in the graph) property changes
 	}

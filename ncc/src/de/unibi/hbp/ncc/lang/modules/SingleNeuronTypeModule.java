@@ -5,6 +5,7 @@ import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
 import de.unibi.hbp.ncc.lang.ProbeConnection;
 import de.unibi.hbp.ncc.lang.Program;
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.codegen.ErrorCollector;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableNameProp;
@@ -46,9 +47,13 @@ public abstract class SingleNeuronTypeModule extends NetworkModule {
       return getNeuronType().isConductanceBased();
    }
 
+   @CodeGenUse
    public NeuronType getNeuronType () { return neuronType.getValue(); }
 
    protected abstract NeuronType createDefaultNeuronType (Namespace<NeuronType> neuronTypes, String typeName);
+
+   @CodeGenUse
+   public double getSynapseDelay () { return synapseDelay.getValue(); }
 
    @Override
    public void checkStaticSemantics (Program program, ErrorCollector diagnostics) {

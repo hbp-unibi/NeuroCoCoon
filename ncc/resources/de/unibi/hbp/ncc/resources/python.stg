@@ -92,7 +92,7 @@ instrument_modulePortProbes(modinst) ::= <<
 >>
 
 get_probe_data(probe) ::= <<
-<if(probe.excerpt)>[<if(probe.startLimited)><probe.firstNeuronIndex><endif>:<if(probe.endLimited)><probe.neuronEndIndex><endif>]<endif>
+<if(probe.excerpt)>[<if(probe.startLimited)><probe.firstNeuronIndex><endif>:<if(probe.endLimited)><probe.neuronEndIndex><endif>]<endif><\\>
 .get_data().segments[0].<if(probe.dataSeries.filtered)>filter(name='<probe.dataSeries.pythonName>')[0]<else>spiketrains<endif>
 >>
 

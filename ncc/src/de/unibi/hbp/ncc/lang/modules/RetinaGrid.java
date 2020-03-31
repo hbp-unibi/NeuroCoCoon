@@ -83,9 +83,9 @@ public class RetinaGrid extends SingleNeuronTypeModule {
    @Override
    protected List<String> getPortNames (Port.Direction direction) {
       if (direction == Port.Direction.IN)
-         return inputPortNames = getPortNames(inputPortNames, numInputRows.getValue(), "row");
+         return inputPortNames = buildPortNames(inputPortNames, "row", numInputRows.getValue());
       else if (direction == Port.Direction.OUT)
-         return outputPortNames = getPortNames(outputPortNames, numOutputColumns.getValue(), "column");
+         return outputPortNames = buildPortNames(outputPortNames, "column", numOutputColumns.getValue());
       else
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }

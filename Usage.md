@@ -176,17 +176,19 @@ Simulation results are provided in the form of plots that monitor spiking behavi
 selected neurons over the course of the simulation. Which neuron populations to monitor and what data to collect is
 also represented visually in the graph of the network.
 
-to create a plot composed of one or more panels, drag a **Data Plot** node from the palette into the main view.
+To create a plot composed of one or more panels, drag a **Data Plot** node from the palette into the main view.
 This node needs to be connected to neuron populations or ports of network module instances by drawing **Data Probe**
 connections. A probe starts at the data plot node and ends at the target node to be monitored, as if the data plot
 node were measuring device. The probe connection is annotated with the kind of data to record and collect from the
 target. In addition, a probe can be limited to just one sub-range of the neurons in the target node, because it is
 often not practical to monitor all individual neurons of a population.
 
-After running a simulation of the network small thumbnail images of all data plots are shown in the **Results** tab
+![Thumbnail view after simulating a network with two data plot nodes](assets/plots_thumbnails.png "Thumbnail view after simulating a network with two data plot nodes")
+
+After running a simulation of the network small thumbnail images of all data plots are shown in the **Plots** tab
 of the details area. Double-clicking a thumbnail opens the full-sized plot in a separate window. Due to
 security concerns in the HBP collaboratory, cross-origin resource sharing is disabled for the plot images created by
-a remote simulation. Thus, the webb app cannot display thumbnail images with the actual plots. Selecting such a
+a remote simulation. Thus, the web app cannot display thumbnail images with the actual plots. Selecting such a
 placeholder image displays the full-sized plot image at the bottom of the web page, below the virtual screen of the
 web app. 
 
@@ -335,13 +337,36 @@ shown in the status summary display at the right end of the toolbar. For the rem
 every 5 seconds and you should expect a minimum round-trip time of two or three minutes, even if your simulation job
 makes it to the front of the work queue immediately.
 
-When the simulation run finishes successfully, the **Results** tab is brought forward and gives you access to all
+When the simulation run finishes successfully, the **Plots** tab is brought forward and gives you access to all
 the data plots you have added to the network. 
 
-TODO
-* platform availability, Source only platform
-* differences compared to explicit check action (info items)
-* changing icon of Check toolbar button
+![Simulated network and plot thumbnail with one plot opened in a full-size window](assets/spike_plot_opened.png "Simulated network and plot thumbnail with one plot opened in a full-size window")
+
+The above image shows the main editor window in the background with thumbnails for all data plots in the details area
+on the right. One of the plots is display at full size in the front window. The example shows a Synfire chain with four
+neuron populations where the spike activity stops after the first pass through the chain. To fix this problem, the
+excitatory weight for all synapses in the chain has to be increased. This can be achived by editing only the single
+excitatory weight of the **synapse type** that is shared by all those synapses. Simulating the modified network results
+in the plot shown below, where the spike activity of the Synfire chain continues after the first cycle, as desired.
+ 
+![Re-simulating the same network after increasing all chain weights by editing the shared synapse type](assets/spike_plot_working.png "Re-simulating the same network after increasing all chain weights by editing the shared synapse type")
+
+The popup menu for the target platform of the simulation shows all targets supported by the editor. However, only some
+of these platforms are enabled, depending on the context in which the editor is run. Remote platforms require
+authorization via the [HBP collaboratory][HBP-Collab], which is only available inside the web app.
+The [NEST][NEST] software simulator can only be run from the local app. The **Source only** pseudo platform is always
+enabled. Instead of running the simulation, this platform displays the intermediate [Python 3][Python3] [PyNN][PyNN]
+source code in a separate window. While the source code cannot be modified, it is possible to select and copy parts of
+the source code to the clipboard.
+
+To the left of the **Run** button in the toolbar is the the **Check** button. This button can be used to check the
+network for definite and possible problems without running a simulation. Beyond errors and warnings, the **Check**
+button also identifies and reports *info items*, which do not prevent simulating the network, but indicate that the
+network will not show any interesting or meaningful behaviour. The results of the check are shown in the details area
+and are summarised in the toolbar and the status area. If any errors have been identified, which would prevent
+running a simulation of the network, the **Check** button changes from a green check mark to a red exclamation sign.
+Modify the network to address the listed errors and click on the exclamation sign to find out, whether you have
+actually fixed all problems.
 
 ---
 

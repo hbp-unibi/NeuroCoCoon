@@ -82,7 +82,10 @@ public class DataPlot extends NamedEntity implements Connectable {
       public String getCellStyle () { return "dataPlot"; }
 
       @Override
-      public int getInitialCellHeight () { return 100; }
+      public int getInitialCellWidth () { return 60; }
+
+      @Override
+      public int getInitialCellHeight () { return 60; }
    }
 
    @Override

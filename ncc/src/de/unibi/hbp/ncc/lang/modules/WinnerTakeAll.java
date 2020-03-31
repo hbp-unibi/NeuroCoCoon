@@ -65,13 +65,13 @@ public class WinnerTakeAll extends SingleNeuronTypeModule {
    protected NeuronType createDefaultNeuronType (Namespace<NeuronType> neuronTypes, String typeName) {
       return new NeuronType(neuronTypes, typeName, NeuronType.NeuronKind.IF_COND_EXP,
                             -70.0, -80.0, -60.0, 0.0, -100.0,
-                            3.0, 3.0, 1.0, 10.0, 0.2, 0.0);
+                            5.0, 3.0, 1.0, 10.0, 0.2, 0.0);
    }
 
    public WinnerTakeAll (Namespace<NetworkModule> namespace, String name) {
       this(namespace, name, null,
-           3, 5,
-           0.01, 0.005, 0.005,
+           5, 5,
+           0.01, 0.006, 0.006,
            20.0, 0.7, 0.5, 0.7,
            1.0);
    }
@@ -95,9 +95,9 @@ public class WinnerTakeAll extends SingleNeuronTypeModule {
    @Override
    protected List<String> getPortNames (Port.Direction direction) {
       if (direction == Port.Direction.IN)
-         return inputPortNames = getPortNames(inputPortNames, numberOfPopulations.getValue(), "stimulus");
+         return inputPortNames = buildPortNames(inputPortNames, "stimulus", numberOfPopulations.getValue());
       else if (direction == Port.Direction.OUT)
-         return outputPortNames = getPortNames(outputPortNames, numberOfPopulations.getValue(), "out");
+         return outputPortNames = buildPortNames(outputPortNames, "out", numberOfPopulations.getValue());
       else
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }

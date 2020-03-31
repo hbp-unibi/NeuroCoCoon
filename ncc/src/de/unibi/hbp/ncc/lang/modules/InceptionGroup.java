@@ -88,9 +88,9 @@ public class InceptionGroup extends SingleNeuronTypeModule {
       if (direction == Port.Direction.IN)
          return inputPortNames;
       else if (direction == Port.Direction.OUT)
-         return outputPortNames = getPortNames(outputPortNames, COMBINED_OUTPUT,
-                                               minStages.getValue(), maxStages.getValue(), "branch",
-                                               Collections.emptyList());
+         return outputPortNames = buildPortNames(outputPortNames, COMBINED_OUTPUT,
+                                                 "branch", minStages.getValue(), maxStages.getValue(),
+                                                 Collections.emptyList());
       else
          throw new IllegalArgumentException("Unexpected direction: " + direction);
    }

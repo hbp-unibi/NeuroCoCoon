@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public abstract class NetworkModule extends NamedEntity
       implements GraphCellConfigurator {
@@ -248,7 +249,8 @@ public abstract class NetworkModule extends NamedEntity
       int layoutSteps = computeLayoutSteps();
       mxGeometry previousModuleGeo = modulePlaceholder.getGeometry();
       mxGeometry moduleGeo = new mxGeometry(previousModuleGeo.getX(), previousModuleGeo.getY(),
-                                            200, 3 * layoutSteps * PORT_SIZE_HALF);
+                                            2 * modulePlaceholder.getGeometry().getWidth(),
+                                            3 * layoutSteps * PORT_SIZE_HALF);
       graph.getModel().setGeometry(modulePlaceholder, moduleGeo);
       graph.getModel().setStyle(modulePlaceholder, computeCellStyle());
       modulePlaceholder.setConnectable(false);
@@ -307,21 +309,52 @@ public abstract class NetworkModule extends NamedEntity
       this.resourceFileBaseName = Objects.requireNonNull(resourceFileBaseName);
    }
 
-   protected List<String> getPortNames (List<String> cache, List<String> prependPorts,
-                                        int minCount, int maxCount, String prefix, List<String> appendPorts) {
+   protected List<String> buildPortNames (List<String> cache, List<String> prependPorts,
+                                          String prefix, int minCount, int maxCount,
+                                          Function<Integer, Object> numberTransformer,
+                                          List<String> appendPorts) {
       int expectedSize = prependPorts.size() + Math.max(maxCount - minCount + 1, 0) + appendPorts.size();
       if (cache == null || cache.size() != expectedSize) {
          cache = new ArrayList<>(expectedSize);
          cache.addAll(prependPorts);
          for (int nr = minCount; nr <= maxCount; nr++)
-            cache.add(prefix + " " + nr);
+            cache.add(prefix + " " + numberTransformer.apply(nr));
+         // TODO how to handle a transformer result with invalid identifier characters?
          cache.addAll(appendPorts);
       }
       return cache;
    }
 
-   protected List<String> getPortNames (List<String> cache, int count, String prefix) {
-      return getPortNames(cache, Collections.emptyList(), 1, count, prefix, Collections.emptyList());
+   private static final Function<Integer, Object> PRESERVE_NUMBER = nr -> nr;
+
+   protected List<String> buildPortNames (List<String> cache, List<String> prependPorts,
+                                          String prefix, int minCount, int maxCount,
+                                          List<String> appendPorts) {
+      return buildPortNames(cache, prependPorts, prefix, minCount, maxCount, PRESERVE_NUMBER, appendPorts);
+   }
+
+   protected List<String> buildPortNames (List<String> cache, String prefix, int count,
+                                          Function<Integer, Object> numberTransformer) {
+      return buildPortNames(cache, Collections.emptyList(), prefix, 0, count - 1, numberTransformer,
+                            Collections.emptyList());
+   }
+
+   protected List<String> buildPortNames (List<String> cache, String prefix, int count) {
+      return buildPortNames(cache, Collections.emptyList(), prefix, 1, count, PRESERVE_NUMBER,
+                            Collections.emptyList());
+   }
+
+   @SafeVarargs
+   protected final List<String> concatPortNames (List<String> cache, List<String>... parts) {
+      int expectedSize = 0;
+      for (List<String> part: parts)
+         expectedSize += part.size();
+      if (cache == null || cache.size() != expectedSize) {
+         cache = new ArrayList<>(expectedSize);
+         for (List<String> part: parts)
+            cache.addAll(part);
+      }
+      return cache;
    }
 
    protected abstract List<String> getPortNames (Port.Direction direction);

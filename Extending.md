@@ -36,8 +36,8 @@ The following code is an excerpt from the [`WinnerTakeAll`](ncc/src/de/unibi/hbp
 module kind implementation. Default values for the properties are passed as the last argument to the property
 constructors. The parameter for the number of competing populations inside the winner-take-all architecture
 determines the number of connection points (ports) of the module instance. Such structural impacts of changes to a
-property value are specified when the property is created. This causes the visual to track such changes and to update
-the affected parts of the internal program representation. 
+property value are specified when the property is created. This causes the visual editor to track such changes and to
+update the affected parts of the internal program representation. 
 
 ``` Java
 private final IntegerProp numberOfPopulations, numberOfNeurons;
@@ -65,9 +65,9 @@ is stored in the directory
 for visual language-specific icons. The recommended size for the icon is 256x256 pixels. A scaled-down version is
 used to represent the module kind in the editor palette and inside graph nodes for module instances.
 
-![Example module icon at recommended size](ncc/resources/de/unibi/hbp/ncc/editor/images/lang/winner.png "Example module icon at recommended size 256x256")
+![Example for a module icon at recommended size](ncc/resources/de/unibi/hbp/ncc/editor/images/lang/winner.png "Example for a module icon at recommended size 256x256")
 
-**Icon Credits:** winner by cindy clegane from the Noun Project
+**Icon Credits:** *winner* by *cindy clegane* from the *Noun Project*
 
 ## Python templates
 
