@@ -20,7 +20,7 @@ public: update copy
 
 copy:
 	cp -p $(WEBAPP_JAR) $(WEBAPP_JAR).js $(PUBLIC_WEB_DIR)
-	cp -p ncc.html $(PUBLIC_WEB_DIR)/index.html
+	sed -e 's:/app/:/app/NeuroCoCoon/:' ncc.html > $(PUBLIC_WEB_DIR)/index.html
 
 push: copy
 	( cd $(PUBLIC_WEB_DIR); \
