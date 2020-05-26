@@ -136,5 +136,10 @@ visual editor to the Python code that creates the instance when the simulation i
    are typical when translating from a higher-level domain-specific (visual) language into a lower-level
    implementation language with supporting libraries.
 
+The created module instance must be returned from the Python function as a dictionary that uses the keys `in` and `out`
+to refer to a list of the externally visible input or output populations (*ports* in the visual language terminology)
+respectively. The order of the list elements needs to follow the ordering used by the Java method `getPortNames`
+and the other port-related methods of the module instance on the visual editor side.
+
 [ST4-Syntax]: https://github.com/antlr/stringtemplate4/blob/master/doc/cheatsheet.md
 [PyNN]: https://neuralensemble.org/PyNN
