@@ -13,7 +13,7 @@ To define a new kind of network module, three components must be provided:
 
 The Java class itself corresponds to the language concept of a network module kind. Objects (instances) of this class
 are used to represent the module instances of this kind in the visual editor (one object per module instance).
-This Java class must belong to the package [de.unibi.hbp.ncc.lang.modules`](ncc/src/de/unibi/hbp/ncc/lang/modules)
+This Java class must belong to the package [`de.unibi.hbp.ncc.lang.modules`](ncc/src/de/unibi/hbp/ncc/lang/modules)
 and must be a direct or indirect subclass of the abstract class
 [`NetworkModule`](ncc/src/de/unibi/hbp/ncc/lang/NetworkModule.java) in the package `de.unibi.hbp.ncc.lang`.
 Intermediate (usually abstract) classes can be used to factor out common traits shared by multiple module kinds.
@@ -23,7 +23,7 @@ class as instance variables conforming to the interface type `de.unibi.hbp.ncc.l
 generic type parameter `T` represents the data type of the property value. Typical examples with pre-supplied
 implementations include properties that represent
 
-* integral or floating point values (data type `int` or `double`), possibly with a restricted range of values,
+* integral or floating-point values (data type `int` or `double`), possibly with a restricted range of values,
   like strictly positive values or probabilities in range `0.0` to `1.0`and an optional unit of measurement;
 
 * references to other language entities, most notably a neuron type or a synapse type;
@@ -33,10 +33,10 @@ implementations include properties that represent
 * free-form entry of entity names or arbitrary short explanatory texts.
 
 The following code is an excerpt from the [`WinnerTakeAll`](ncc/src/de/unibi/hbp/ncc/lang/modules/WinnerTakeAll.java)
-module kind implementation. Default values for the properties are passed as the last argument to the property
+module kind implementation. Default values for the properties appear as the last argument to the property
 constructors. The parameter for the number of competing populations inside the winner-take-all architecture
 determines the number of connection points (ports) of the module instance. Such structural impacts of changes to a
-property value are specified when the property is created. This causes the visual editor to track such changes and to
+property value need to be declared on property creation. This causes the visual editor to track such changes and to
 update the affected parts of the internal program representation. 
 
 ``` Java
@@ -54,28 +54,43 @@ this.noiseProbability = new ProbabilityProp("Noise Probability", this, 0.7);
 this.synapseDelay = new NonNegativeDoubleProp("Synapse Delay", this, 1.0).setUnit("ms");
 ``` 
 
-TODO: inner class `Creator` and short internal name `resourceFileBaseName` for the module kind, which is used as the
-basename for the other two files.
+To create a module instance by dragging an icon from the palette, the class must provide a factory object of type
+`EntityCreator` that is parameterized with the type of the class itself. This factory object is, by convention, the
+only instance of a private inner class named `Creator` and is available via a public read-only (`final`) class field
+`CREATOR`. Beyond the actual module instance creation method `create`, the object provides a text caption and the base
+filename for the icon and code generation templates.
+
+Public getter methods make property values of a module instance available to the code generation templates. The
+custom-defined Java annotation `@CodeGenUse` marks these methods, which have no apparent direct uses in the Java code
+itself.   
 
 ## Icon
 
-TODO: A graphical icon *`basename.png`* for the module. The icon must be a square PNG image, usually with alpha transparency, and
+The graphical icon *`basename.png`* for the module must be a square PNG image, usually with alpha transparency, and
 is stored in the directory
 [ncc/resources/de/unibi/hbp/ncc/editor/images/lang](ncc/resources/de/unibi/hbp/ncc/editor/images/lang)
-for visual language-specific icons. The recommended size for the icon is 256x256 pixels. A scaled-down version is
-used to represent the module kind in the editor palette and inside graph nodes for module instances.
+for visual language-specific icons. The recommended size for the icon is 256x256 pixels. A scaled-down version
+represents the module kind in the editor palette and inside graph nodes for module instances.
 
 ![Example for a module icon at recommended size](ncc/resources/de/unibi/hbp/ncc/editor/images/lang/winner.png "Example for a module icon at recommended size 256x256")
 
 **Icon Credits:** *winner* by *cindy clegane* from the *Noun Project*
 
-## Python templates
+## Python code generation templates
 
-TODO: A [StringTemplate 4][ST4-Syntax] template group file *`basename.stg`* that defines two Python code fragments.
-The first fragment is usually the definition of a Python function or class that builds a module instance.
-The second fragment is invoked, possibly multiple times, to create each module instance.
+The [StringTemplate 4][ST4-Syntax] template group file *`basename.stg`* must define two Python code fragments.
+The first fragment appears only once in the generated code and usually defines a Python function or class to build a
+module instance.
+The second fragment must create one module instance, usually by invoking the defined function or class, and may
+appear multiple times.
 
-simplified and abbreviated excerpt from [`winner.stg`](ncc/src/de/unibi/hbp/ncc/lang/modules/winner.stg)
+A simplified and abbreviated excerpt from [`winner.stg`](ncc/src/de/unibi/hbp/ncc/lang/modules/winner.stg)
+is given below. The [StringTemplate 4][ST4-Syntax]-Operator `::=` defines one template with the template name and
+the names of the template parameters, if any, given on the left-hand side. Pairs of angled brackets
+`<<` … `>>` delimit the body of longer templates, similar to the triple-quoted multi-line string literals in Python.
+All text, whitespace and linebreaks inside such a template body are taken literally, except for template
+expressions in single angled brackets `<` … `>`.
+
 ```
 define_winner_builder() ::= <<
 def build_winner_take_all(num_pops, num_neurons,
@@ -98,6 +113,28 @@ build_winner_take_all(<winner.numberOfPopulations>, <winner.numberOfNeuronsPerPo
 >>
 ```
 
-TODO: mention ref_xyz templates (from [`python.stg`](ncc/resources/de/unibi/hbp/ncc/resources/python.stg)) for use in build_*modulekind*_instance
+The template `build_winner_instance` receives the Java representation of a specific module instance as its
+parameter `winner` and uses the following two mechanisms pass information about the module instance from the
+visual editor to the Python code that creates the instance when the simulation is started.
+
+1. For simple properties (numbers, text annotations) the code template invokes the public Java getter methods on the
+   module instance in the visual editor, for example `<winner.numberOfPopulations>`. The returned values are passed
+   unmodified to the Python code.
+
+2. More complex properties use different representations on the Java and the [PyNN][PyNN]/Python side. Here, the editor
+   provides auxiliary translation templates in its code generation framework
+   [`python.stg`](ncc/resources/de/unibi/hbp/ncc/resources/python.stg).
+   For example, the template invocation `<ref_neuronType(winner.neuronType)>` retrieves a reference to a user-specified
+   neuron type from a property of the module instance, resolves this type reference to the type definition and expands
+   it into two constituent items of information:
+   * the fully qualified name `neuron_kind` of the [PyNN][PyNN] class which represents this kind of neuron
+   * a Python dictionary `neuron_params` with values for all numeric parameters relevant for this kind of neuron.
+   
+   These two items of information are closely related and must be kept consistent. The visual language and its editor
+   check and ensure this consistency by design, while in hand-written [PyNN][PyNN] code this would be the
+   programmer's responsibility. Such expansions of a single concept into multiple related fragments of information
+   are typical when translating from a higher-level domain-specific (visual) language into a lower-level
+   implementation language with supporting libraries.
 
 [ST4-Syntax]: https://github.com/antlr/stringtemplate4/blob/master/doc/cheatsheet.md
+[PyNN]: https://neuralensemble.org/PyNN

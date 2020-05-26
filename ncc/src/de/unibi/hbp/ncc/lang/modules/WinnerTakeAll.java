@@ -6,6 +6,7 @@ import de.unibi.hbp.ncc.lang.LanguageEntity;
 import de.unibi.hbp.ncc.lang.Namespace;
 import de.unibi.hbp.ncc.lang.NetworkModule;
 import de.unibi.hbp.ncc.lang.NeuronType;
+import de.unibi.hbp.ncc.lang.codegen.CodeGenUse;
 import de.unibi.hbp.ncc.lang.props.DoubleProp;
 import de.unibi.hbp.ncc.lang.props.EditableProp;
 import de.unibi.hbp.ncc.lang.props.IntegerProp;
@@ -138,15 +139,25 @@ public class WinnerTakeAll extends SingleNeuronTypeModule {
       public String getIconCaption () { return "Winner"; }
    }
 
+   @CodeGenUse
    public int getNumberOfPopulations () { return numberOfPopulations.getValue(); }
+   @CodeGenUse
    public int getNumberOfNeuronsPerPopulation () { return numberOfNeurons.getValue(); }
 
+   @CodeGenUse
    public double getNoiseWeight () { return noiseWeight.getValue(); }
+   @CodeGenUse
    public double getInhibitionWeight () { return inhibitionWeight.getValue(); }
+   @CodeGenUse
    public double getExcitationWeight () { return excitationWeight.getValue(); }
+   @CodeGenUse
    public double getNoiseRate () { return noiseRate.getValue(); }
+   @CodeGenUse
    public double getNoiseProbability () { return noiseProbability.getValue(); }
+   @CodeGenUse
    public double getInhibitionProbability () { return inhibitionProbability.getValue(); }
+   @CodeGenUse
    public double getExcitationProbability () { return excitationProbability.getValue(); }
+   @CodeGenUse
    public double getSynapseDelay () { return synapseDelay.getValue(); }
 }

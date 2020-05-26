@@ -4,7 +4,7 @@ Each concrete Java class in this directory implements a specific kind of network
 can combine different kinds of network modules and may contain multiple module instances of the same kind with
 possibly different parameters.
 
-Abstract classes are used to factor out common traits of multiple module kinds with similar parametrization
+Abstract classes factor out common traits of multiple module kinds with similar parametrization
 requirements.
 
 ## Constituent files for each module kind
