@@ -24,7 +24,7 @@ generic type parameter `T` represents the data type of the property value. Typic
 implementations include properties that represent
 
 * integral or floating-point values (data type `int` or `double`), possibly with a restricted range of values,
-  like strictly positive values or probabilities in range `0.0` to `1.0`and an optional unit of measurement;
+  like strictly positive values or probabilities in range `0.0` to `1.0` and an optional unit of measurement;
 
 * references to other language entities, most notably a neuron type or a synapse type;
 
@@ -114,7 +114,7 @@ build_winner_take_all(<winner.numberOfPopulations>, <winner.numberOfNeuronsPerPo
 ```
 
 The template `build_winner_instance` receives the Java representation of a specific module instance as its
-parameter `winner` and uses the following two mechanisms pass information about the module instance from the
+parameter `winner` and uses the following two mechanisms to pass information about the module instance from the
 visual editor to the Python code that creates the instance when the simulation is started.
 
 1. For simple properties (numbers, text annotations) the code template invokes the public Java getter methods on the
